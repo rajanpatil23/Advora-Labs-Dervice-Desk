@@ -401,7 +401,7 @@ export default function Tickets() {
           </div>
 
           {/* Conversation + side panel */}
-          <div className="flex-1 min-h-0 grid grid-cols-1 xl:grid-cols-[1fr_300px]">
+          <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-[1fr_280px] 2xl:grid-cols-[1fr_320px]">
             <div className="flex flex-col min-h-0">
               <div ref={threadRef} className="flex-1 overflow-y-auto px-5 py-4 space-y-3">
                 {selected.messages.map((m, idx) => {
