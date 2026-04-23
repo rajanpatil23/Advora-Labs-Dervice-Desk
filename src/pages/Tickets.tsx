@@ -500,7 +500,7 @@ export default function Tickets() {
             </div>
 
             {/* Right side panel */}
-            <aside className="hidden xl:flex flex-col border-l border-border bg-surface/30 overflow-y-auto">
+            <aside className="hidden lg:flex flex-col border-l border-border bg-surface/30 overflow-y-auto min-w-0">
               <Section title="Requester">
                 {requester && (
                   <div className="space-y-2.5">
