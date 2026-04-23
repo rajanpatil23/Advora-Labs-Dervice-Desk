@@ -7,9 +7,12 @@ import {
   Filter, Inbox, Star, Clock, AlertTriangle, ChevronDown, Paperclip, Send,
   Lock, MoreHorizontal, Tag, Building2, Mail, Phone, Globe, MessageSquare,
   Plus, Sparkles, Search, CheckCircle2, ArrowUpRight, Zap, CornerDownLeft,
-  X, SlidersHorizontal, Hash, Reply, Bookmark, FileText, ChevronRight,
+  X, SlidersHorizontal, Hash, Reply, Bookmark, FileText, ChevronRight, Trash2,
 } from "lucide-react";
 import type { Priority, TicketStatus } from "@/lib/types";
+import { NewTicketDialog } from "@/components/dialogs/NewTicketDialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import { toast } from "sonner";
 
 const queues = [
   { key: "all", label: "All tickets", icon: Inbox },
@@ -186,9 +189,13 @@ export default function Tickets() {
                 <h2 className="font-display font-bold text-[15px]">Tickets</h2>
                 <span className="text-[11px] text-muted-foreground tabular-nums">{filtered.length}</span>
               </div>
-              <button className="h-7 w-7 rounded-md flex items-center justify-center hover:bg-surface-2 text-muted-foreground hover:text-foreground transition-colors" title="New ticket">
-                <Plus className="h-4 w-4" />
-              </button>
+              <NewTicketDialog
+                trigger={
+                  <button className="h-7 w-7 rounded-md flex items-center justify-center hover:bg-surface-2 text-muted-foreground hover:text-foreground transition-colors" title="New ticket">
+                    <Plus className="h-4 w-4" />
+                  </button>
+                }
+              />
             </div>
             <div className="relative">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
