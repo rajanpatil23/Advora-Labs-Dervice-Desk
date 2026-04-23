@@ -138,9 +138,9 @@ export default function Tickets() {
 
   return (
     <div className="h-full flex bg-background">
-      {/* Queue rail — icon-only, hover for label */}
-      <div className="hidden lg:flex w-14 shrink-0 flex-col items-center border-r border-border bg-surface/40 py-3 gap-1">
-        <div className="text-[9px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Queue</div>
+      {/* Queue rail — expanded with labels */}
+      <div className="hidden lg:flex w-[200px] shrink-0 flex-col border-r border-border bg-surface/40 py-3 px-2 gap-0.5">
+        <div className="px-2 pb-1 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Queue</div>
         {queues.map(q => {
           const Icon = q.icon;
           const active = queue === q.key;
@@ -153,36 +153,39 @@ export default function Tickets() {
             <button
               key={q.key}
               onClick={() => setQueue(q.key)}
-              title={`${q.label} (${count})`}
+              title={q.label}
               className={cn(
-                "relative h-9 w-9 rounded-lg flex items-center justify-center transition-colors",
-                active ? "bg-primary/10 text-primary" : "hover:bg-surface-2 text-foreground/70 hover:text-foreground"
+                "h-8 px-2 rounded-md flex items-center gap-2 text-[12px] font-medium transition-colors",
+                active ? "bg-primary/10 text-primary" : "hover:bg-surface-2 text-foreground/75 hover:text-foreground"
               )}
             >
-              <Icon className="h-4 w-4" />
+              <Icon className="h-3.5 w-3.5 shrink-0" />
+              <span className="flex-1 text-left truncate">{q.label}</span>
               {count > 0 && (
                 <span className={cn(
-                  "absolute -top-0.5 -right-0.5 h-4 min-w-[16px] px-1 rounded-full text-[9px] font-semibold flex items-center justify-center",
-                  active ? "bg-primary text-primary-foreground" : "bg-surface-2 text-foreground/70 border border-border"
+                  "text-[10px] tabular-nums px-1.5 rounded-full",
+                  active ? "bg-primary text-primary-foreground" : "bg-surface-2 text-muted-foreground"
                 )}>{count}</span>
               )}
             </button>
           );
         })}
-        <div className="my-2 h-px w-6 bg-border" />
-        <div className="text-[9px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Tags</div>
+        <div className="my-2 h-px bg-border" />
+        <div className="px-2 pb-1 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Tags</div>
         {["urgent","vpn","sso","onboarding","security"].map(t => (
           <button
             key={t}
             title={`#${t}`}
-            className="h-8 w-8 rounded-md flex items-center justify-center hover:bg-surface-2 text-muted-foreground hover:text-foreground transition-colors"
+            className="h-7 px-2 rounded-md flex items-center gap-2 text-[12px] text-muted-foreground hover:text-foreground hover:bg-surface-2 transition-colors"
           >
-            <Hash className="h-3.5 w-3.5" />
+            <Hash className="h-3 w-3 shrink-0" />
+            <span className="truncate">{t}</span>
           </button>
         ))}
         <div className="mt-auto pt-2" title="Shortcuts: j/k navigate · r reply · / search · ⌘↵ send">
-          <div className="h-8 w-8 rounded-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-surface-2 cursor-help">
-            <Zap className="h-3.5 w-3.5" />
+          <div className="h-7 px-2 rounded-md flex items-center gap-2 text-[11px] text-muted-foreground hover:text-foreground hover:bg-surface-2 cursor-help">
+            <Zap className="h-3 w-3" />
+            <span>Shortcuts</span>
           </div>
         </div>
       </div>
