@@ -47,7 +47,7 @@ export default function Settings() {
 
           <div className="panel p-6 space-y-5">
             {sel === "company" && (
-              <>
+              <form onSubmit={saveCompany} className="space-y-5">
                 <div>
                   <div className="font-display font-semibold">Company profile</div>
                   <div className="text-xs text-muted-foreground">How your support workspace appears to customers.</div>
@@ -55,16 +55,17 @@ export default function Settings() {
                 <Field label="Company name" defaultValue="Connecttly" />
                 <Field label="Support email" defaultValue="support@connecttly.io" />
                 <Field label="Time zone" defaultValue="Europe/Stockholm" />
-              </>
+                <button type="submit" className="h-9 px-4 rounded-lg bg-gradient-primary text-primary-foreground text-sm font-semibold">Save changes</button>
+              </form>
             )}
             {sel === "categories" && (
               <>
                 <div className="font-display font-semibold">Ticket categories</div>
                 <div className="flex flex-wrap gap-2">
-                  {["Network","Hardware","Access","Software","Email","Security","Cloud","Mobile"].map(c => (
-                    <span key={c} className="px-3 py-1.5 rounded-lg bg-surface-2 text-sm border border-border">{c} <button className="ml-2 text-muted-foreground">×</button></span>
+                  {cats.map(c => (
+                    <span key={c} className="px-3 py-1.5 rounded-lg bg-surface-2 text-sm border border-border">{c} <button onClick={() => removeCategory(c)} className="ml-2 text-muted-foreground hover:text-destructive">×</button></span>
                   ))}
-                  <button className="px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-sm">+ Add category</button>
+                  <button onClick={addCategory} className="px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-sm">+ Add category</button>
                 </div>
               </>
             )}
