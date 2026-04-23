@@ -2,6 +2,7 @@ import { useState } from "react";
 import { logs } from "@/lib/mockData";
 import { timeAgo } from "@/lib/format";
 import { Filter } from "lucide-react";
+import { toast } from "sonner";
 
 const typeColor: Record<string, string> = {
   ticket: "bg-primary/10 text-primary",
@@ -28,7 +29,7 @@ export default function Logs() {
               className={`text-xs px-3 py-1.5 rounded-lg font-medium capitalize transition-colors ${filter === f ? "bg-primary text-primary-foreground" : "bg-surface-2 text-foreground/70 hover:bg-muted"}`}
             >{f}</button>
           ))}
-          <button className="ml-auto text-xs px-3 py-1.5 rounded-lg bg-surface-2 flex items-center gap-1.5"><Filter className="h-3 w-3" /> More filters</button>
+          <button onClick={() => toast.message("More filters", { description: "Filter by date, actor or target — coming soon." })} className="ml-auto text-xs px-3 py-1.5 rounded-lg bg-surface-2 flex items-center gap-1.5"><Filter className="h-3 w-3" /> More filters</button>
         </div>
 
         <div className="panel overflow-hidden">

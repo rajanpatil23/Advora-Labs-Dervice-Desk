@@ -2,9 +2,17 @@ import { customers } from "@/lib/mockData";
 import { Avatar } from "@/components/common/Chips";
 import { Building2, Mail } from "lucide-react";
 import { useAppStore } from "@/lib/store";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 export default function Users() {
-  const { tickets } = useAppStore();
+  const { tickets, setSelectedTicket } = useAppStore();
+  const nav = useNavigate();
+  const openCustomer = (cid: string) => {
+    const t = tickets.find(t => t.requesterId === cid);
+    if (t) { setSelectedTicket(t.id); nav("/app/tickets"); toast.message("Opened latest ticket", { description: t.number }); }
+    else toast.message("No tickets for this customer yet");
+  };
   return (
     <div className="h-full overflow-y-auto">
       <div className="px-6 lg:px-8 py-6 max-w-[1600px] mx-auto space-y-6">
@@ -19,7 +27,7 @@ export default function Users() {
             const open = tickets.filter(t => t.requesterId === c.id && t.status !== "resolved" && t.status !== "closed").length;
             const total = tickets.filter(t => t.requesterId === c.id).length;
             return (
-              <div key={c.id} className="panel-elev p-5 hover:shadow-lg transition-shadow">
+              <button key={c.id} onClick={() => openCustomer(c.id)} className="text-left panel-elev p-5 hover:shadow-lg transition-shadow w-full">
                 <div className="flex items-start gap-3">
                   <Avatar initials={c.initials} color={c.avatarColor} size={48} />
                   <div className="min-w-0 flex-1">
@@ -33,7 +41,7 @@ export default function Users() {
                   <KV label="Open" value={open} tone="primary" />
                   <KV label="Tier" value="Pro" />
                 </div>
-              </div>
+              </button>
             );
           })}
         </div>

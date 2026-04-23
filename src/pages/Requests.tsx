@@ -1,9 +1,10 @@
-import { useAppStore, findUser } from "@/lib/store";
+import { useAppStore, findUser, agents } from "@/lib/store";
 import { catalog } from "@/lib/mockData";
 import { Avatar } from "@/components/common/Chips";
 import { timeAgo } from "@/lib/format";
 import * as Icons from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 const statusChip: Record<string,string> = {
   submitted: "bg-info/10 text-info",
@@ -14,7 +15,19 @@ const statusChip: Record<string,string> = {
 };
 
 export default function Requests() {
-  const { requests } = useAppStore();
+  const { requests, addTicket } = useAppStore();
+  const requestItem = (item: typeof catalog[number]) => {
+    const t = addTicket({
+      title: `Service request: ${item.title}`,
+      description: item.description,
+      requesterId: "c1",
+      assigneeId: agents[0].id,
+      priority: "medium",
+      category: item.catalog,
+      channel: "portal",
+    });
+    toast.success(`Request submitted as ${t.number}`, { description: `Est. delivery: ${item.estimate}` });
+  };
   return (
     <div className="h-full overflow-y-auto">
       <div className="px-6 lg:px-8 py-6 max-w-[1600px] mx-auto space-y-6">
@@ -28,7 +41,7 @@ export default function Requests() {
           {catalog.map(item => {
             const Icon = (Icons as any)[item.icon] ?? Icons.Package;
             return (
-              <button key={item.id} className="group panel-elev p-5 text-left hover:-translate-y-0.5 transition-transform">
+              <button key={item.id} onClick={() => requestItem(item)} className="group panel-elev p-5 text-left hover:-translate-y-0.5 transition-transform">
                 <div className="flex items-center gap-3">
                   <div className="h-11 w-11 rounded-xl bg-gradient-primary/15 text-primary flex items-center justify-center group-hover:bg-gradient-primary group-hover:text-primary-foreground transition-all">
                     <Icon className="h-5 w-5" />

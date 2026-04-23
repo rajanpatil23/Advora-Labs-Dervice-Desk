@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, Ticket, AlertOctagon, ClipboardList, Users, UserCog,
   Timer, BookOpen, BarChart3, ScrollText, Settings, Sparkles, LogOut,
   PanelLeftClose, PanelLeft
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 const items = [
   { to: "/app/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -23,6 +24,7 @@ const items = [
 
 export function AppSidebar() {
   const loc = useLocation();
+  const nav = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
 
   return (
@@ -110,17 +112,17 @@ export function AppSidebar() {
       )}
 
       <div className={cn("pb-3", collapsed ? "px-2" : "px-3")}>
-        <NavLink
-          to="/"
+        <button
+          onClick={() => { toast.success("Signed out"); nav("/"); }}
           title={collapsed ? "Sign out" : undefined}
           className={cn(
-            "flex items-center rounded-lg text-xs text-sidebar-foreground/70 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground transition-colors",
+            "w-full flex items-center rounded-lg text-xs text-sidebar-foreground/70 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground transition-colors",
             collapsed ? "justify-center h-10 w-10 mx-auto" : "gap-2 px-3 py-2"
           )}
         >
           <LogOut className="h-3.5 w-3.5" />
           {!collapsed && <span>Sign out</span>}
-        </NavLink>
+        </button>
       </div>
     </aside>
   );

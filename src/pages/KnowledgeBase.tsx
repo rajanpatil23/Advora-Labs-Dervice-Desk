@@ -2,6 +2,7 @@ import { useState } from "react";
 import { articles } from "@/lib/mockData";
 import { Search, ThumbsUp, Eye, BookOpen, ChevronRight } from "lucide-react";
 import { timeAgo } from "@/lib/format";
+import { toast } from "sonner";
 
 export default function KnowledgeBase() {
   const [q, setQ] = useState("");
@@ -58,8 +59,8 @@ export default function KnowledgeBase() {
               <div className="text-xs text-muted-foreground">{sel.helpful}% of {sel.views} readers found this useful.</div>
             </div>
             <div className="flex gap-2">
-              <button className="px-3 py-1.5 rounded-lg bg-success/10 text-success text-xs font-semibold flex items-center gap-1.5"><ThumbsUp className="h-3.5 w-3.5" /> Yes</button>
-              <button className="px-3 py-1.5 rounded-lg bg-surface-2 text-xs font-semibold">No</button>
+              <button onClick={() => toast.success("Thanks for your feedback!")} className="px-3 py-1.5 rounded-lg bg-success/10 text-success text-xs font-semibold flex items-center gap-1.5"><ThumbsUp className="h-3.5 w-3.5" /> Yes</button>
+              <button onClick={() => toast.message("Thanks — we'll improve this article.")} className="px-3 py-1.5 rounded-lg bg-surface-2 text-xs font-semibold">No</button>
             </div>
           </div>
         </div>

@@ -2,6 +2,8 @@ import { useAppStore, findAgent } from "@/lib/store";
 import { Avatar } from "@/components/common/Chips";
 import { timeAgo } from "@/lib/format";
 import { AlertOctagon, Activity, ShieldAlert, Layers, Server } from "lucide-react";
+import { NewIncidentDialog } from "@/components/dialogs/NewIncidentDialog";
+import { toast } from "sonner";
 
 const sevColors: Record<number, string> = { 1: "bg-destructive text-destructive-foreground", 2: "bg-accent text-accent-foreground", 3: "bg-warning text-warning-foreground", 4: "bg-info text-info-foreground" };
 const statusColor: Record<string,string> = { investigating: "bg-destructive/10 text-destructive", identified: "bg-warning/10 text-warning", monitoring: "bg-info/10 text-info", resolved: "bg-success/10 text-success" };
@@ -22,7 +24,11 @@ export default function Incidents() {
         <div className="panel overflow-hidden">
           <div className="px-5 py-4 border-b border-border flex items-center justify-between">
             <div className="font-display font-semibold">Active incidents</div>
-            <button className="text-xs px-3 py-1.5 rounded-lg bg-gradient-primary text-primary-foreground font-semibold">+ New incident</button>
+            <NewIncidentDialog
+              trigger={
+                <button className="text-xs px-3 py-1.5 rounded-lg bg-gradient-primary text-primary-foreground font-semibold">+ New incident</button>
+              }
+            />
           </div>
           <table className="w-full text-sm">
             <thead className="text-[10px] uppercase tracking-wider text-muted-foreground bg-surface-2/50">
@@ -40,7 +46,8 @@ export default function Incidents() {
               {incidents.map(i => {
                 const owner = findAgent(i.ownerId);
                 return (
-                  <tr key={i.id} className="border-t border-border hover:bg-surface-2/40 transition-colors">
+                  <tr key={i.id} onClick={() => toast.message(`${i.number} · ${i.title}`, { description: `${i.service} · SEV ${i.severity} · ${i.status}` })}
+                    className="border-t border-border hover:bg-surface-2/40 transition-colors cursor-pointer">
                     <td className="px-5 py-3">
                       <div className="font-mono text-[10px] text-muted-foreground">{i.number}</div>
                       <div className="font-medium">{i.title}</div>
