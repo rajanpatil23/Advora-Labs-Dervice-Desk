@@ -1,6 +1,7 @@
 import { useAppStore } from "@/lib/store";
 import { Building2, Bell, Palette, ShieldCheck, Tag, Users } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 const sections = [
   { id: "company", label: "Company", icon: Building2 },
