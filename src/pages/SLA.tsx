@@ -2,6 +2,7 @@ import { slaPolicies } from "@/lib/mockData";
 import { useAppStore } from "@/lib/store";
 import { PriorityChip } from "@/components/common/Chips";
 import { Timer, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { toast } from "sonner";
 
 export default function SLA() {
   const { tickets } = useAppStore();
@@ -28,7 +29,7 @@ export default function SLA() {
         <div className="panel overflow-hidden">
           <div className="px-5 py-4 border-b border-border flex items-center justify-between">
             <div className="font-display font-semibold">SLA Policies</div>
-            <button className="text-xs px-3 py-1.5 rounded-lg bg-gradient-primary text-primary-foreground font-semibold">+ New policy</button>
+            <button onClick={() => toast.success("New SLA policy", { description: "Policy editor coming soon." })} className="text-xs px-3 py-1.5 rounded-lg bg-gradient-primary text-primary-foreground font-semibold">+ New policy</button>
           </div>
           <table className="w-full text-sm">
             <thead className="text-[10px] uppercase tracking-wider text-muted-foreground bg-surface-2/50">
@@ -42,7 +43,8 @@ export default function SLA() {
             </thead>
             <tbody>
               {slaPolicies.map(p => (
-                <tr key={p.id} className="border-t border-border hover:bg-surface-2/40">
+                <tr key={p.id} onClick={() => toast.message(p.name, { description: `${fmt(p.responseMins)} response · ${fmt(p.resolutionMins)} resolution` })}
+                  className="border-t border-border hover:bg-surface-2/40 cursor-pointer">
                   <td className="px-5 py-4 font-medium">{p.name}</td>
                   <td className="py-4"><PriorityChip priority={p.priority} /></td>
                   <td className="py-4 text-xs font-mono">{fmt(p.responseMins)}</td>

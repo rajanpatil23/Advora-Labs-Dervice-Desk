@@ -2,13 +2,28 @@ import { useAppStore } from "@/lib/store";
 import { agents } from "@/lib/mockData";
 import { Download } from "lucide-react";
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, BarChart, Bar, CartesianGrid } from "recharts";
+import { toast } from "sonner";
+import { useState } from "react";
 
 export default function Reports() {
   const { tickets } = useAppStore();
+  const [period, setPeriod] = useState("Last 12 months");
   const volume = Array.from({ length: 12 }, (_, i) => ({ m: `M${i+1}`, vol: 80 + Math.round(Math.sin(i/2)*30 + Math.random()*40) }));
   const resTime = Array.from({ length: 12 }, (_, i) => ({ m: `M${i+1}`, h: 6 + Math.round(Math.cos(i/2)*3 + Math.random()*4) }));
   const cats = ["Network","Hardware","Access","Software","Email","Security","Cloud"].map(c => ({ name: c, count: tickets.filter(t => t.category === c).length }));
   const perf = agents.slice(0,8).map(a => ({ name: a.name.split(" ")[0], resolved: a.resolved, rating: a.rating * 20 }));
+
+  const exportCsv = () => {
+    const rows = [["Number","Title","Status","Priority","Category","SLA","Updated"],
+      ...tickets.map(t => [t.number, t.title.replace(/,/g, ";"), t.status, t.priority, t.category, t.slaState, t.updatedAt])];
+    const csv = rows.map(r => r.join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = `connecttly-tickets-${Date.now()}.csv`; a.click();
+    URL.revokeObjectURL(url);
+    toast.success("Report exported", { description: `${tickets.length} tickets exported as CSV` });
+  };
 
   return (
     <div className="h-full overflow-y-auto">
@@ -19,10 +34,10 @@ export default function Reports() {
             <h1 className="text-2xl lg:text-3xl font-display font-bold mt-1">Reports</h1>
           </div>
           <div className="flex gap-2">
-            <select className="h-10 px-3 rounded-lg bg-surface border border-border text-sm">
+            <select value={period} onChange={e => setPeriod(e.target.value)} className="h-10 px-3 rounded-lg bg-surface border border-border text-sm">
               <option>Last 12 months</option><option>Last 90 days</option><option>Last 30 days</option>
             </select>
-            <button className="h-10 px-4 rounded-lg bg-gradient-primary text-primary-foreground text-sm font-semibold flex items-center gap-2"><Download className="h-4 w-4" /> Export</button>
+            <button onClick={exportCsv} className="h-10 px-4 rounded-lg bg-gradient-primary text-primary-foreground text-sm font-semibold flex items-center gap-2"><Download className="h-4 w-4" /> Export</button>
           </div>
         </div>
 
