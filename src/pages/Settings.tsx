@@ -15,6 +15,13 @@ const sections = [
 export default function Settings() {
   const [sel, setSel] = useState("company");
   const { theme, toggleTheme } = useAppStore();
+  const [cats, setCats] = useState(["Network","Hardware","Access","Software","Email","Security","Cloud","Mobile"]);
+  const addCategory = () => {
+    const name = window.prompt("New category name");
+    if (name && name.trim()) { setCats([...cats, name.trim()]); toast.success(`Added “${name.trim()}”`); }
+  };
+  const removeCategory = (c: string) => { setCats(cats.filter(x => x !== c)); toast.message(`Removed “${c}”`); };
+  const saveCompany = (e: React.FormEvent) => { e.preventDefault(); toast.success("Settings saved"); };
 
   return (
     <div className="h-full overflow-y-auto">
