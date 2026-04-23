@@ -355,8 +355,21 @@ export default function Tickets() {
                   <ArrowUpRight className="h-3.5 w-3.5" /> Escalate
                 </button>
                 <div className="w-px h-5 bg-border mx-1" />
-                <button className="h-8 w-8 rounded-md flex items-center justify-center hover:bg-surface-2 text-muted-foreground"><Bookmark className="h-4 w-4" /></button>
-                <button className="h-8 w-8 rounded-md flex items-center justify-center hover:bg-surface-2 text-muted-foreground"><MoreHorizontal className="h-4 w-4" /></button>
+                <button onClick={() => toast.success("Bookmarked")} className="h-8 w-8 rounded-md flex items-center justify-center hover:bg-surface-2 text-muted-foreground" title="Bookmark"><Bookmark className="h-4 w-4" /></button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="h-8 w-8 rounded-md flex items-center justify-center hover:bg-surface-2 text-muted-foreground" title="More"><MoreHorizontal className="h-4 w-4" /></button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuItem onClick={() => useAppStore.getState().setStatus(selected.id, "on_hold")}>Put on hold</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => useAppStore.getState().setStatus(selected.id, "closed")}>Close ticket</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => { navigator.clipboard?.writeText(selected.number); toast.success("Ticket number copied"); }}>Copy ticket number</DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => { useAppStore.getState().deleteTicket(selected.id); toast.success("Ticket deleted"); }} className="text-destructive">
+                      <Trash2 className="h-4 w-4 mr-2" /> Delete
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
 
