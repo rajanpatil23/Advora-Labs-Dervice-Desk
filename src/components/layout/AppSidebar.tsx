@@ -6,14 +6,14 @@ import {
 import { cn } from "@/lib/utils";
 
 const items = [
-  { to: "/app", label: "Dashboard", icon: LayoutDashboard, end: true },
-  { to: "/app/tickets", label: "Tickets", icon: Ticket, badge: "24" },
+  { to: "/app", label: "Tickets", icon: Ticket, badge: "24", end: true },
   { to: "/app/incidents", label: "Incidents", icon: AlertOctagon, badge: "3" },
   { to: "/app/requests", label: "Service Requests", icon: ClipboardList },
   { to: "/app/users", label: "Users", icon: Users },
   { to: "/app/agents", label: "Agents", icon: UserCog },
   { to: "/app/sla", label: "SLA", icon: Timer },
   { to: "/app/kb", label: "Knowledge Base", icon: BookOpen },
+  { to: "/app/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/app/reports", label: "Reports", icon: BarChart3 },
   { to: "/app/logs", label: "Activity Logs", icon: ScrollText },
   { to: "/app/settings", label: "Settings", icon: Settings },
