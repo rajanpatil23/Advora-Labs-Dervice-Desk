@@ -79,6 +79,61 @@ export const useAppStore = create<AppState>((set, get) => ({
     const a = agents.find(a => a.id === agentId);
     get().addActivity(id, { type: "assigned", text: a ? `Assigned to ${a.name}` : "Unassigned", by: agents[0].name });
   },
+  addTicket: (input) => {
+    const nextNum = 1000 + get().tickets.length + 1;
+    const nowIso = new Date().toISOString();
+    const dueOffset = input.priority === "critical" ? 4 : input.priority === "high" ? 12 : input.priority === "medium" ? 24 : 72;
+    const ticket: Ticket = {
+      id: `t${Math.floor(Math.random()*1e9)}`,
+      number: `CN-${nextNum}`,
+      title: input.title,
+      description: input.description ?? "",
+      requesterId: input.requesterId,
+      assigneeId: input.assigneeId,
+      priority: input.priority,
+      status: "new",
+      category: input.category,
+      subcategory: "Request",
+      tags: [],
+      createdAt: nowIso,
+      updatedAt: nowIso,
+      dueAt: new Date(Date.now() + dueOffset * 3600000).toISOString(),
+      responseDueAt: new Date(Date.now() + (dueOffset / 4) * 3600000).toISOString(),
+      slaState: "on_track",
+      channel: input.channel ?? "portal",
+      messages: [],
+      activity: [{ id: `e${Date.now()}`, type: "created", text: "Ticket created", by: agents[0].name, at: nowIso }],
+      attachments: [],
+    };
+    set({ tickets: [ticket, ...get().tickets], selectedTicketId: ticket.id });
+    return ticket;
+  },
+  addIncident: (input) => {
+    const nextNum = 200 + get().incidents.length + 1;
+    const nowIso = new Date().toISOString();
+    const incident: Incident = {
+      id: `i${Math.floor(Math.random()*1e9)}`,
+      number: `INC-${nextNum}`,
+      title: input.title,
+      service: input.service,
+      impact: "medium",
+      urgency: "medium",
+      severity: input.severity,
+      status: "investigating",
+      escalation: 1,
+      createdAt: nowIso,
+      updatedAt: nowIso,
+      ownerId: input.ownerId,
+      affected: input.affected ?? 0,
+      timeline: [{ id: `e${Date.now()}`, type: "created", text: "Incident opened", by: agents[0].name, at: nowIso }],
+    };
+    set({ incidents: [incident, ...get().incidents] });
+    return incident;
+  },
+  deleteTicket: (id) => set({
+    tickets: get().tickets.filter(t => t.id !== id),
+    selectedTicketId: get().selectedTicketId === id ? (get().tickets.find(t => t.id !== id)?.id ?? null) : get().selectedTicketId,
+  }),
   toggleTheme: () => {
     const next = get().theme === "dark" ? "light" : "dark";
     document.documentElement.classList.toggle("dark", next === "dark");
