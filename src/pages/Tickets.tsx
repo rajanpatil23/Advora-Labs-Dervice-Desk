@@ -127,6 +127,7 @@ export default function Tickets() {
   const send = () => {
     if (!selected || !reply.trim()) return;
     addMessage(selected.id, reply.trim(), internal);
+    toast.success(internal ? "Internal note added" : "Reply sent");
     setReply("");
   };
 
