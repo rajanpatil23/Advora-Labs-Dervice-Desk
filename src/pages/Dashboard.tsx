@@ -4,9 +4,11 @@ import { timeAgo } from "@/lib/format";
 import { findUser } from "@/lib/store";
 import { ArrowUpRight, Ticket as TicketIcon, AlertOctagon, CheckCircle2, Timer, TrendingUp, Activity } from "lucide-react";
 import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, Tooltip, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, RadialBarChart, RadialBar } from "recharts";
+import { useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
-  const { tickets } = useAppStore();
+  const { tickets, setSelectedTicket } = useAppStore();
+  const nav = useNavigate();
   const open = tickets.filter(t => t.status !== "resolved" && t.status !== "closed").length;
   const overdue = tickets.filter(t => t.slaState === "breached").length;
   const atRisk = tickets.filter(t => t.slaState === "at_risk").length;
@@ -52,7 +54,7 @@ export default function Dashboard() {
               <button className="px-4 py-2 rounded-xl bg-surface border border-border text-sm font-medium hover:bg-surface-2 transition-colors flex items-center gap-2">
                 Last 30 days <TrendingUp className="h-4 w-4" />
               </button>
-              <button className="px-4 py-2 rounded-xl bg-gradient-primary text-primary-foreground text-sm font-semibold hover:shadow-glow transition-shadow flex items-center gap-2">
+              <button onClick={() => nav("/app/tickets")} className="px-4 py-2 rounded-xl bg-gradient-primary text-primary-foreground text-sm font-semibold hover:shadow-glow transition-shadow flex items-center gap-2">
                 Open agent workspace <ArrowUpRight className="h-4 w-4" />
               </button>
             </div>
@@ -167,7 +169,8 @@ export default function Dashboard() {
               {highPriority.map(t => {
                 const r = findUser(t.requesterId);
                 return (
-                  <div key={t.id} className="flex items-center gap-3 py-2.5 px-2 rounded-lg hover:bg-surface-2 transition-colors">
+                  <button key={t.id} onClick={() => { setSelectedTicket(t.id); nav("/app/tickets"); }}
+                    className="w-full text-left flex items-center gap-3 py-2.5 px-2 rounded-lg hover:bg-surface-2 transition-colors">
                     <PriorityChip priority={t.priority} />
                     <div className="min-w-0 flex-1">
                       <div className="text-sm font-medium truncate">{t.title}</div>
@@ -177,7 +180,7 @@ export default function Dashboard() {
                     </div>
                     <StatusChip status={t.status} />
                     <SlaChip state={t.slaState} />
-                  </div>
+                  </button>
                 );
               })}
             </div>

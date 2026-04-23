@@ -19,7 +19,7 @@ export default function Users() {
             const open = tickets.filter(t => t.requesterId === c.id && t.status !== "resolved" && t.status !== "closed").length;
             const total = tickets.filter(t => t.requesterId === c.id).length;
             return (
-              <div key={c.id} className="panel-elev p-5 hover:shadow-lg transition-shadow">
+              <button key={c.id} onClick={() => openCustomer(c.id)} className="text-left panel-elev p-5 hover:shadow-lg transition-shadow w-full">
                 <div className="flex items-start gap-3">
                   <Avatar initials={c.initials} color={c.avatarColor} size={48} />
                   <div className="min-w-0 flex-1">
@@ -33,7 +33,7 @@ export default function Users() {
                   <KV label="Open" value={open} tone="primary" />
                   <KV label="Tier" value="Pro" />
                 </div>
-              </div>
+              </button>
             );
           })}
         </div>
