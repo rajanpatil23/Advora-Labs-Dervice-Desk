@@ -25,7 +25,7 @@ const items = [
 export function AppSidebar() {
   const loc = useLocation();
   const nav = useNavigate();
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
 
   return (
     <aside
