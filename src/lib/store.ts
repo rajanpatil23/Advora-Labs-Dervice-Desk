@@ -23,7 +23,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   incidents: seedIncidents,
   requests: seedRequests,
   selectedTicketId: seedTickets[0]?.id ?? null,
-  theme: "dark",
+  theme: "light",
   setSelectedTicket: (id) => set({ selectedTicketId: id }),
   updateTicket: (id, patch) => set({
     tickets: get().tickets.map(t => t.id === id ? { ...t, ...patch, updatedAt: new Date().toISOString() } : t),
