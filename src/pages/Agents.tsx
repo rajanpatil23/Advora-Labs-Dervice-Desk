@@ -1,6 +1,7 @@
 import { agents } from "@/lib/mockData";
 import { Avatar } from "@/components/common/Chips";
 import { Star, Mail, Trophy } from "lucide-react";
+import { toast } from "sonner";
 
 export default function AgentsPage() {
   return (
@@ -14,7 +15,8 @@ export default function AgentsPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {agents.map(a => (
-            <div key={a.id} className="panel-elev p-5 relative overflow-hidden">
+            <button key={a.id} onClick={() => toast.message(a.name, { description: `${a.team} · ${a.workload} active · ${a.resolved} resolved` })}
+              className="text-left panel-elev p-5 relative overflow-hidden hover:shadow-lg transition-shadow">
               <div className="absolute -top-10 -right-10 h-32 w-32 rounded-full bg-gradient-primary opacity-10 blur-2xl pointer-events-none" />
               <div className="flex items-start gap-3">
                 <Avatar initials={a.initials} color={a.avatarColor} size={48} online={a.online} />
@@ -52,7 +54,7 @@ export default function AgentsPage() {
                   <Trophy className="h-3 w-3" /> Top performer
                 </div>
               )}
-            </div>
+            </button>
           ))}
         </div>
       </div>
