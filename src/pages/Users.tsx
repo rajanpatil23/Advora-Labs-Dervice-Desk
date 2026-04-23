@@ -2,9 +2,17 @@ import { customers } from "@/lib/mockData";
 import { Avatar } from "@/components/common/Chips";
 import { Building2, Mail } from "lucide-react";
 import { useAppStore } from "@/lib/store";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 export default function Users() {
-  const { tickets } = useAppStore();
+  const { tickets, setSelectedTicket } = useAppStore();
+  const nav = useNavigate();
+  const openCustomer = (cid: string) => {
+    const t = tickets.find(t => t.requesterId === cid);
+    if (t) { setSelectedTicket(t.id); nav("/app/tickets"); toast.message("Opened latest ticket", { description: t.number }); }
+    else toast.message("No tickets for this customer yet");
+  };
   return (
     <div className="h-full overflow-y-auto">
       <div className="px-6 lg:px-8 py-6 max-w-[1600px] mx-auto space-y-6">
