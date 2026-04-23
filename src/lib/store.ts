@@ -2,6 +2,24 @@ import { create } from "zustand";
 import { tickets as seedTickets, incidents as seedIncidents, serviceRequests as seedRequests, agents, customers } from "./mockData";
 import type { Ticket, Incident, ServiceRequest, Priority, TicketStatus, Message, ActivityEvent } from "./types";
 
+export interface NewTicketInput {
+  title: string;
+  description?: string;
+  requesterId: string;
+  assigneeId?: string;
+  priority: Priority;
+  category: string;
+  channel?: Ticket["channel"];
+}
+
+export interface NewIncidentInput {
+  title: string;
+  service: string;
+  severity: 1 | 2 | 3 | 4;
+  ownerId: string;
+  affected?: number;
+}
+
 interface AppState {
   tickets: Ticket[];
   incidents: Incident[];
@@ -15,6 +33,9 @@ interface AppState {
   setStatus: (id: string, status: TicketStatus) => void;
   setPriority: (id: string, priority: Priority) => void;
   setAssignee: (id: string, agentId: string | undefined) => void;
+  addTicket: (input: NewTicketInput) => Ticket;
+  addIncident: (input: NewIncidentInput) => Incident;
+  deleteTicket: (id: string) => void;
   toggleTheme: () => void;
 }
 
