@@ -28,8 +28,7 @@ export function Topbar() {
   const onSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (!search.trim()) return;
-    nav("/app/tickets");
-    toast.message("Searching tickets…", { description: `Query: "${search}"` });
+    nav(`/app/tickets?q=${encodeURIComponent(search.trim())}`);
   };
 
   const notifs = tickets.filter(t => t.slaState === "at_risk" || t.slaState === "breached").slice(0, 5);
@@ -148,7 +147,11 @@ export function Topbar() {
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel>{profile?.email}</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => nav("/app/agents")}><UserIcon className="h-4 w-4 mr-2" /> Profile</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => {
+              toast.message(profile?.full_name || profile?.email || "Profile", {
+                description: `${currentRole?.toUpperCase()} · ${currentOrg?.org_name ?? ""}`,
+              });
+            }}><UserIcon className="h-4 w-4 mr-2" /> Profile</DropdownMenuItem>
             <DropdownMenuItem onClick={() => nav("/app/settings")}><SettingsIcon className="h-4 w-4 mr-2" /> Settings</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleSignOut}>
