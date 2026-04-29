@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import type { Priority, TicketStatus } from "@/lib/types";
 import { NewTicketDialog } from "@/components/dialogs/NewTicketDialog";
+import { AssistSuggestButton, AssistInsightsPanel } from "@/components/tickets/AiAssist";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { PresenceBubbles } from "@/components/common/Presence";
@@ -501,7 +502,11 @@ export default function Tickets() {
                   ><Lock className="h-3 w-3" /> Internal note</button>
                   <div className="ml-auto flex items-center gap-1">
                     <TemplateMenu onPick={(body) => setReply(body.replace("{name}", requester?.name.split(" ")[0] ?? "there"))} />
-                    <button className="text-[11px] text-primary hover:underline flex items-center gap-1 px-2 py-1"><Sparkles className="h-3 w-3" /> AI suggest</button>
+                    <AssistSuggestButton
+                      ticket={selected}
+                      requesterName={requester?.name}
+                      onSuggestion={(text) => setReply(text)}
+                    />
                   </div>
                 </div>
                 <div className={cn("rounded-xl border bg-surface p-2.5 transition-all focus-within:ring-2 focus-within:ring-ring/30", internal && "border-warning/40 bg-warning/5")}>
@@ -543,6 +548,10 @@ export default function Tickets() {
 
             {/* Right side panel */}
             <aside className="hidden lg:flex flex-col border-l border-border bg-surface/30 overflow-y-auto min-w-0">
+              <Section title="AI assist">
+                <AssistInsightsPanel ticket={selected} requesterName={requester?.name} />
+              </Section>
+
               <Section title="Requester">
                 {requester && (
                   <div className="space-y-2.5">

@@ -1,1 +1,4 @@
 project_id = "pspppmdfisbcmvcqdnji"
+
+[functions.ai-ticket-assist]
+verify_jwt = false
