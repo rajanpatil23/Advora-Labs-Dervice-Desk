@@ -49,7 +49,7 @@ export default function Tickets() {
   const [filterCategory, setFilterCategory] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [tick, setTick] = useState(0);
-  // me already declared above via useCurrentOrgUser
+  // `me` already declared above
   const composerRef = useRef<HTMLTextAreaElement>(null);
   const threadRef = useRef<HTMLDivElement>(null);
 
@@ -264,7 +264,7 @@ export default function Tickets() {
                       <FilterSelect label="Priority" value={filterPriority} onChange={(v) => setFilterPriority(v as Priority)}
                         options={[["",""],["low","Low"],["medium","Medium"],["high","High"],["critical","Critical"]]} />
                       <FilterSelect label="Assignee" value={filterAssignee} onChange={setFilterAssignee}
-                        options={[["", "Anyone"], ...agents.map(a => [a.id, a.name] as [string, string])]} />
+                        options={[["", "Anyone"], ...orgAgents.map(a => [a.id, a.name] as [string, string])]} />
                       <FilterSelect label="Category" value={filterCategory} onChange={setFilterCategory}
                         options={[["", "All"], ...categories.map(c => [c, c] as [string, string])]} />
                     </div>
@@ -738,7 +738,7 @@ function AssigneeMenu({ value, onChange }: { value?: string; onChange: (id: stri
               onClick={() => { onChange(undefined); setOpen(false); }}
               className="w-full text-left text-[11px] px-2.5 py-1.5 hover:bg-surface-2 text-muted-foreground italic"
             >Unassigned</button>
-            {agents.map(ag => (
+            {orgAgents.map(ag => (
               <button key={ag.id}
                 onClick={() => { onChange(ag.id); setOpen(false); }}
                 className="w-full text-left text-[11px] px-2.5 py-1.5 hover:bg-surface-2 flex items-center gap-2"
