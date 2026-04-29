@@ -13,11 +13,14 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetFo
 import { toast } from "sonner";
 import {
   Zap, Plus, Trash2, Play, ChevronRight, Workflow, CheckCircle2, XCircle, MinusCircle,
+  Copy, ArrowUp, ArrowDown, Sparkles,
 } from "lucide-react";
 import {
   ACTION_OPTIONS, CONDITION_FIELDS, CONDITION_OPS, TRIGGER_OPTIONS,
   automationsApi, type Action, type Condition, type Rule, type RunLog,
 } from "@/lib/api/automations";
+import { RULE_TEMPLATES } from "@/lib/api/automationTemplates";
+import { FlowPreview } from "@/components/automations/FlowPreview";
 
 export default function Automations() {
   const { user } = useAuth();
