@@ -13,11 +13,14 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetFo
 import { toast } from "sonner";
 import {
   Zap, Plus, Trash2, Play, ChevronRight, Workflow, CheckCircle2, XCircle, MinusCircle,
+  Copy, ArrowUp, ArrowDown, Sparkles,
 } from "lucide-react";
 import {
   ACTION_OPTIONS, CONDITION_FIELDS, CONDITION_OPS, TRIGGER_OPTIONS,
   automationsApi, type Action, type Condition, type Rule, type RunLog,
 } from "@/lib/api/automations";
+import { RULE_TEMPLATES } from "@/lib/api/automationTemplates";
+import { FlowPreview } from "@/components/automations/FlowPreview";
 
 export default function Automations() {
   const { user } = useAuth();
@@ -50,6 +53,7 @@ export default function Automations() {
       <Tabs defaultValue="rules">
         <TabsList>
           <TabsTrigger value="rules">Rules ({state.rules.length})</TabsTrigger>
+          <TabsTrigger value="templates">Templates</TabsTrigger>
           <TabsTrigger value="runs">Recent runs</TabsTrigger>
         </TabsList>
 
@@ -58,19 +62,53 @@ export default function Automations() {
             <Card>
               <CardContent className="py-12 text-center text-muted-foreground">
                 <Workflow className="h-10 w-10 mx-auto mb-3 opacity-50" />
-                <p>No automation rules yet. Create your first one to start routing work automatically.</p>
+                <p>No automation rules yet. Create your first one or start from a template.</p>
               </CardContent>
             </Card>
           ) : (
-            state.rules.map(rule => (
+            state.rules.map((rule, idx) => (
               <RuleRow
                 key={rule.id}
                 rule={rule}
+                index={idx}
+                total={state.rules.length}
                 onEdit={() => setEditing({ ...rule })}
                 onChanged={refresh}
               />
             ))
           )}
+        </TabsContent>
+
+        <TabsContent value="templates" className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+          {RULE_TEMPLATES.map((tpl) => (
+            <Card key={tpl.id} className="flex flex-col hover:border-primary/40 transition-colors">
+              <CardHeader>
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="h-4 w-4 text-primary shrink-0" />
+                    <CardTitle className="text-base">{tpl.name}</CardTitle>
+                  </div>
+                  <Badge variant="outline" className="text-[10px]">{tpl.category}</Badge>
+                </div>
+                <CardDescription className="text-xs">{tpl.description}</CardDescription>
+              </CardHeader>
+              <CardContent className="mt-auto">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => {
+                    const created = automationsApi.createFromTemplate(tpl.build());
+                    toast.success("Rule created from template");
+                    refresh();
+                    setEditing({ ...created });
+                  }}
+                >
+                  <Plus className="h-3.5 w-3.5 mr-1" /> Use template
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
         </TabsContent>
 
         <TabsContent value="runs">
@@ -97,11 +135,29 @@ export default function Automations() {
   );
 }
 
-function RuleRow({ rule, onEdit, onChanged }: { rule: Rule; onEdit: () => void; onChanged: () => void }) {
+function RuleRow({ rule, index, total, onEdit, onChanged }: { rule: Rule; index: number; total: number; onEdit: () => void; onChanged: () => void }) {
   const triggerLabel = TRIGGER_OPTIONS.find(t => t.value === rule.trigger)?.label ?? rule.trigger;
   return (
     <Card className="hover:border-primary/40 transition-colors">
-      <CardContent className="flex items-center gap-4 py-4">
+      <CardContent className="flex items-center gap-3 py-4">
+        <div className="flex flex-col -my-1">
+          <button
+            className="h-5 w-5 rounded hover:bg-muted disabled:opacity-30 flex items-center justify-center"
+            disabled={index === 0}
+            onClick={() => { automationsApi.moveRule(rule.id, "up"); onChanged(); }}
+            title="Move up"
+          >
+            <ArrowUp className="h-3 w-3" />
+          </button>
+          <button
+            className="h-5 w-5 rounded hover:bg-muted disabled:opacity-30 flex items-center justify-center"
+            disabled={index === total - 1}
+            onClick={() => { automationsApi.moveRule(rule.id, "down"); onChanged(); }}
+            title="Move down"
+          >
+            <ArrowDown className="h-3 w-3" />
+          </button>
+        </div>
         <Switch checked={rule.enabled} onCheckedChange={() => { automationsApi.toggleRule(rule.id); onChanged(); }} />
         <button onClick={onEdit} className="flex-1 text-left min-w-0">
           <div className="flex items-center gap-2">
@@ -127,7 +183,10 @@ function RuleRow({ rule, onEdit, onChanged }: { rule: Rule; onEdit: () => void; 
         }}>
           <Play className="h-3.5 w-3.5 mr-1" /> Test
         </Button>
-        <Button variant="ghost" size="icon" onClick={() => { automationsApi.deleteRule(rule.id); onChanged(); }}>
+        <Button variant="ghost" size="icon" title="Duplicate" onClick={() => { automationsApi.duplicateRule(rule.id); toast.success("Rule duplicated"); onChanged(); }}>
+          <Copy className="h-4 w-4" />
+        </Button>
+        <Button variant="ghost" size="icon" title="Delete" onClick={() => { automationsApi.deleteRule(rule.id); onChanged(); }}>
           <Trash2 className="h-4 w-4" />
         </Button>
       </CardContent>
@@ -201,6 +260,12 @@ function RuleEditor({ rule, onClose, onSaved }: { rule: Rule | null; onClose: ()
           <div className="space-y-2">
             <Label>Description (optional)</Label>
             <Input value={draft.description ?? ""} onChange={(e) => update({ description: e.target.value })} placeholder="What this rule does" />
+          </div>
+
+          {/* Live flow preview */}
+          <div className="space-y-2">
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground">Flow preview</Label>
+            <FlowPreview rule={draft} />
           </div>
 
           {/* Trigger */}
