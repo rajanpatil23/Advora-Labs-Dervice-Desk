@@ -83,6 +83,7 @@ const App = () => (
                 <Route path="integrations" element={<Integrations />} />
                 <Route path="automations" element={<Automations />} />
                 <Route path="csat" element={<Csat />} />
+                <Route path="fields" element={<CustomFields />} />
               </Route>
             </Route>
 
