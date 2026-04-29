@@ -52,6 +52,7 @@ import ImportExport from "./pages/ImportExport";
 import ActivityFeed from "./pages/ActivityFeed";
 import Macros from "./pages/Macros";
 import Webhooks from "./pages/Webhooks";
+import Developer from "./pages/Developer";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -106,6 +107,7 @@ const App = () => (
                 <Route path="activity" element={<ActivityFeed />} />
                 <Route path="macros" element={<Macros />} />
                 <Route path="webhooks" element={<Webhooks />} />
+                <Route path="developer" element={<Developer />} />
               </Route>
             </Route>
 
