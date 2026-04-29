@@ -74,15 +74,40 @@ function membershipsFor(u: SeedUser): Membership[] {
 
 function buildSession(u: SeedUser, current_org_id?: string): Session {
   const mems = membershipsFor(u);
-  const orgId = current_org_id && mems.some((m) => m.org_id === current_org_id)
-    ? current_org_id
-    : mems[0].org_id;
+  const orgId = mems.length === 0
+    ? ""
+    : current_org_id && mems.some((m) => m.org_id === current_org_id)
+      ? current_org_id
+      : mems[0].org_id;
   return {
     token: `mock.${u.id}.${Date.now()}`,
     user: toAuthUser(u),
     memberships: mems,
     current_org_id: orgId,
   };
+}
+
+function requirePlatform(min: PlatformRole | "any" = "any"): SeedUser {
+  const s = readSession();
+  if (!s) err(401, "Not authenticated");
+  const u = getUser(s!.user_id);
+  if (!u) err(401, "User not found");
+  const pa = getPlatformAdmin(u!.id);
+  if (!pa) err(403, "Platform access required");
+  if (min !== "any" && pa!.role !== min) err(403, `Requires platform role: ${min}`);
+  return u!;
+}
+
+function logAudit(actor_id: string, action: string, opts: { target_org_id?: string; target_user_id?: string; metadata?: Record<string, unknown> } = {}) {
+  SEED_AUDIT_LOG.unshift({
+    id: `aud_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+    actor_id,
+    action,
+    target_org_id: opts.target_org_id ?? null,
+    target_user_id: opts.target_user_id ?? null,
+    metadata: opts.metadata,
+    created_at: new Date().toISOString(),
+  });
 }
 
 // --- handlers ------------------------------------------------------------
