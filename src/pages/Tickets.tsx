@@ -14,7 +14,7 @@ import type { Priority, TicketStatus } from "@/lib/types";
 import { NewTicketDialog } from "@/components/dialogs/NewTicketDialog";
 import { AssistSuggestButton, AssistInsightsPanel } from "@/components/tickets/AiAssist";
 import { MentionAutocomplete, type MentionAutocompleteHandle } from "@/components/common/MentionAutocomplete";
-import { extractMentionHandles, toMentionable } from "@/lib/mentions";
+import { extractMentionHandles, toMentionable, toHandle, renderWithMentions } from "@/lib/mentions";
 import { emitNotification } from "@/lib/api/notificationEngine";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
@@ -497,7 +497,7 @@ export default function Tickets() {
                             ? "bg-primary text-primary-foreground border-transparent shadow-sm rounded-tr-md"
                             : "bg-surface border-border rounded-tl-md"
                         )}>
-                          <MessageBody text={m.body} knownHandles={mentionables.map(p => p.handle)} myHandle={me ? toMentionable({ id: me.id, name: me.name, initials: me.initials, avatarColor: me.avatarColor } as any).handle : undefined} />
+                          <MessageBody text={m.body} knownHandles={mentionables.map(p => p.handle)} myHandle={me ? toHandle(me.name) : undefined} />
                         </div>
                         {m.attachments && m.attachments.length > 0 && (
                           <div className="mt-1.5 flex flex-wrap gap-1.5">
