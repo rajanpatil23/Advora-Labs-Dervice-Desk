@@ -86,7 +86,10 @@ function seed(): InboxMessage[] {
 function read(): InboxMessage[] {
   try {
     const raw = localStorage.getItem(KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
   } catch {}
   const s = seed();
   localStorage.setItem(KEY, JSON.stringify(s));

@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
-import { useAppStore } from "@/lib/store";
+import { useAppStore, useCurrentOrgUser } from "@/lib/store";
 import { useAuth } from "@/contexts/AuthContext";
 import { Inbox, Filter, AlertTriangle, Clock, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -14,11 +14,12 @@ export default function MyQueue() {
   const [params, setParams] = useSearchParams();
   const { tickets } = useAppStore();
   const { user, currentRole } = useAuth();
+  const queueUser = useCurrentOrgUser();
   const filter = params.get("filter") ?? "all";
 
   const myTickets = useMemo(() => {
-    if (!user) return [];
-    let list = tickets.filter((t) => t.assigneeId === user.id && t.status !== "closed");
+    if (!queueUser) return [];
+    let list = tickets.filter((t) => t.assigneeId === queueUser.id && t.status !== "closed");
     if (filter === "escalated") {
       list = list.filter((t) => t.priority === "high" || t.priority === "critical" || t.slaState === "breached" || t.slaState === "at_risk");
     } else if (filter === "at_risk") {
@@ -28,7 +29,7 @@ export default function MyQueue() {
       const order = { critical: 0, high: 1, medium: 2, low: 3 } as const;
       return order[a.priority] - order[b.priority];
     });
-  }, [tickets, user, filter]);
+  }, [tickets, queueUser, filter]);
 
   const stats = useMemo(() => ({
     open: myTickets.length,
@@ -103,11 +104,11 @@ export default function MyQueue() {
                 <button
                   type="button"
                   onClick={() => {
-                    if (!user) return;
+                     if (!queueUser) return;
                     const pool = tickets
                       .filter((t) => t.status !== "closed" && t.status !== "resolved")
                       .slice(0, 6);
-                    pool.forEach((t) => useAppStore.getState().updateTicket(t.id, { assigneeId: user.id }));
+                     pool.forEach((t) => useAppStore.getState().updateTicket(t.id, { assigneeId: queueUser.id }));
                   }}
                   className="inline-flex items-center gap-1.5 h-9 px-4 rounded-lg border border-border text-xs font-medium hover:bg-surface-2"
                 >

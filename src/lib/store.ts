@@ -674,6 +674,7 @@ export function useCurrentOrgUser() {
 export function useOrgSync() {
   const auth = useAuth();
   const currentOrgId = auth?.currentOrgId ?? null;
+  const currentRole = auth?.currentRole ?? null;
   const userId = auth?.user?.id ?? null;
   const userEmail = auth?.user?.email ?? null;
   const userName = auth?.user?.full_name ?? null;
@@ -691,10 +692,18 @@ export function useOrgSync() {
     const match = [...orgAgents, ...orgCustomers].find((u) => u.email === userEmail);
     if (match) {
       useAppStore.getState().setCurrentUser(match.id, match.name);
-    } else {
-      useAppStore.getState().setCurrentUser(userId, userName ?? userEmail);
+      return;
     }
-  }, [currentOrgId, userId, userEmail, userName]);
+
+    if (currentRole === "requester") {
+      const firstCustomer = orgCustomers[0];
+      useAppStore.getState().setCurrentUser(firstCustomer?.id ?? userId, firstCustomer?.name ?? userName ?? userEmail);
+      return;
+    }
+
+    const firstAgent = orgAgents[0];
+    useAppStore.getState().setCurrentUser(firstAgent?.id ?? userId, firstAgent?.name ?? userName ?? userEmail);
+  }, [currentOrgId, currentRole, userId, userEmail, userName]);
 }
 
 // Backwards-compatibility (full datasets - used only by helpers like findUser).
