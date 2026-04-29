@@ -45,7 +45,7 @@ export const SEED_MACROS: Omit<Macro, "id" | "createdAt" | "updatedAt">[] = [
     description: "Ask for steps to reproduce; pause clock.",
     scope: "team",
     reply: "Hi {requester}, to help me track this down, could you share:\n\n• Exact steps to reproduce\n• Browser & OS\n• Any error messages or screenshots\n\nThanks!",
-    status: "pending",
+    status: "on_hold",
     addTags: ["awaiting-info"],
     shortcut: "2",
   },
