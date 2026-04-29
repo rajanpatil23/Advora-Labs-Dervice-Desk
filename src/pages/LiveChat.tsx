@@ -26,7 +26,8 @@ export default function LiveChat() {
     seedIfEmpty();
     const refresh = () => setSessions(listSessions());
     refresh();
-    return subscribe(refresh);
+    const unsub = subscribe(refresh);
+    return () => { unsub(); };
   }, []);
 
   useEffect(() => {
