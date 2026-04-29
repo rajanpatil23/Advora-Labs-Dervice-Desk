@@ -1,9 +1,10 @@
-import { agents } from "@/lib/mockData";
+import { useOrgAgents } from "@/lib/store";
 import { Avatar } from "@/components/common/Chips";
 import { Star, Mail, Trophy } from "lucide-react";
 import { toast } from "sonner";
 
 export default function AgentsPage() {
+  const agents = useOrgAgents();
   return (
     <div className="h-full overflow-y-auto">
       <div className="px-6 lg:px-8 py-6 max-w-[1600px] mx-auto space-y-6">
