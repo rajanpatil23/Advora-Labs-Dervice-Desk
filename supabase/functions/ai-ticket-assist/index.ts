@@ -122,6 +122,72 @@ Deno.serve(async (req) => {
       return json({ reply });
     }
 
+    if (mode === "suggest_drafts") {
+      const n = Math.max(2, Math.min(4, variantCount ?? 3));
+      const kbBlock = (kbArticles ?? []).length
+        ? `\n\nRelevant knowledge base snippets you MAY ground in (cite the title in brackets if used):\n${(kbArticles ?? [])
+            .map((a, i) => `[${i + 1}] ${a.title}\n${a.excerpt}`)
+            .join("\n\n")}`
+        : "";
+
+      const tools = [
+        {
+          type: "function",
+          function: {
+            name: "emit_drafts",
+            description: "Return multiple draft replies for the agent to choose from.",
+            parameters: {
+              type: "object",
+              properties: {
+                drafts: {
+                  type: "array",
+                  minItems: n,
+                  maxItems: n,
+                  items: {
+                    type: "object",
+                    properties: {
+                      label: { type: "string", description: "Short 1-3 word label, e.g. 'Empathetic apology', 'Quick fix', 'Ask for details'." },
+                      body: { type: "string", description: "The full reply, plain text, ~70-180 words." },
+                      groundedArticles: { type: "array", items: { type: "integer" }, description: "1-based KB indices used. Empty if none." },
+                      asksClarifyingQuestion: { type: "boolean" },
+                    },
+                    required: ["label", "body", "groundedArticles", "asksClarifyingQuestion"],
+                    additionalProperties: false,
+                  },
+                },
+              },
+              required: ["drafts"],
+              additionalProperties: false,
+            },
+          },
+        },
+      ];
+
+      const payload = {
+        model: MODEL,
+        messages: [
+          {
+            role: "system",
+            content:
+              "You draft customer support replies. Produce DISTINCT variations: each takes a different angle (quick resolution, empathetic acknowledgement, request for diagnostic info, etc). Match the requested tone overall. Do NOT invent facts. If information is missing, one draft should ask a single targeted clarifying question. Use the customer's first name when known. Sign off briefly. Plain text only.",
+          },
+          {
+            role: "user",
+            content: `Tone: ${tone}\nAgent name: ${agentName ?? "the agent"}\nProduce exactly ${n} distinct drafts.\n${customInstructions ? `Extra instructions: ${customInstructions}\n` : ""}\n${ticketMeta}\n\nThread so far:\n${thread}${kbBlock}`,
+          },
+        ],
+        tools,
+        tool_choice: { type: "function", function: { name: "emit_drafts" } },
+      };
+
+      const res = await callGateway(payload, apiKey);
+      if (!res.ok) return errorResponse(res.status, res.text);
+      const tc = res.data.choices?.[0]?.message?.tool_calls?.[0];
+      const args = tc?.function?.arguments ? JSON.parse(tc.function.arguments) : null;
+      if (!args?.drafts?.length) return json({ error: "no drafts" }, 502);
+      return json({ drafts: args.drafts });
+    }
+
     if (mode === "categorize") {
       const cats = categories?.length
         ? categories
