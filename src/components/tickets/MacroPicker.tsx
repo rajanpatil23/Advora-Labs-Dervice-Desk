@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Zap, Search, Lock, MessageSquare, Tag, Keyboard } from "lucide-react";
 import { readMacros, runMacro, type Macro } from "@/lib/api/macros";
 import { useAppStore } from "@/lib/store";
-import type { Ticket, User } from "@/lib/types";
+import type { Ticket } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuTrigger,
@@ -12,7 +12,7 @@ import { toast } from "sonner";
 
 interface Props {
   ticket: Ticket;
-  me: User | null | undefined;
+  me: { id: string; name: string } | null | undefined;
   requesterName?: string;
 }
 
