@@ -78,6 +78,7 @@ const SECTIONS: NavSection[] = [
       { to: "/app/sla",        label: "SLA Policies",     i18nKey: "nav.sla",           icon: Timer,           roles: ["owner", "admin"] },
       { to: "/app/escalations", label: "Escalations",     icon: Siren,                                         roles: ["owner", "admin", "manager"] },
       { to: "/app/automations", label: "Automations",     i18nKey: "nav.automations",   icon: Zap,             roles: ["owner", "admin", "manager"] },
+      { to: "/app/routing",    label: "Smart routing",    icon: RouteIcon,                                     roles: ["owner", "admin", "manager"] },
       { to: "/app/workflows",  label: "Workflow builder", icon: WorkflowIcon,                                  roles: ["owner", "admin", "manager"] },
       { to: "/app/logs",       label: "Audit Log",        i18nKey: "nav.logs",          icon: ScrollText,      roles: ["owner", "admin"] },
     ],
