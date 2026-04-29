@@ -6,7 +6,14 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { AppLayout } from "@/components/layout/AppLayout";
+import { PortalLayout } from "@/components/layout/PortalLayout";
 import { ComingSoon } from "@/components/common/ComingSoon";
+import PortalHome from "./pages/portal/PortalHome";
+import PortalNewRequest from "./pages/portal/PortalNewRequest";
+import PortalRequests from "./pages/portal/PortalRequests";
+import PortalRequestDetail from "./pages/portal/PortalRequestDetail";
+import PortalCatalog from "./pages/portal/PortalCatalog";
+import PortalKnowledge, { PortalKnowledgeArticle } from "./pages/portal/PortalKnowledge";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
 import Onboarding from "./pages/Onboarding";
@@ -67,7 +74,19 @@ const App = () => (
               </Route>
             </Route>
 
-            <Route path="/portal/*" element={<ComingSoon phase="Phase 3" title="Requester Portal" description="Self-service portal for end users: submit a request, browse the catalog, track your requests, search the knowledge base." backTo="/login" />} />
+
+            <Route element={<ProtectedRoute />}>
+              <Route path="/portal" element={<PortalLayout />}>
+                <Route index element={<PortalHome />} />
+                <Route path="new" element={<PortalNewRequest />} />
+                <Route path="requests" element={<PortalRequests />} />
+                <Route path="requests/:id" element={<PortalRequestDetail />} />
+                <Route path="catalog" element={<PortalCatalog />} />
+                <Route path="kb" element={<PortalKnowledge />} />
+                <Route path="kb/:id" element={<PortalKnowledgeArticle />} />
+              </Route>
+            </Route>
+
             <Route path="/dashboard" element={<Navigate to="/app" replace />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
