@@ -48,8 +48,8 @@ export default function Login() {
       <div className="relative hidden lg:flex flex-col justify-between p-10 bg-sidebar text-sidebar-foreground overflow-hidden">
         <div className="absolute inset-0 mesh-bg opacity-80 pointer-events-none" />
         <div className="relative flex items-center gap-2.5">
-          <div className="h-10 w-10 rounded-xl bg-gradient-primary flex items-center justify-center shadow-glow">
-            <Sparkles className="h-5 w-5 text-primary-foreground" />
+          <div className="h-10 w-10 rounded-xl bg-sidebar-accent flex items-center justify-center overflow-hidden">
+            <img src={advoraLogo} alt="Advora" className="h-8 w-8 object-contain" />
           </div>
           <div>
             <div className="font-display font-bold text-sidebar-accent-foreground text-lg">Advora</div>
