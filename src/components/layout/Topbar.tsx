@@ -1,20 +1,19 @@
-import { Bell, Search, Sun, Moon, Plus, HelpCircle, LogOut, User as UserIcon, Settings as SettingsIcon } from "lucide-react";
+import { Bell, Search, Sun, Moon, Plus, HelpCircle, LogOut, User as UserIcon, Settings as SettingsIcon, Building2, Check, ChevronsUpDown } from "lucide-react";
 import { useAppStore } from "@/lib/store";
-import { agents } from "@/lib/mockData";
 import { Button } from "@/components/ui/button";
 import { NewTicketDialog } from "@/components/dialogs/NewTicketDialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 
 export function Topbar() {
   const { theme, toggleTheme, tickets } = useAppStore();
-  const me = agents[0];
+  const { profile, memberships, currentOrgId, currentRole, switchOrg, signOut } = useAuth();
   const nav = useNavigate();
   const [search, setSearch] = useState("");
 
-  // Cmd+K focuses search
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
@@ -34,9 +33,51 @@ export function Topbar() {
   };
 
   const notifs = tickets.filter(t => t.slaState === "at_risk" || t.slaState === "breached").slice(0, 5);
+  const currentOrg = memberships.find(m => m.org_id === currentOrgId)?.org;
+  const initials = (profile?.full_name || profile?.email || "?")
+    .split(/\s+/).map(s => s[0]).slice(0, 2).join("").toUpperCase();
+
+  const handleSignOut = async () => {
+    await signOut();
+    toast.success("Signed out");
+    nav("/login");
+  };
 
   return (
     <header className="h-16 shrink-0 border-b border-border bg-surface/70 backdrop-blur-xl px-4 md:px-6 flex items-center gap-3 sticky top-0 z-30">
+      {/* Org switcher */}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button className="hidden md:flex items-center gap-2 h-10 px-3 rounded-xl bg-surface-2 hover:bg-surface border border-border text-sm">
+            <Building2 className="h-4 w-4 text-muted-foreground" />
+            <span className="font-medium max-w-[140px] truncate">{currentOrg?.name || "No workspace"}</span>
+            <ChevronsUpDown className="h-3.5 w-3.5 text-muted-foreground" />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start" className="w-64">
+          <DropdownMenuLabel>Workspaces</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          {memberships.map(m => (
+            <DropdownMenuItem key={m.org_id} onClick={async () => {
+              try { await switchOrg(m.org_id); toast.success(`Switched to ${m.org?.name}`); }
+              catch (e) { toast.error((e as Error).message); }
+            }}>
+              <div className="flex items-center justify-between w-full">
+                <div>
+                  <div className="text-sm font-medium">{m.org?.name}</div>
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{m.role}</div>
+                </div>
+                {m.org_id === currentOrgId && <Check className="h-4 w-4 text-primary" />}
+              </div>
+            </DropdownMenuItem>
+          ))}
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={() => nav("/onboarding")}>
+            <Plus className="h-4 w-4 mr-2" /> Create workspace
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
       <form onSubmit={onSearch} className="relative flex-1 max-w-xl">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <input
@@ -61,7 +102,7 @@ export function Topbar() {
           {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
         </button>
         <button
-          onClick={() => toast.message("Help center", { description: "Press ⌘K for the command bar, j/k to navigate tickets." })}
+          onClick={() => toast.message("Help center", { description: "Press ⌘K for the command bar." })}
           className="h-9 w-9 rounded-lg flex items-center justify-center hover:bg-surface-2 transition-colors" aria-label="Help" title="Help">
           <HelpCircle className="h-4 w-4" />
         </button>
@@ -93,22 +134,22 @@ export function Topbar() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button className="ml-1 flex items-center gap-2 pl-2 border-l border-border hover:opacity-90">
-              <div className="h-9 w-9 rounded-full flex items-center justify-center text-xs font-semibold text-primary-foreground" style={{ background: me.avatarColor }}>
-                {me.initials}
+              <div className="h-9 w-9 rounded-full flex items-center justify-center text-xs font-semibold text-primary-foreground bg-gradient-primary">
+                {initials}
               </div>
               <div className="hidden md:block leading-tight text-left">
-                <div className="text-sm font-semibold">{me.name}</div>
-                <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{me.role}</div>
+                <div className="text-sm font-semibold">{profile?.full_name || profile?.email}</div>
+                <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{currentRole || "—"}</div>
               </div>
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel>{me.email}</DropdownMenuLabel>
+            <DropdownMenuLabel>{profile?.email}</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => nav("/app/agents")}><UserIcon className="h-4 w-4 mr-2" /> Profile</DropdownMenuItem>
             <DropdownMenuItem onClick={() => nav("/app/settings")}><SettingsIcon className="h-4 w-4 mr-2" /> Settings</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => { toast.success("Signed out"); nav("/"); }}>
+            <DropdownMenuItem onClick={handleSignOut}>
               <LogOut className="h-4 w-4 mr-2" /> Sign out
             </DropdownMenuItem>
           </DropdownMenuContent>
