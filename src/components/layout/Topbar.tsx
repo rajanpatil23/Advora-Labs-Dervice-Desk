@@ -10,7 +10,10 @@ import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 
+import { useT } from "@/lib/i18n-app";
+
 export function Topbar() {
+  const t = useT();
   const { theme, toggleTheme, tickets } = useAppStore();
   const { profile, memberships, currentOrgId, currentRole, switchOrg, signOut } = useAuth();
   const nav = useNavigate();
@@ -87,7 +90,7 @@ export function Topbar() {
           id="global-search"
           value={search}
           onChange={e => setSearch(e.target.value)}
-          placeholder="Search tickets, users, articles…"
+          placeholder={t("common.search")}
           className="w-full h-10 pl-10 pr-16 rounded-xl bg-surface-2 border border-transparent focus:border-ring focus:bg-surface text-sm outline-none transition-all"
         />
         <kbd className="absolute right-3 top-1/2 -translate-y-1/2 hidden sm:inline-block text-[10px] font-mono px-1.5 py-0.5 rounded bg-background border border-border text-muted-foreground">⌘K</kbd>
