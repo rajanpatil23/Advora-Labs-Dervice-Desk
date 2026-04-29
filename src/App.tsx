@@ -70,6 +70,7 @@ import AiAssistant from "./pages/AiAssistant";
 import Sentiment from "./pages/Sentiment";
 import Routing from "./pages/Routing";
 import KbAiSearch from "./pages/KbAiSearch";
+import LiveChat from "./pages/LiveChat";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -142,6 +143,7 @@ const App = () => (
                 <Route path="sentiment" element={<Sentiment />} />
                 <Route path="routing" element={<Routing />} />
                 <Route path="kb-search" element={<KbAiSearch />} />
+                <Route path="chat" element={<LiveChat />} />
               </Route>
             </Route>
 

@@ -3,7 +3,7 @@ import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, Ticket, AlertOctagon, ClipboardList, Users, UserCog,
   Timer, BookOpen, BarChart3, ScrollText, Settings, Sparkles, LogOut,
-  PanelLeftClose, PanelLeft, Inbox, UsersRound, CheckSquare, CreditCard, ShieldCheck, Plug, Zap, Smile, ListChecks, Palette, Bell, Bookmark, Layers, Database, Activity, Wand2, Webhook, Code2, KeyRound, FileCheck2, Globe2, Workflow as WorkflowIcon, Siren, CalendarRange, MessageSquareQuote, GitMerge, TrendingUp, Heart, Route as RouteIcon, BookOpenCheck
+  PanelLeftClose, PanelLeft, Inbox, UsersRound, CheckSquare, CreditCard, ShieldCheck, Plug, Zap, Smile, ListChecks, Palette, Bell, Bookmark, Layers, Database, Activity, Wand2, Webhook, Code2, KeyRound, FileCheck2, Globe2, Workflow as WorkflowIcon, Siren, CalendarRange, MessageSquareQuote, GitMerge, TrendingUp, Heart, Route as RouteIcon, BookOpenCheck, MessageCircle
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -37,6 +37,7 @@ const SECTIONS: NavSection[] = [
       { to: "/app/my-queue",   label: "My Queue",         i18nKey: "nav.myQueue",       icon: Inbox,           roles: ["agent", "resolver"] },
       { to: "/app/inbox",      label: "Unified inbox",    icon: Inbox,                                         roles: ["owner", "admin", "manager", "agent", "resolver"] },
       { to: "/app/ai",         label: "AI assistant",     icon: Sparkles,                                      roles: ["owner", "admin", "manager", "agent", "resolver"] },
+      { to: "/app/chat",       label: "Live chat",        icon: MessageCircle,                                 roles: ["owner", "admin", "manager", "agent", "resolver"] },
       { to: "/app/sentiment",  label: "Customer mood",    icon: Heart,                                         roles: ["owner", "admin", "manager", "agent", "resolver"] },
     ],
   },
