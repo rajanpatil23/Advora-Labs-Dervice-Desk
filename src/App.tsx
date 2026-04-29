@@ -34,6 +34,7 @@ import Logs from "./pages/Logs";
 import Settings from "./pages/Settings";
 import Platform from "./pages/Platform";
 import Approvals from "./pages/Approvals";
+import Billing from "./pages/Billing";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -70,7 +71,7 @@ const App = () => (
                 <Route path="reports" element={<Reports />} />
                 <Route path="logs" element={<Logs />} />
                 <Route path="settings" element={<Settings />} />
-                <Route path="billing" element={<ComingSoon phase="Phase 5" title="Billing & Plan" description="Plan management, invoices, payment methods, and usage. Wired to Lovable Payments." />} />
+                <Route path="billing" element={<Billing />} />
                 <Route path="security" element={<ComingSoon phase="Phase 5" title="Security" description="SSO (SAML/OIDC), session policies, IP allowlists, and API tokens." />} />
               </Route>
             </Route>
