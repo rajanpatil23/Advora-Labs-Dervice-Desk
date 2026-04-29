@@ -138,8 +138,8 @@ export function AppSidebar() {
       <div className={cn("flex items-center h-16 border-b border-sidebar-border", collapsed ? "px-2 justify-center" : "px-4 gap-2")}>
         {!collapsed && (
           <>
-            <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-primary shadow-glow shrink-0">
-              <Sparkles className="h-4 w-4 text-primary-foreground" />
+            <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-sidebar-accent shrink-0 overflow-hidden">
+              <img src={advoraLogo} alt="Advora" className="h-7 w-7 object-contain" />
             </div>
             <div className="leading-tight min-w-0 flex-1">
               <div className="font-display font-bold text-sidebar-accent-foreground tracking-tight truncate">Advora</div>
