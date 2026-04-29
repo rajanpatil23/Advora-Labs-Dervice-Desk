@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { useAppStore, agents, customers } from "@/lib/store";
+import { useAppStore, useOrgAgents, useOrgCustomers, useOrgSettings, useCurrentOrgUser } from "@/lib/store";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import type { Priority } from "@/lib/types";
@@ -11,26 +11,46 @@ interface Props {
   onCreated?: (id: string) => void;
 }
 
-const categories = ["Network", "Hardware", "Access", "Software", "Email", "Security", "Cloud", "Mobile"];
-
 export function NewTicketDialog({ trigger, onCreated }: Props) {
   const addTicket = useAppStore(s => s.addTicket);
+  const orgAgents = useOrgAgents();
+  const orgCustomers = useOrgCustomers();
+  const settings = useOrgSettings();
+  const me = useCurrentOrgUser();
+  const isRequester = me?.role === "requester";
   const nav = useNavigate();
+
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [requesterId, setRequesterId] = useState(customers[0].id);
-  const [assigneeId, setAssigneeId] = useState<string>(agents[0].id);
+  const [requesterId, setRequesterId] = useState<string>("");
+  const [assigneeId, setAssigneeId] = useState<string>("");
   const [priority, setPriority] = useState<Priority>("medium");
-  const [category, setCategory] = useState(categories[0]);
+  const [category, setCategory] = useState<string>("");
+
+  // (Re)initialize defaults when dialog opens or org changes
+  useEffect(() => {
+    if (!open) return;
+    const defaultRequester = isRequester
+      ? (me?.id ?? orgCustomers[0]?.id ?? "")
+      : (orgCustomers[0]?.id ?? "");
+    setRequesterId(defaultRequester);
+    setAssigneeId(orgAgents[0]?.id ?? "");
+    setCategory(settings.categories[0] ?? "General");
+  }, [open, orgCustomers, orgAgents, settings.categories, isRequester, me?.id]);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim()) {
-      toast.error("Please add a title");
-      return;
-    }
-    const t = addTicket({ title: title.trim(), description, requesterId, assigneeId, priority, category });
+    if (!title.trim()) { toast.error("Please add a title"); return; }
+    if (!requesterId) { toast.error("Pick a requester"); return; }
+    const t = addTicket({
+      title: title.trim(),
+      description,
+      requesterId,
+      assigneeId: assigneeId || undefined,
+      priority,
+      category: category || (settings.categories[0] ?? "General"),
+    });
     toast.success(`Ticket ${t.number} created`);
     setOpen(false);
     setTitle(""); setDescription("");
@@ -58,12 +78,20 @@ export function NewTicketDialog({ trigger, onCreated }: Props) {
           </Field>
           <div className="grid grid-cols-2 gap-3">
             <Field label="Requester">
-              <Select value={requesterId} onChange={setRequesterId}
-                options={customers.map(c => [c.id, c.name] as [string, string])} />
+              {isRequester ? (
+                <input
+                  disabled
+                  value={me?.name ?? "You"}
+                  className="w-full h-10 px-3 rounded-lg bg-surface-2 border border-border text-sm text-muted-foreground"
+                />
+              ) : (
+                <Select value={requesterId} onChange={setRequesterId}
+                  options={orgCustomers.map(c => [c.id, c.name] as [string, string])} />
+              )}
             </Field>
             <Field label="Assignee">
               <Select value={assigneeId} onChange={setAssigneeId}
-                options={agents.map(a => [a.id, a.name] as [string, string])} />
+                options={[["", "— Unassigned —"], ...orgAgents.map(a => [a.id, a.name] as [string, string])]} />
             </Field>
             <Field label="Priority">
               <Select value={priority} onChange={(v) => setPriority(v as Priority)}
@@ -71,7 +99,7 @@ export function NewTicketDialog({ trigger, onCreated }: Props) {
             </Field>
             <Field label="Category">
               <Select value={category} onChange={setCategory}
-                options={categories.map(c => [c, c] as [string, string])} />
+                options={(settings.categories.length ? settings.categories : ["General"]).map(c => [c, c] as [string, string])} />
             </Field>
           </div>
           <DialogFooter className="pt-2">
