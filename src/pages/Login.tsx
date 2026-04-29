@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { ArrowRight, Loader2, Mail, Lock, Eye, EyeOff, ChevronDown } from "lucide-react";
+import { ArrowRight, Loader2, Mail, Lock, Eye, EyeOff, ChevronDown, Sparkles, X } from "lucide-react";
 import { authApi } from "@/lib/api/auth";
 import { useAuth } from "@/contexts/AuthContext";
 import { SEED_USERS, SEED_PLATFORM_ADMINS } from "@/lib/api/seedUsers";
