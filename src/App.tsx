@@ -6,11 +6,15 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { AppLayout } from "@/components/layout/AppLayout";
+import { ComingSoon } from "@/components/common/ComingSoon";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
 import Onboarding from "./pages/Onboarding";
 import AcceptInvite from "./pages/AcceptInvite";
+import AppHome from "./pages/AppHome";
 import Dashboard from "./pages/Dashboard";
+import MyQueue from "./pages/MyQueue";
+import TeamDashboard from "./pages/TeamDashboard";
 import Tickets from "./pages/Tickets";
 import Incidents from "./pages/Incidents";
 import Requests from "./pages/Requests";
@@ -43,11 +47,14 @@ const App = () => (
             <Route element={<ProtectedRoute />}>
               <Route path="/platform" element={<Platform />} />
               <Route path="/app" element={<AppLayout />}>
-                <Route index element={<Tickets />} />
+                <Route index element={<AppHome />} />
                 <Route path="dashboard" element={<Dashboard />} />
+                <Route path="my-queue" element={<MyQueue />} />
+                <Route path="team" element={<TeamDashboard />} />
                 <Route path="tickets" element={<Tickets />} />
                 <Route path="incidents" element={<Incidents />} />
                 <Route path="requests" element={<Requests />} />
+                <Route path="approvals" element={<ComingSoon phase="Phase 6" title="Approvals inbox" description="Manager approval queue for service requests, with one-click approve/reject and audit trail." />} />
                 <Route path="users" element={<Users />} />
                 <Route path="agents" element={<Agents />} />
                 <Route path="sla" element={<SLA />} />
@@ -55,9 +62,12 @@ const App = () => (
                 <Route path="reports" element={<Reports />} />
                 <Route path="logs" element={<Logs />} />
                 <Route path="settings" element={<Settings />} />
+                <Route path="billing" element={<ComingSoon phase="Phase 5" title="Billing & Plan" description="Plan management, invoices, payment methods, and usage. Wired to Lovable Payments." />} />
+                <Route path="security" element={<ComingSoon phase="Phase 5" title="Security" description="SSO (SAML/OIDC), session policies, IP allowlists, and API tokens." />} />
               </Route>
             </Route>
 
+            <Route path="/portal/*" element={<ComingSoon phase="Phase 3" title="Requester Portal" description="Self-service portal for end users: submit a request, browse the catalog, track your requests, search the knowledge base." backTo="/login" />} />
             <Route path="/dashboard" element={<Navigate to="/app" replace />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

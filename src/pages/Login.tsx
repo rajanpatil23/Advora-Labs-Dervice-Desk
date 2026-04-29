@@ -4,6 +4,7 @@ import { Sparkles, ArrowRight, Loader2 } from "lucide-react";
 import { authApi } from "@/lib/api/auth";
 import { useAuth } from "@/contexts/AuthContext";
 import { SEED_USERS, SEED_PLATFORM_ADMINS } from "@/lib/api/seedUsers";
+import { postLoginRedirect } from "@/lib/roleRoutes";
 import { toast } from "sonner";
 
 export default function Login() {
@@ -22,9 +23,13 @@ export default function Login() {
       const session = await authApi.login(email, password);
       setSession(session);
       toast.success(`Welcome back, ${session.user.full_name}`);
-      const dest = session.user.platform_role && session.memberships.length === 0
-        ? "/platform"
-        : redirect;
+      const tenantRole = session.memberships.find((m) => m.org_id === session.current_org_id)?.role ?? null;
+      const dest = postLoginRedirect({
+        platformRole: session.user.platform_role,
+        hasMemberships: session.memberships.length > 0,
+        tenantRole,
+        fallback: redirect,
+      });
       nav(dest, { replace: true });
     } catch (err) {
       toast.error((err as Error).message || "Sign in failed");
