@@ -1,8 +1,10 @@
 import { Outlet } from "react-router-dom";
 import { AppSidebar } from "./AppSidebar";
 import { Topbar } from "./Topbar";
+import { useOrgSync } from "@/lib/store";
 
 export function AppLayout() {
+  useOrgSync();
   return (
     <div className="flex h-screen w-full bg-background mesh-bg overflow-hidden">
       <AppSidebar />
