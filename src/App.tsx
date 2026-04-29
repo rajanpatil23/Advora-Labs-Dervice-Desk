@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { BrandingProvider } from "@/contexts/BrandingContext";
+import { I18nProvider } from "@/lib/i18n-app";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PortalLayout } from "@/components/layout/PortalLayout";
@@ -57,6 +58,7 @@ const App = () => (
     <BrowserRouter>
       <AuthProvider>
         <BrandingProvider>
+        <I18nProvider>
         <TooltipProvider>
           <Toaster />
           <Sonner />
@@ -118,6 +120,7 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
         </TooltipProvider>
+        </I18nProvider>
         </BrandingProvider>
       </AuthProvider>
     </BrowserRouter>

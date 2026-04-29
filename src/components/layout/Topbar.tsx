@@ -1,5 +1,6 @@
 import { Bell, Search, Sun, Moon, Plus, HelpCircle, LogOut, User as UserIcon, Settings as SettingsIcon, Building2, Check, ChevronsUpDown, Sparkles } from "lucide-react";
 import { startProductTour } from "@/components/common/ProductTour";
+import { LanguageSwitcher } from "@/components/common/LanguageSwitcher";
 import { useAppStore } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { NewTicketDialog } from "@/components/dialogs/NewTicketDialog";
@@ -9,7 +10,10 @@ import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 
+import { useT } from "@/lib/i18n-app";
+
 export function Topbar() {
+  const t = useT();
   const { theme, toggleTheme, tickets } = useAppStore();
   const { profile, memberships, currentOrgId, currentRole, switchOrg, signOut } = useAuth();
   const nav = useNavigate();
@@ -86,7 +90,7 @@ export function Topbar() {
           id="global-search"
           value={search}
           onChange={e => setSearch(e.target.value)}
-          placeholder="Search tickets, users, articles…"
+          placeholder={t("common.search")}
           className="w-full h-10 pl-10 pr-16 rounded-xl bg-surface-2 border border-transparent focus:border-ring focus:bg-surface text-sm outline-none transition-all"
         />
         <kbd className="absolute right-3 top-1/2 -translate-y-1/2 hidden sm:inline-block text-[10px] font-mono px-1.5 py-0.5 rounded bg-background border border-border text-muted-foreground">⌘K</kbd>
@@ -100,6 +104,7 @@ export function Topbar() {
             </Button>
           }
         />
+        <LanguageSwitcher />
         <button onClick={toggleTheme} className="h-9 w-9 rounded-lg flex items-center justify-center hover:bg-surface-2 transition-colors" aria-label="Toggle theme" title="Toggle theme">
           {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
         </button>
