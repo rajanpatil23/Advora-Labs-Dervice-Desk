@@ -62,7 +62,7 @@ const App = () => (
                 <Route path="tickets" element={<Tickets />} />
                 <Route path="incidents" element={<Incidents />} />
                 <Route path="requests" element={<Requests />} />
-                <Route path="approvals" element={<ComingSoon phase="Phase 6" title="Approvals inbox" description="Manager approval queue for service requests, with one-click approve/reject and audit trail." />} />
+                <Route path="approvals" element={<Approvals />} />
                 <Route path="users" element={<Users />} />
                 <Route path="agents" element={<Agents />} />
                 <Route path="sla" element={<SLA />} />
