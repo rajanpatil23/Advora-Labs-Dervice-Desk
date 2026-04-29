@@ -21,7 +21,7 @@ export default function SignUp() {
       const session = await authApi.signup(email, password, fullName, orgName);
       setSession(session);
       toast.success("Workspace created");
-      nav("/app", { replace: true });
+      nav("/onboarding", { replace: true });
     } catch (err) {
       toast.error((err as Error).message || "Sign up failed");
     } finally {
