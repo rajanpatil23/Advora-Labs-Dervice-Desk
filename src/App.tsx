@@ -36,6 +36,7 @@ import Platform from "./pages/Platform";
 import Approvals from "./pages/Approvals";
 import Billing from "./pages/Billing";
 import Security from "./pages/Security";
+import Integrations from "./pages/Integrations";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -74,6 +75,7 @@ const App = () => (
                 <Route path="settings" element={<Settings />} />
                 <Route path="billing" element={<Billing />} />
                 <Route path="security" element={<Security />} />
+                <Route path="integrations" element={<Integrations />} />
               </Route>
             </Route>
 
