@@ -1,10 +1,19 @@
 export type Priority = "low" | "medium" | "high" | "critical";
 export type TicketStatus = "new" | "open" | "in_progress" | "on_hold" | "resolved" | "closed";
 export type SlaState = "on_track" | "at_risk" | "breached" | "met";
-export type Role = "admin" | "manager" | "agent" | "viewer" | "requester";
+export type Role = "owner" | "admin" | "manager" | "agent" | "resolver" | "requester";
+
+export interface Org {
+  id: string;
+  name: string;
+  slug: string;
+  industry: string;
+  domain: string;
+}
 
 export interface User {
   id: string;
+  org_id: string;
   name: string;
   email: string;
   avatarColor: string;
@@ -31,7 +40,7 @@ export interface Message {
   authorRole: "agent" | "requester" | "system";
   body: string;
   isInternal: boolean;
-  createdAt: string; // ISO
+  createdAt: string;
   attachments?: { name: string; size: string }[];
 }
 
@@ -45,7 +54,8 @@ export interface ActivityEvent {
 
 export interface Ticket {
   id: string;
-  number: string; // CN-1024
+  org_id: string;
+  number: string;
   title: string;
   description: string;
   requesterId: string;
@@ -70,7 +80,8 @@ export interface Ticket {
 
 export interface Incident {
   id: string;
-  number: string; // INC-204
+  org_id: string;
+  number: string;
   title: string;
   service: string;
   impact: "low" | "medium" | "high";
@@ -90,6 +101,7 @@ export interface Incident {
 
 export interface ServiceRequestItem {
   id: string;
+  org_id: string;
   catalog: string;
   title: string;
   description: string;
@@ -99,6 +111,7 @@ export interface ServiceRequestItem {
 
 export interface ServiceRequest {
   id: string;
+  org_id: string;
   number: string;
   itemId: string;
   itemTitle: string;
@@ -112,6 +125,7 @@ export interface ServiceRequest {
 
 export interface KbArticle {
   id: string;
+  org_id: string;
   title: string;
   category: string;
   excerpt: string;
@@ -124,6 +138,7 @@ export interface KbArticle {
 
 export interface SlaPolicy {
   id: string;
+  org_id: string;
   name: string;
   priority: Priority;
   responseMins: number;
@@ -133,6 +148,7 @@ export interface SlaPolicy {
 
 export interface LogEntry {
   id: string;
+  org_id: string;
   at: string;
   actor: string;
   action: string;
