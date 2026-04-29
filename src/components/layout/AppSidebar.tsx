@@ -3,7 +3,7 @@ import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, Ticket, AlertOctagon, ClipboardList, Users, UserCog,
   Timer, BookOpen, BarChart3, ScrollText, Settings, Sparkles, LogOut,
-  PanelLeftClose, PanelLeft, Inbox, UsersRound, CheckSquare, CreditCard, ShieldCheck, Plug, Zap, Smile, ListChecks, Palette, Bell, Bookmark, Layers, Database, Activity, Wand2
+  PanelLeftClose, PanelLeft, Inbox, UsersRound, CheckSquare, CreditCard, ShieldCheck, Plug, Zap, Smile, ListChecks, Palette, Bell, Bookmark, Layers, Database, Activity, Wand2, Webhook
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -83,6 +83,7 @@ const SECTIONS: NavSection[] = [
       { to: "/app/billing",    label: "Billing & Plan",   i18nKey: "nav.billing",       icon: CreditCard,      roles: ["owner"] },
       { to: "/app/security",   label: "Security",         i18nKey: "nav.security",      icon: ShieldCheck,     roles: ["owner", "admin"] },
       { to: "/app/integrations", label: "Integrations",   i18nKey: "nav.integrations",  icon: Plug,            roles: ["owner", "admin"] },
+      { to: "/app/webhooks",   label: "Webhooks",         i18nKey: "nav.webhooks",      icon: Webhook,         roles: ["owner", "admin"] },
     ],
   },
 ];
