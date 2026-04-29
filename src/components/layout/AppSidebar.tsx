@@ -10,7 +10,8 @@ import { toast } from "sonner";
 import { useAppStore } from "@/lib/store";
 import { useAuth, type AppRole } from "@/contexts/AuthContext";
 import { useT } from "@/lib/i18n-app";
-import advoraLogo from "@/assets/advora-logo-light.png";
+import advoraLogoDark from "@/assets/advora-logo-dark.png";
+import advoraLogoLight from "@/assets/advora-logo-light.png";
 
 interface NavItem {
   to: string;
