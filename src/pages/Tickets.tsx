@@ -836,80 +836,71 @@ function SuggestedArticle({ title }: { title: string }) {
 }
 
 function SelectMenu<T extends string>({ label, value, options, onChange }: { label?: string; value: T; options: T[]; onChange: (v: T) => void }) {
-  const [open, setOpen] = useState(false);
   return (
-    <div className="relative">
-      <button
-        onClick={() => setOpen(!open)}
-        className="h-7 px-2 rounded-md bg-surface-2 hover:bg-muted text-[11px] font-medium flex items-center gap-1 capitalize border border-transparent hover:border-border transition-colors"
-      >
-        {label && <span className="text-muted-foreground font-normal">{label}:</span>}
-        <span>{value.replace("_", " ")}</span>
-        <ChevronDown className="h-3 w-3 opacity-60" />
-      </button>
-      {open && (
-        <>
-          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute left-0 mt-1 w-44 rounded-lg bg-popover border border-border shadow-lg z-50 py-1 animate-fade-in">
-            {options.map(o => (
-              <button key={o}
-                onClick={() => { onChange(o); setOpen(false); }}
-                className="w-full text-left text-[11px] px-2.5 py-1.5 hover:bg-surface-2 capitalize flex items-center justify-between"
-              >
-                {o.replace("_", " ")}
-                {o === value && <span className="h-1.5 w-1.5 rounded-full bg-primary" />}
-              </button>
-            ))}
-          </div>
-        </>
-      )}
-    </div>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          className="h-7 px-2 rounded-md bg-surface-2 hover:bg-muted text-[11px] font-medium flex items-center gap-1 capitalize border border-transparent hover:border-border transition-colors"
+        >
+          {label && <span className="text-muted-foreground font-normal">{label}:</span>}
+          <span>{value.replace("_", " ")}</span>
+          <ChevronDown className="h-3 w-3 opacity-60" />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start" className="w-44">
+        {options.map((o) => (
+          <DropdownMenuItem
+            key={o}
+            onSelect={() => onChange(o)}
+            className="text-[11px] capitalize flex items-center justify-between"
+          >
+            {o.replace("_", " ")}
+            {o === value && <span className="h-1.5 w-1.5 rounded-full bg-primary" />}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 
 function AssigneeMenu({ value, onChange }: { value?: string; onChange: (id: string | undefined) => void }) {
-  const [open, setOpen] = useState(false);
   const orgAgents = useOrgAgents();
   const a = value ? findAgent(value) : null;
   return (
-    <div className="relative">
-      <button
-        onClick={() => setOpen(!open)}
-        className="h-7 px-2 rounded-md bg-surface-2 hover:bg-muted text-[11px] font-medium flex items-center gap-1.5 border border-transparent hover:border-border transition-colors"
-      >
-        <span className="text-muted-foreground font-normal">Assignee:</span>
-        {a ? (
-          <span className="flex items-center gap-1">
-            <Avatar initials={a.initials} color={a.avatarColor} size={14} />
-            {a.name.split(" ")[0]}
-          </span>
-        ) : (
-          <span className="text-muted-foreground italic">Unassigned</span>
-        )}
-        <ChevronDown className="h-3 w-3 opacity-60" />
-      </button>
-      {open && (
-        <>
-          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute left-0 mt-1 w-52 rounded-lg bg-popover border border-border shadow-lg z-50 py-1 animate-fade-in max-h-72 overflow-y-auto">
-            <button
-              onClick={() => { onChange(undefined); setOpen(false); }}
-              className="w-full text-left text-[11px] px-2.5 py-1.5 hover:bg-surface-2 text-muted-foreground italic"
-            >Unassigned</button>
-            {orgAgents.map(ag => (
-              <button key={ag.id}
-                onClick={() => { onChange(ag.id); setOpen(false); }}
-                className="w-full text-left text-[11px] px-2.5 py-1.5 hover:bg-surface-2 flex items-center gap-2"
-              >
-                <Avatar initials={ag.initials} color={ag.avatarColor} size={18} online={ag.online} />
-                <span className="flex-1">{ag.name}</span>
-                {ag.id === value && <span className="h-1.5 w-1.5 rounded-full bg-primary" />}
-              </button>
-            ))}
-          </div>
-        </>
-      )}
-    </div>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          className="h-7 px-2 rounded-md bg-surface-2 hover:bg-muted text-[11px] font-medium flex items-center gap-1.5 border border-transparent hover:border-border transition-colors"
+        >
+          <span className="text-muted-foreground font-normal">Assignee:</span>
+          {a ? (
+            <span className="flex items-center gap-1">
+              <Avatar initials={a.initials} color={a.avatarColor} size={14} />
+              {a.name.split(" ")[0]}
+            </span>
+          ) : (
+            <span className="text-muted-foreground italic">Unassigned</span>
+          )}
+          <ChevronDown className="h-3 w-3 opacity-60" />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start" className="w-52 max-h-72 overflow-y-auto">
+        <DropdownMenuItem onSelect={() => onChange(undefined)} className="text-[11px] text-muted-foreground italic">
+          Unassigned
+        </DropdownMenuItem>
+        {orgAgents.map((ag) => (
+          <DropdownMenuItem
+            key={ag.id}
+            onSelect={() => onChange(ag.id)}
+            className="text-[11px] flex items-center gap-2"
+          >
+            <Avatar initials={ag.initials} color={ag.avatarColor} size={18} online={ag.online} />
+            <span className="flex-1">{ag.name}</span>
+            {ag.id === value && <span className="h-1.5 w-1.5 rounded-full bg-primary" />}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 
