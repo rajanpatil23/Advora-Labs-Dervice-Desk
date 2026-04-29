@@ -40,6 +40,7 @@ import Integrations from "./pages/Integrations";
 import Automations from "./pages/Automations";
 import Csat from "./pages/Csat";
 import PublicSurvey from "./pages/PublicSurvey";
+import CustomFields from "./pages/CustomFields";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -82,6 +83,7 @@ const App = () => (
                 <Route path="integrations" element={<Integrations />} />
                 <Route path="automations" element={<Automations />} />
                 <Route path="csat" element={<Csat />} />
+                <Route path="fields" element={<CustomFields />} />
               </Route>
             </Route>
 
