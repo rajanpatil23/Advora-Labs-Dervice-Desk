@@ -4,7 +4,7 @@ import { ArrowRight, Loader2, Mail, Lock, User, Building2 } from "lucide-react";
 import { authApi } from "@/lib/api/auth";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
-import advoraLogo from "@/assets/advora-logo-light.png";
+import advoraLogo from "@/assets/advora-logo-dark.png";
 
 export default function SignUp() {
   const nav = useNavigate();

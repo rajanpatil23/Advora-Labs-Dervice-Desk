@@ -6,7 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { SEED_USERS, SEED_PLATFORM_ADMINS } from "@/lib/api/seedUsers";
 import { postLoginRedirect } from "@/lib/roleRoutes";
 import { toast } from "sonner";
-import advoraLogo from "@/assets/advora-logo-light.png";
+import advoraLogo from "@/assets/advora-logo-dark.png";
 
 export default function Login() {
   const nav = useNavigate();
