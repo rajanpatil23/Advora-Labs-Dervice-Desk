@@ -610,15 +610,33 @@ export function useCurrentOrgUser() {
 }
 
 // Bridge: keep store.currentOrgId + currentUserId in sync with AuthContext.
+// IMPORTANT: keep hook calls flat & unconditional to avoid "rendered more hooks
+// than during the previous render" errors. We read/write the store via
+// getState/setState inside effects rather than via reactive selectors.
 export function useOrgSync() {
-  const { currentOrgId, user } = useAuth();
-  const setCurrentOrg = useAppStore((s) => s.setCurrentOrg);
-  const setCurrentUser = useAppStore((s) => s.setCurrentUser);
-  const me = useCurrentOrgUser();
-  useEffect(() => { setCurrentOrg(currentOrgId); }, [currentOrgId, setCurrentOrg]);
+  const auth = useAuth();
+  const currentOrgId = auth?.currentOrgId ?? null;
+  const userId = auth?.user?.id ?? null;
+  const userEmail = auth?.user?.email ?? null;
+  const userName = auth?.user?.full_name ?? null;
+
   useEffect(() => {
-    setCurrentUser(me?.id ?? null, me?.name ?? user?.full_name ?? user?.email ?? null);
-  }, [me?.id, me?.name, user?.full_name, user?.email, setCurrentUser]);
+    useAppStore.getState().setCurrentOrg(currentOrgId);
+  }, [currentOrgId]);
+
+  useEffect(() => {
+    if (!currentOrgId) {
+      useAppStore.getState().setCurrentUser(null, null);
+      return;
+    }
+    const { orgAgents, orgCustomers } = useAppStore.getState();
+    const match = [...orgAgents, ...orgCustomers].find((u) => u.email === userEmail);
+    if (match) {
+      useAppStore.getState().setCurrentUser(match.id, match.name);
+    } else {
+      useAppStore.getState().setCurrentUser(userId, userName ?? userEmail);
+    }
+  }, [currentOrgId, userId, userEmail, userName]);
 }
 
 // Backwards-compatibility (full datasets — used only by helpers like findUser).
