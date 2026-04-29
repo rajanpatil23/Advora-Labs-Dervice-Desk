@@ -49,7 +49,7 @@ export default function Tickets() {
   const [filterCategory, setFilterCategory] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [tick, setTick] = useState(0);
-  const me = agents[0];
+  // me already declared above via useCurrentOrgUser
   const composerRef = useRef<HTMLTextAreaElement>(null);
   const threadRef = useRef<HTMLDivElement>(null);
 
