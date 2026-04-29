@@ -69,6 +69,7 @@ import SlaForecast from "./pages/SlaForecast";
 import AiAssistant from "./pages/AiAssistant";
 import Sentiment from "./pages/Sentiment";
 import Routing from "./pages/Routing";
+import KbAiSearch from "./pages/KbAiSearch";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -140,6 +141,7 @@ const App = () => (
                 <Route path="ai" element={<AiAssistant />} />
                 <Route path="sentiment" element={<Sentiment />} />
                 <Route path="routing" element={<Routing />} />
+                <Route path="kb-search" element={<KbAiSearch />} />
               </Route>
             </Route>
 

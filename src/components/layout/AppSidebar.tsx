@@ -3,7 +3,7 @@ import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, Ticket, AlertOctagon, ClipboardList, Users, UserCog,
   Timer, BookOpen, BarChart3, ScrollText, Settings, Sparkles, LogOut,
-  PanelLeftClose, PanelLeft, Inbox, UsersRound, CheckSquare, CreditCard, ShieldCheck, Plug, Zap, Smile, ListChecks, Palette, Bell, Bookmark, Layers, Database, Activity, Wand2, Webhook, Code2, KeyRound, FileCheck2, Globe2, Workflow as WorkflowIcon, Siren, CalendarRange, MessageSquareQuote, GitMerge, TrendingUp, Heart, Route as RouteIcon
+  PanelLeftClose, PanelLeft, Inbox, UsersRound, CheckSquare, CreditCard, ShieldCheck, Plug, Zap, Smile, ListChecks, Palette, Bell, Bookmark, Layers, Database, Activity, Wand2, Webhook, Code2, KeyRound, FileCheck2, Globe2, Workflow as WorkflowIcon, Siren, CalendarRange, MessageSquareQuote, GitMerge, TrendingUp, Heart, Route as RouteIcon, BookOpenCheck
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -55,6 +55,7 @@ const SECTIONS: NavSection[] = [
       { to: "/app/canned",     label: "Canned responses", icon: MessageSquareQuote,                            roles: ["owner", "admin", "manager", "agent", "resolver"] },
       { to: "/app/links",      label: "Links & merges",   icon: GitMerge,                                      roles: ["owner", "admin", "manager", "agent", "resolver"] },
       { to: "/app/kb",         label: "Knowledge Base",   i18nKey: "nav.knowledge",     icon: BookOpen },
+      { to: "/app/kb-search",  label: "AI KB search",     icon: BookOpenCheck,                                 roles: ["owner", "admin", "manager", "agent", "resolver"] },
     ],
   },
   {
