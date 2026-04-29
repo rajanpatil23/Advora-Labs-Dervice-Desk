@@ -36,6 +36,7 @@ const SECTIONS: NavSection[] = [
       { to: "/app/team",       label: "Team Dashboard",   i18nKey: "nav.team",          icon: UsersRound,      roles: ["manager"] },
       { to: "/app/my-queue",   label: "My Queue",         i18nKey: "nav.myQueue",       icon: Inbox,           roles: ["agent", "resolver"] },
       { to: "/app/inbox",      label: "Unified inbox",    icon: Inbox,                                         roles: ["owner", "admin", "manager", "agent", "resolver"] },
+      { to: "/app/ai",         label: "AI assistant",     icon: Sparkles,                                      roles: ["owner", "admin", "manager", "agent", "resolver"] },
     ],
   },
   {

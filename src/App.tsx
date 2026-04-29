@@ -66,6 +66,7 @@ import Scheduling from "./pages/Scheduling";
 import CannedResponses from "./pages/CannedResponses";
 import TicketLinks from "./pages/TicketLinks";
 import SlaForecast from "./pages/SlaForecast";
+import AiAssistant from "./pages/AiAssistant";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -134,6 +135,7 @@ const App = () => (
                 <Route path="canned" element={<CannedResponses />} />
                 <Route path="links" element={<TicketLinks />} />
                 <Route path="sla-forecast" element={<SlaForecast />} />
+                <Route path="ai" element={<AiAssistant />} />
               </Route>
             </Route>
 
