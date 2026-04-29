@@ -78,7 +78,7 @@ const defaultSettings = (categories: string[]): OrgSettings => ({
     "Mention in note": true,
     "Daily summary": false,
   },
-  companyName: "Connecttly",
+  companyName: "Advora",
   supportEmail: "support@connecttly.io",
   timezone: "Europe/Stockholm",
   require2fa: true,

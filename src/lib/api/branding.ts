@@ -16,7 +16,7 @@ export type Branding = {
 const KEY = "lov.branding.v1";
 
 const defaults: Branding = {
-  companyName: "Connecttly",
+  companyName: "Advora",
   primaryHsl: "215 88% 56%",
   accentHsl: "180 60% 42%",
   theme: "system",

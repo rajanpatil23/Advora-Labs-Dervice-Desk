@@ -115,7 +115,7 @@ export function PortalLayout() {
       </main>
 
       <footer className="border-t border-border py-6 text-center text-xs text-muted-foreground">
-        Powered by <span className="font-semibold text-foreground">Connecttly</span>
+        Powered by <span className="font-semibold text-foreground">Advora</span>
       </footer>
 
       <PortalChatWidget />

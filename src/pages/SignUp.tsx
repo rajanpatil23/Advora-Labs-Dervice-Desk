@@ -38,7 +38,7 @@ export default function SignUp() {
             <Sparkles className="h-5 w-5 text-primary-foreground" />
           </div>
           <div>
-            <div className="font-display font-bold text-sidebar-accent-foreground text-lg">Connecttly</div>
+            <div className="font-display font-bold text-sidebar-accent-foreground text-lg">Advora</div>
             <div className="text-[10px] uppercase tracking-[0.2em] text-sidebar-foreground/60">Support OS</div>
           </div>
         </div>
@@ -48,7 +48,7 @@ export default function SignUp() {
           </h1>
           <p className="text-sidebar-foreground/70 text-lg">Tickets, incidents, SLAs and a knowledge base — all in one focused workspace.</p>
         </div>
-        <div className="relative text-xs text-sidebar-foreground/50">© Connecttly 2026</div>
+        <div className="relative text-xs text-sidebar-foreground/50">© Advora 2026</div>
       </div>
 
       <div className="flex flex-col justify-center p-6 sm:p-12">
