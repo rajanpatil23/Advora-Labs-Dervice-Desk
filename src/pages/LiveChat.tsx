@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useAppStore } from "@/lib/store";
 import {
   subscribe, listSessions, getSession, appendMessage, markRead,
   assignAgent, endSession, setTags, seedIfEmpty, chatStats, startSession,
   type ChatSession, type ChatMessage,
 } from "@/lib/api/liveChat";
+import { chatbotAutoReply, chatbotGreet, type BotReply } from "@/lib/api/aiChatbot";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
   MessageCircle, Send, UserPlus, X, Globe, Monitor, Smartphone, Tablet,
-  Plus, CheckCheck, Tag as TagIcon, Star,
+  Plus, CheckCheck, Tag as TagIcon, Star, Bot, Sparkles, Loader2, Wand2,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -159,8 +161,13 @@ function ChatThread({
   session: ChatSession;
   currentUser: { id: string; name: string };
 }) {
+  const articles = useAppStore(s => s.articles);
   const [input, setInput] = useState("");
   const [tagInput, setTagInput] = useState("");
+  const [autopilot, setAutopilot] = useState(false);
+  const [botSuggestion, setBotSuggestion] = useState<BotReply | null>(null);
+  const [botBusy, setBotBusy] = useState(false);
+  const lastVisitorMsgIdRef = useRef<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -170,6 +177,60 @@ function ChatThread({
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [session.messages.length]);
+
+  // reset suggestion when switching sessions
+  useEffect(() => {
+    setBotSuggestion(null);
+    lastVisitorMsgIdRef.current = null;
+  }, [session.id]);
+
+  const lastVisitorMsg = useMemo(() => {
+    for (let i = session.messages.length - 1; i >= 0; i--) {
+      if (session.messages[i].sender === "visitor") return session.messages[i];
+    }
+    return null;
+  }, [session.messages]);
+
+  // Autopilot: when a new visitor message arrives and autopilot is on, ask bot to reply
+  useEffect(() => {
+    if (!autopilot || !lastVisitorMsg) return;
+    if (session.status === "ended") return;
+    if (lastVisitorMsgIdRef.current === lastVisitorMsg.id) return;
+    lastVisitorMsgIdRef.current = lastVisitorMsg.id;
+    runBot(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autopilot, lastVisitorMsg?.id, session.status]);
+
+  async function runBot(autoSend: boolean) {
+    setBotBusy(true);
+    try {
+      const reply = await chatbotAutoReply({ session, kbArticles: articles });
+      setBotSuggestion(reply);
+      if (autoSend && !reply.shouldHandoff) {
+        appendMessage(session.id, { sender: "bot", authorName: "AI assistant", body: reply.reply });
+        setBotSuggestion(null);
+      }
+      if (reply.shouldHandoff && session.status !== "active") {
+        toast.warning("Bot recommends human handoff", { description: reply.handoffReason });
+      }
+    } catch (e: any) {
+      toast.error(e.message ?? "Bot failed");
+    } finally {
+      setBotBusy(false);
+    }
+  }
+
+  async function greet() {
+    setBotBusy(true);
+    try {
+      const reply = await chatbotGreet({ visitor: session.visitor });
+      appendMessage(session.id, { sender: "bot", authorName: "AI assistant", body: reply });
+    } catch (e: any) {
+      toast.error(e.message ?? "Greeting failed");
+    } finally {
+      setBotBusy(false);
+    }
+  }
 
   // Visitor auto-reply demo: 30% chance after agent sends
   function maybeAutoReply() {
@@ -188,11 +249,13 @@ function ChatThread({
     if (!input.trim()) return;
     appendMessage(session.id, { sender: "agent", authorName: currentUser.name, body: input.trim() });
     setInput("");
+    setBotSuggestion(null);
     maybeAutoReply();
   }
 
   function take() {
     assignAgent(session.id, currentUser.id, currentUser.name);
+    setAutopilot(false);
     toast.success("You took this chat");
   }
 
@@ -206,6 +269,12 @@ function ChatThread({
     if (!t || session.tags.includes(t)) return;
     setTags(session.id, [...session.tags, t]);
     setTagInput("");
+  }
+
+  function useSuggestion() {
+    if (!botSuggestion) return;
+    setInput(botSuggestion.reply);
+    setBotSuggestion(null);
   }
 
   const Device = deviceIcon(session.visitor.device);
