@@ -36,10 +36,13 @@ const replyTemplates = [
 ];
 
 export default function Tickets() {
-  const { tickets: allTickets, selectedTicketId, setSelectedTicket, addMessage, setStatus, setPriority, setAssignee } = useAppStore();
+  const { tickets: allTickets, selectedTicketId, setSelectedTicket, addMessage, setStatus, setPriority, setAssignee, toggleWatcher, deleteTicket } = useAppStore();
   const orgAgents = useOrgAgents();
   const me = useCurrentOrgUser();
   const isRequester = me?.role === "requester";
+  const role = me?.role;
+  const canManage = role === "owner" || role === "admin" || role === "manager";
+  const canWork = canManage || role === "agent" || role === "resolver";
   const tickets = useMemo(
     () => (isRequester && me ? allTickets.filter(t => t.requesterId === me.id) : allTickets),
     [allTickets, isRequester, me?.id]
