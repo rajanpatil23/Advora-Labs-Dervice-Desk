@@ -25,10 +25,10 @@ const TONES: Tone[] = ["friendly", "formal", "concise", "empathetic"];
 
 function toThreadMessages(msgs: Message[]): ThreadMsg[] {
   return msgs.map(m => ({
-    role: m.kind === "agent" ? "agent" : m.kind === "requester" ? "requester" : "system",
-    author: m.author,
+    role: m.authorRole === "agent" ? "agent" : m.authorRole === "requester" ? "requester" : "system",
+    author: m.authorName,
     body: m.body,
-    internal: m.internal,
+    internal: m.isInternal,
   }));
 }
 
