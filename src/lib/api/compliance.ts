@@ -2,7 +2,7 @@
 // Signs export payloads with HMAC-SHA256 using a per-org key persisted in localStorage.
 // Backend agent: replace this with a real export pipeline; UI shape stays the same.
 
-import type { OrgLog } from "@/lib/store";
+import type { LogEntry } from "@/lib/types";
 
 export type ExportFormat = "csv" | "json" | "ndjson";
 
@@ -105,15 +105,15 @@ function escapeCsv(value: unknown): string {
   return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 }
 
-function logsToCsv(logs: OrgLog[]): string {
-  const headers = ["id", "timestamp", "type", "actor", "action", "subject", "details"];
+function logsToCsv(logs: LogEntry[]): string {
+  const headers = ["id", "at", "type", "actor", "action", "target"];
   const rows = logs.map(l => [
-    l.id, l.timestamp, l.type, l.actor, l.action, l.subject ?? "", l.details ?? "",
+    l.id, l.at, l.type, l.actor, l.action, l.target,
   ].map(escapeCsv).join(","));
   return [headers.join(","), ...rows].join("\n");
 }
 
-function logsToJson(logs: OrgLog[]): string {
+function logsToJson(logs: LogEntry[]): string {
   return JSON.stringify({
     exportedAt: new Date().toISOString(),
     schemaVersion: 1,
@@ -121,7 +121,7 @@ function logsToJson(logs: OrgLog[]): string {
   }, null, 2);
 }
 
-function logsToNdjson(logs: OrgLog[]): string {
+function logsToNdjson(logs: LogEntry[]): string {
   return logs.map(l => JSON.stringify(l)).join("\n");
 }
 
@@ -183,21 +183,23 @@ export const complianceApi = {
     write(s);
   },
   generateExport: async (params: {
-    logs: OrgLog[];
+    logs: LogEntry[];
     format: ExportFormat;
     range: "1h" | "24h" | "7d" | "30d" | "90d" | "all";
     filters: Record<string, string | undefined>;
   }): Promise<{ record: ExportRecord; manifest: string }> => {
     const cutoff = rangeBoundary(params.range);
     const filtered = cutoff
-      ? params.logs.filter(l => new Date(l.timestamp).getTime() >= cutoff)
+      ? params.logs.filter(l => new Date(l.at).getTime() >= cutoff)
       : params.logs;
 
     const retention = read().retention;
     const sanitized = filtered.map(l => ({
       ...l,
-      actor: retention.pseudonymizeRequesters ? `user_${l.actor.split("").reduce((a, c) => a + c.charCodeAt(0), 0).toString(16)}` : l.actor,
-      details: retention.redactMessageBodies && l.type !== "system" ? "[redacted]" : l.details,
+      actor: retention.pseudonymizeRequesters
+        ? `user_${l.actor.split("").reduce((a, c) => a + c.charCodeAt(0), 0).toString(16)}`
+        : l.actor,
+      target: retention.redactMessageBodies && l.type !== "system" ? "[redacted]" : l.target,
     }));
 
     const content = params.format === "csv" ? logsToCsv(sanitized)
