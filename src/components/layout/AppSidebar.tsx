@@ -3,7 +3,7 @@ import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, Ticket, AlertOctagon, ClipboardList, Users, UserCog,
   Timer, BookOpen, BarChart3, ScrollText, Settings, Sparkles, LogOut,
-  PanelLeftClose, PanelLeft, Inbox, UsersRound, CheckSquare, CreditCard, ShieldCheck, Plug, Zap, Smile, ListChecks, Palette, Bell, Bookmark, Layers, Database, Activity, Wand2, Webhook, Code2, KeyRound, FileCheck2, Globe2, Workflow as WorkflowIcon, Siren, CalendarRange, MessageSquareQuote, GitMerge
+  PanelLeftClose, PanelLeft, Inbox, UsersRound, CheckSquare, CreditCard, ShieldCheck, Plug, Zap, Smile, ListChecks, Palette, Bell, Bookmark, Layers, Database, Activity, Wand2, Webhook, Code2, KeyRound, FileCheck2, Globe2, Workflow as WorkflowIcon, Siren, CalendarRange, MessageSquareQuote, GitMerge, TrendingUp
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -62,6 +62,7 @@ const SECTIONS: NavSection[] = [
       { to: "/app/reports",        label: "Reports",         i18nKey: "nav.reports",       icon: BarChart3,       roles: ["owner", "admin", "manager"] },
       { to: "/app/report-builder", label: "Report builder",  i18nKey: "nav.reportBuilder", icon: BarChart3,       roles: ["owner", "admin", "manager"] },
       { to: "/app/csat",           label: "CSAT",            i18nKey: "nav.csat",          icon: Smile,           roles: ["owner", "admin", "manager"] },
+      { to: "/app/sla-forecast",   label: "SLA forecast",    icon: TrendingUp,                                    roles: ["owner", "admin", "manager"] },
     ],
   },
   {
