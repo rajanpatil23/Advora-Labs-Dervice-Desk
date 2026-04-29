@@ -13,6 +13,9 @@ import {
 import type { Priority, TicketStatus } from "@/lib/types";
 import { NewTicketDialog } from "@/components/dialogs/NewTicketDialog";
 import { AssistSuggestButton, AssistInsightsPanel } from "@/components/tickets/AiAssist";
+import { MentionAutocomplete, type MentionAutocompleteHandle } from "@/components/common/MentionAutocomplete";
+import { extractMentionHandles, toMentionable } from "@/lib/mentions";
+import { emitNotification } from "@/lib/api/notificationEngine";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { PresenceBubbles } from "@/components/common/Presence";
