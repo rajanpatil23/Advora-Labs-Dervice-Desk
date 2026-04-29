@@ -49,6 +49,35 @@ export const aiAssist = {
       tone,
     }),
 
+  suggestDrafts: (
+    ticket: Ticket,
+    opts: {
+      requesterName?: string;
+      agentName?: string;
+      tone?: AssistTone;
+      variantCount?: 2 | 3 | 4;
+      kbArticles?: { title: string; excerpt: string }[];
+      customInstructions?: string;
+    } = {},
+  ) =>
+    invoke<{
+      drafts: Array<{
+        label: string;
+        body: string;
+        groundedArticles: number[];
+        asksClarifyingQuestion: boolean;
+      }>;
+    }>({
+      mode: "suggest_drafts",
+      ticket: ticketPayload(ticket, opts.requesterName),
+      messages: messagesPayload(ticket),
+      tone: opts.tone ?? "friendly",
+      variantCount: opts.variantCount ?? 3,
+      kbArticles: opts.kbArticles ?? [],
+      agentName: opts.agentName,
+      customInstructions: opts.customInstructions,
+    }),
+
   categorize: (ticket: Ticket, requesterName?: string, categories?: string[]) =>
     invoke<{
       classification: {
