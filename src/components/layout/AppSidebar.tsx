@@ -3,7 +3,7 @@ import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, Ticket, AlertOctagon, ClipboardList, Users, UserCog,
   Timer, BookOpen, BarChart3, ScrollText, Settings, Sparkles, LogOut,
-  PanelLeftClose, PanelLeft, Inbox, UsersRound, CheckSquare, CreditCard, ShieldCheck, Plug, Zap, Smile, ListChecks, Palette, Bell, Bookmark, Layers, Database, Activity, Wand2, Webhook, Code2, KeyRound, FileCheck2, Globe2, Workflow as WorkflowIcon, Siren, CalendarRange
+  PanelLeftClose, PanelLeft, Inbox, UsersRound, CheckSquare, CreditCard, ShieldCheck, Plug, Zap, Smile, ListChecks, Palette, Bell, Bookmark, Layers, Database, Activity, Wand2, Webhook, Code2, KeyRound, FileCheck2, Globe2, Workflow as WorkflowIcon, Siren, CalendarRange, MessageSquareQuote
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -50,6 +50,7 @@ const SECTIONS: NavSection[] = [
       { to: "/app/bulk",       label: "Bulk Actions",     icon: Layers,                                       roles: ["owner", "admin", "manager"] },
       { to: "/app/data",       label: "Import / Export",  i18nKey: "nav.data",          icon: Database,        roles: ["owner", "admin"] },
       { to: "/app/macros",     label: "Macros",           i18nKey: "nav.macros",        icon: Wand2,           roles: ["owner", "admin", "manager", "agent", "resolver"] },
+      { to: "/app/canned",     label: "Canned responses", icon: MessageSquareQuote,                            roles: ["owner", "admin", "manager", "agent", "resolver"] },
       { to: "/app/kb",         label: "Knowledge Base",   i18nKey: "nav.knowledge",     icon: BookOpen },
     ],
   },
