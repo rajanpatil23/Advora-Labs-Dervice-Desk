@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useAppStore, findUser, findAgent, agents } from "@/lib/store";
+import { useAppStore, findUser, findAgent, useOrgAgents, useCurrentOrgUser } from "@/lib/store";
+import { useSearchParams } from "react-router-dom";
 import { PriorityChip, StatusChip, SlaChip, Avatar } from "@/components/common/Chips";
 import { timeAgo, timeUntil, formatDateTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -35,9 +36,17 @@ const replyTemplates = [
 ];
 
 export default function Tickets() {
-  const { tickets, selectedTicketId, setSelectedTicket, addMessage, setStatus, setPriority, setAssignee } = useAppStore();
+  const { tickets: allTickets, selectedTicketId, setSelectedTicket, addMessage, setStatus, setPriority, setAssignee } = useAppStore();
+  const orgAgents = useOrgAgents();
+  const me = useCurrentOrgUser();
+  const isRequester = me?.role === "requester";
+  const tickets = useMemo(
+    () => (isRequester && me ? allTickets.filter(t => t.requesterId === me.id) : allTickets),
+    [allTickets, isRequester, me?.id]
+  );
+  const [params, setParams] = useSearchParams();
   const [queue, setQueue] = useState("all");
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(params.get("q") ?? "");
   const [reply, setReply] = useState("");
   const [internal, setInternal] = useState(false);
   const [activeQuick, setActiveQuick] = useState<string | null>(null);
@@ -48,27 +57,27 @@ export default function Tickets() {
   const [filterCategory, setFilterCategory] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [tick, setTick] = useState(0);
-  const me = agents[0];
   const composerRef = useRef<HTMLTextAreaElement>(null);
   const threadRef = useRef<HTMLDivElement>(null);
 
-  // Initial loading skeleton
+  useEffect(() => { setSearch(params.get("q") ?? ""); }, [params]);
   useEffect(() => {
-    const t = setTimeout(() => setLoading(false), 400);
-    return () => clearTimeout(t);
-  }, []);
+    const cur = params.get("q") ?? "";
+    if (cur !== search) {
+      const next = new URLSearchParams(params);
+      if (search) next.set("q", search); else next.delete("q");
+      setParams(next, { replace: true });
+    }
+  }, [search]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Live SLA tick (every 30s)
-  useEffect(() => {
-    const i = setInterval(() => setTick((t) => t + 1), 30000);
-    return () => clearInterval(i);
-  }, []);
+  useEffect(() => { const t = setTimeout(() => setLoading(false), 400); return () => clearTimeout(t); }, []);
+  useEffect(() => { const i = setInterval(() => setTick((t) => t + 1), 30000); return () => clearInterval(i); }, []);
 
   const categories = useMemo(() => Array.from(new Set(tickets.map(t => t.category))), [tickets]);
 
   const filtered = useMemo(() => {
     let list = tickets;
-    if (queue === "mine") list = list.filter(t => t.assigneeId === me.id);
+    if (queue === "mine" && me) list = list.filter(t => t.assigneeId === me.id);
     if (queue === "unassigned") list = list.filter(t => !t.assigneeId);
     if (queue === "at_risk") list = list.filter(t => t.slaState === "at_risk" || t.slaState === "breached");
 
@@ -85,14 +94,13 @@ export default function Tickets() {
     if (search) list = list.filter(t =>
       (t.title + " " + t.number + " " + (findUser(t.requesterId)?.name ?? "")).toLowerCase().includes(search.toLowerCase())
     );
-    // Sort: at-risk first, then by updatedAt
     return [...list].sort((a, b) => {
       const sa = a.slaState === "breached" ? 0 : a.slaState === "at_risk" ? 1 : 2;
       const sb = b.slaState === "breached" ? 0 : b.slaState === "at_risk" ? 1 : 2;
       if (sa !== sb) return sa - sb;
       return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
     });
-  }, [tickets, queue, search, me.id, activeQuick, filterStatus, filterPriority, filterAssignee, filterCategory]);
+  }, [tickets, queue, search, me?.id, activeQuick, filterStatus, filterPriority, filterAssignee, filterCategory]);
 
   const selected = tickets.find(t => t.id === selectedTicketId) ?? filtered[0];
   const requester = selected ? findUser(selected.requesterId) : null;
@@ -263,7 +271,7 @@ export default function Tickets() {
                       <FilterSelect label="Priority" value={filterPriority} onChange={(v) => setFilterPriority(v as Priority)}
                         options={[["",""],["low","Low"],["medium","Medium"],["high","High"],["critical","Critical"]]} />
                       <FilterSelect label="Assignee" value={filterAssignee} onChange={setFilterAssignee}
-                        options={[["", "Anyone"], ...agents.map(a => [a.id, a.name] as [string, string])]} />
+                        options={[["", "Anyone"], ...orgAgents.map(a => [a.id, a.name] as [string, string])]} />
                       <FilterSelect label="Category" value={filterCategory} onChange={setFilterCategory}
                         options={[["", "All"], ...categories.map(c => [c, c] as [string, string])]} />
                     </div>
@@ -711,6 +719,7 @@ function SelectMenu<T extends string>({ label, value, options, onChange }: { lab
 
 function AssigneeMenu({ value, onChange }: { value?: string; onChange: (id: string | undefined) => void }) {
   const [open, setOpen] = useState(false);
+  const orgAgents = useOrgAgents();
   const a = value ? findAgent(value) : null;
   return (
     <div className="relative">
@@ -737,7 +746,7 @@ function AssigneeMenu({ value, onChange }: { value?: string; onChange: (id: stri
               onClick={() => { onChange(undefined); setOpen(false); }}
               className="w-full text-left text-[11px] px-2.5 py-1.5 hover:bg-surface-2 text-muted-foreground italic"
             >Unassigned</button>
-            {agents.map(ag => (
+            {orgAgents.map(ag => (
               <button key={ag.id}
                 onClick={() => { onChange(ag.id); setOpen(false); }}
                 className="w-full text-left text-[11px] px-2.5 py-1.5 hover:bg-surface-2 flex items-center gap-2"

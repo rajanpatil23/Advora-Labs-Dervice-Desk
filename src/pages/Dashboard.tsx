@@ -1,4 +1,4 @@
-import { useAppStore, agents } from "@/lib/store";
+import { useAppStore, useOrgAgents, useCurrentOrgUser } from "@/lib/store";
 import { Avatar, PriorityChip, SlaChip, StatusChip } from "@/components/common/Chips";
 import { timeAgo } from "@/lib/format";
 import { findUser } from "@/lib/store";
@@ -8,6 +8,8 @@ import { useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
   const { tickets, setSelectedTicket } = useAppStore();
+  const agents = useOrgAgents();
+  const me = useCurrentOrgUser();
   const nav = useNavigate();
   const open = tickets.filter(t => t.status !== "resolved" && t.status !== "closed").length;
   const overdue = tickets.filter(t => t.slaState === "breached").length;
@@ -46,7 +48,7 @@ export default function Dashboard() {
             <div>
               <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Support overview</div>
               <h1 className="mt-1 text-3xl lg:text-4xl font-display font-bold tracking-tight">
-                Good morning, <span className="gradient-text">{agents[0].name.split(" ")[0]}</span>
+                Good morning, <span className="gradient-text">{(me?.name ?? "there").split(" ")[0]}</span>
               </h1>
               <p className="mt-2 text-sm text-muted-foreground max-w-lg">Your team has {open} open tickets and {atRisk + overdue} need attention. Let's clear the queue.</p>
             </div>

@@ -7,25 +7,51 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { useAppStore } from "@/lib/store";
+import { useAuth, type AppRole } from "@/contexts/AuthContext";
 
-const items = [
-  { to: "/app/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/app", label: "Tickets", icon: Ticket, badge: "24", end: true },
-  { to: "/app/incidents", label: "Incidents", icon: AlertOctagon, badge: "3" },
+interface NavItem {
+  to: string;
+  label: string;
+  icon: typeof LayoutDashboard;
+  end?: boolean;
+  roles?: AppRole[]; // if omitted, visible to all roles
+  badgeKey?: "openTickets" | "activeIncidents";
+}
+
+const items: NavItem[] = [
+  { to: "/app/dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["owner", "admin", "manager", "agent", "resolver"] },
+  { to: "/app", label: "Tickets", icon: Ticket, end: true, badgeKey: "openTickets" },
+  { to: "/app/incidents", label: "Incidents", icon: AlertOctagon, badgeKey: "activeIncidents", roles: ["owner", "admin", "manager", "agent", "resolver"] },
   { to: "/app/requests", label: "Service Requests", icon: ClipboardList },
-  { to: "/app/users", label: "Users", icon: Users },
-  { to: "/app/agents", label: "Agents", icon: UserCog },
-  { to: "/app/sla", label: "SLA", icon: Timer },
+  { to: "/app/users", label: "Users", icon: Users, roles: ["owner", "admin", "manager"] },
+  { to: "/app/agents", label: "Agents", icon: UserCog, roles: ["owner", "admin", "manager"] },
+  { to: "/app/sla", label: "SLA", icon: Timer, roles: ["owner", "admin", "manager"] },
   { to: "/app/kb", label: "Knowledge Base", icon: BookOpen },
-  { to: "/app/reports", label: "Reports", icon: BarChart3 },
-  { to: "/app/logs", label: "Activity Logs", icon: ScrollText },
-  { to: "/app/settings", label: "Settings", icon: Settings },
+  { to: "/app/reports", label: "Reports", icon: BarChart3, roles: ["owner", "admin", "manager"] },
+  { to: "/app/logs", label: "Activity Logs", icon: ScrollText, roles: ["owner", "admin"] },
+  { to: "/app/settings", label: "Settings", icon: Settings, roles: ["owner", "admin"] },
 ];
 
 export function AppSidebar() {
   const loc = useLocation();
   const nav = useNavigate();
   const [collapsed, setCollapsed] = useState(true);
+  const { tickets, incidents } = useAppStore();
+  const { currentRole, signOut } = useAuth();
+
+  const counts = {
+    openTickets: tickets.filter((t) => t.status !== "resolved" && t.status !== "closed").length,
+    activeIncidents: incidents.filter((i) => i.status !== "resolved").length,
+  };
+
+  const visibleItems = items.filter((it) => !it.roles || (currentRole && it.roles.includes(currentRole)));
+
+  const handleSignOut = async () => {
+    await signOut();
+    toast.success("Signed out");
+    nav("/login");
+  };
 
   return (
     <aside
@@ -63,9 +89,11 @@ export function AppSidebar() {
         {!collapsed && (
           <div className="px-2 pb-2 text-[10px] uppercase tracking-wider text-sidebar-foreground/50">Workspace</div>
         )}
-        {items.map((it) => {
+        {visibleItems.map((it) => {
           const active = it.end ? loc.pathname === it.to : loc.pathname.startsWith(it.to);
           const Icon = it.icon;
+          const badge = it.badgeKey ? counts[it.badgeKey] : undefined;
+          const showBadge = badge !== undefined && badge > 0;
           return (
             <NavLink
               key={it.to}
@@ -85,16 +113,16 @@ export function AppSidebar() {
               {!collapsed && (
                 <>
                   <span className="flex-1">{it.label}</span>
-                  {it.badge && (
-                    <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-md bg-sidebar-primary/15 text-sidebar-primary">
-                      {it.badge}
+                  {showBadge && (
+                    <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-md bg-sidebar-primary/15 text-sidebar-primary tabular-nums">
+                      {badge}
                     </span>
                   )}
                 </>
               )}
-              {collapsed && it.badge && (
-                <span className="absolute -top-0.5 -right-0.5 h-4 min-w-[16px] px-1 rounded-full bg-sidebar-primary text-[9px] font-semibold text-sidebar-primary-foreground flex items-center justify-center">
-                  {it.badge}
+              {collapsed && showBadge && (
+                <span className="absolute -top-0.5 -right-0.5 h-4 min-w-[16px] px-1 rounded-full bg-sidebar-primary text-[9px] font-semibold text-sidebar-primary-foreground flex items-center justify-center tabular-nums">
+                  {badge}
                 </span>
               )}
             </NavLink>
@@ -113,7 +141,7 @@ export function AppSidebar() {
 
       <div className={cn("pb-3", collapsed ? "px-2" : "px-3")}>
         <button
-          onClick={() => { toast.success("Signed out"); nav("/"); }}
+          onClick={handleSignOut}
           title={collapsed ? "Sign out" : undefined}
           className={cn(
             "w-full flex items-center rounded-lg text-xs text-sidebar-foreground/70 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground transition-colors",

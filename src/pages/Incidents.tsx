@@ -4,12 +4,14 @@ import { timeAgo } from "@/lib/format";
 import { AlertOctagon, Activity, ShieldAlert, Layers, Server } from "lucide-react";
 import { NewIncidentDialog } from "@/components/dialogs/NewIncidentDialog";
 import { toast } from "sonner";
+import type { Incident } from "@/lib/types";
 
 const sevColors: Record<number, string> = { 1: "bg-destructive text-destructive-foreground", 2: "bg-accent text-accent-foreground", 3: "bg-warning text-warning-foreground", 4: "bg-info text-info-foreground" };
 const statusColor: Record<string,string> = { investigating: "bg-destructive/10 text-destructive", identified: "bg-warning/10 text-warning", monitoring: "bg-info/10 text-info", resolved: "bg-success/10 text-success" };
+const statusOrder: Incident["status"][] = ["investigating", "identified", "monitoring", "resolved"];
 
 export default function Incidents() {
-  const { incidents } = useAppStore();
+  const { incidents, setIncidentStatus } = useAppStore();
   return (
     <div className="h-full overflow-y-auto">
       <div className="px-6 lg:px-8 py-6 max-w-[1600px] mx-auto space-y-6">
@@ -54,7 +56,16 @@ export default function Incidents() {
                     </td>
                     <td className="py-3 text-xs flex items-center gap-1.5"><Server className="h-3 w-3 text-muted-foreground" /> {i.service}</td>
                     <td className="py-3"><span className={`text-[10px] font-bold px-2 py-0.5 rounded ${sevColors[i.severity]}`}>SEV {i.severity}</span></td>
-                    <td className="py-3"><span className={`text-[10px] capitalize font-medium px-2 py-0.5 rounded ${statusColor[i.status]}`}>{i.status}</span></td>
+                    <td className="py-3">
+                      <select
+                        value={i.status}
+                        onClick={(e) => e.stopPropagation()}
+                        onChange={(e) => { setIncidentStatus(i.id, e.target.value as Incident["status"]); toast.success(`Incident ${i.number} → ${e.target.value}`); }}
+                        className={`text-[10px] capitalize font-medium px-2 py-1 rounded outline-none border-0 ${statusColor[i.status]}`}
+                      >
+                        {statusOrder.map(s => <option key={s} value={s}>{s}</option>)}
+                      </select>
+                    </td>
                     <td className="py-3">{owner && <div className="flex items-center gap-2"><Avatar initials={owner.initials} color={owner.avatarColor} size={22} /><span className="text-xs">{owner.name}</span></div>}</td>
                     <td className="py-3 text-xs tabular-nums">{i.affected.toLocaleString()}</td>
                     <td className="py-3 pr-5 text-xs text-muted-foreground">{timeAgo(i.updatedAt)}</td>
