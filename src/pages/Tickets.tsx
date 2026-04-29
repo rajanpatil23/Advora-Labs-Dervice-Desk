@@ -13,6 +13,7 @@ import {
 import type { Priority, TicketStatus } from "@/lib/types";
 import { NewTicketDialog } from "@/components/dialogs/NewTicketDialog";
 import { AssistSuggestButton, AssistInsightsPanel } from "@/components/tickets/AiAssist";
+import { MacroPicker } from "@/components/tickets/MacroPicker";
 import { MentionAutocomplete, type MentionAutocompleteHandle } from "@/components/common/MentionAutocomplete";
 import { extractMentionHandles, toMentionable, toHandle, renderWithMentions } from "@/lib/mentions";
 import { emitNotification } from "@/lib/api/notificationEngine";
@@ -527,6 +528,7 @@ export default function Tickets() {
                   ><Lock className="h-3 w-3" /> Internal note</button>
                   <div className="ml-auto flex items-center gap-1">
                     <TemplateMenu onPick={(body) => setReply(body.replace("{name}", requester?.name.split(" ")[0] ?? "there"))} />
+                    <MacroPicker ticket={selected} me={me} requesterName={requester?.name} />
                     <AssistSuggestButton
                       ticket={selected}
                       requesterName={requester?.name}
