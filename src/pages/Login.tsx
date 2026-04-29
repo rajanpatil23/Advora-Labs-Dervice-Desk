@@ -22,7 +22,10 @@ export default function Login() {
       const session = await authApi.login(email, password);
       setSession(session);
       toast.success(`Welcome back, ${session.user.full_name}`);
-      nav(redirect, { replace: true });
+      const dest = session.user.platform_role && session.memberships.length === 0
+        ? "/platform"
+        : redirect;
+      nav(dest, { replace: true });
     } catch (err) {
       toast.error((err as Error).message || "Sign in failed");
     } finally {
