@@ -10,7 +10,8 @@ import { toast } from "sonner";
 import { useAppStore } from "@/lib/store";
 import { useAuth, type AppRole } from "@/contexts/AuthContext";
 import { useT } from "@/lib/i18n-app";
-import advoraLogo from "@/assets/advora-logo-light.png";
+import advoraLogoDark from "@/assets/advora-logo-dark.png";
+import advoraLogoLight from "@/assets/advora-logo-light.png";
 
 interface NavItem {
   to: string;
@@ -139,8 +140,9 @@ export function AppSidebar() {
       <div className={cn("flex items-center h-16 border-b border-sidebar-border", collapsed ? "px-2 justify-center" : "px-4 gap-2")}>
         {!collapsed && (
           <>
-            <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-sidebar-accent shrink-0 overflow-hidden">
-              <img src={advoraLogo} alt="Advora" className="h-7 w-7 object-contain" />
+            <div className="relative flex h-9 w-9 items-center justify-center shrink-0">
+              <img src={advoraLogoDark} alt="Advora" className="h-9 w-9 object-contain block dark:hidden" />
+              <img src={advoraLogoLight} alt="Advora" className="h-9 w-9 object-contain hidden dark:block" />
             </div>
             <div className="leading-tight min-w-0 flex-1">
               <div className="font-display font-bold text-sidebar-accent-foreground tracking-tight truncate">Advora</div>

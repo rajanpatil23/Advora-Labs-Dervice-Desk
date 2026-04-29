@@ -4,7 +4,7 @@ import { ArrowRight, Loader2, Mail, Lock, User, Building2 } from "lucide-react";
 import { authApi } from "@/lib/api/auth";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
-import advoraLogo from "@/assets/advora-logo-light.png";
+import advoraLogo from "@/assets/advora-logo-dark.png";
 
 export default function SignUp() {
   const nav = useNavigate();
@@ -37,8 +37,8 @@ export default function SignUp() {
       {/* Left brand panel */}
       <div className="relative hidden lg:flex flex-col justify-between p-10 overflow-hidden text-white" style={{ background: "linear-gradient(135deg, hsl(217 91% 55%) 0%, hsl(221 83% 45%) 100%)" }}>
         <div className="relative flex items-center gap-3">
-          <div className="h-11 w-11 rounded-xl bg-white/15 backdrop-blur flex items-center justify-center overflow-hidden ring-1 ring-white/20">
-            <img src={advoraLogo} alt="Advora" className="h-8 w-8 object-contain" />
+          <div className="h-11 w-11 rounded-xl bg-white flex items-center justify-center overflow-hidden ring-1 ring-white/30 shadow-sm">
+            <img src={advoraLogo} alt="Advora" className="h-9 w-9 object-contain" />
           </div>
           <div>
             <div className="font-display font-bold text-white text-lg leading-tight">Advora Service Desk</div>
