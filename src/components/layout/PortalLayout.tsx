@@ -8,6 +8,7 @@ import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent,
   DropdownMenuItem, DropdownMenuSeparator, DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
+import { PortalChatWidget } from "@/components/portal/PortalChatWidget";
 
 /**
  * Requester-facing portal shell.
@@ -116,6 +117,8 @@ export function PortalLayout() {
       <footer className="border-t border-border py-6 text-center text-xs text-muted-foreground">
         Powered by <span className="font-semibold text-foreground">Connecttly</span>
       </footer>
+
+      <PortalChatWidget />
     </div>
   );
 }
