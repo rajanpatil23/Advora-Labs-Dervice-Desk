@@ -2,12 +2,9 @@ import { useNavigate } from "react-router-dom";
 import { Sparkles, Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
-// Onboarding is currently a no-op in the dummy frontend: signup already creates
-// a workspace via /auth/signup. Kept around so the route stays valid and so the
-// local AI agent can wire it to a real /orgs endpoint later.
 export default function Onboarding() {
   const nav = useNavigate();
-  const { user, loading, signOut } = useAuth();
+  const { user, currentMembership, loading, signOut } = useAuth();
 
   if (loading) {
     return <div className="h-screen flex items-center justify-center bg-background"><Loader2 className="h-6 w-6 animate-spin" /></div>;
@@ -22,7 +19,7 @@ export default function Onboarding() {
         </div>
         <div className="font-display font-bold text-xl">You're all set</div>
         <p className="text-sm text-muted-foreground">
-          Workspace <span className="font-medium text-foreground">{user.org_name}</span> is ready.
+          Workspace <span className="font-medium text-foreground">{currentMembership?.org_name ?? "—"}</span> is ready.
         </p>
         <button onClick={() => nav("/app", { replace: true })} className="w-full h-11 rounded-xl bg-gradient-primary text-primary-foreground font-semibold text-sm hover:shadow-glow">
           Enter workspace
