@@ -212,7 +212,7 @@ export default function Login() {
               <div className="mt-2 rounded-xl border border-dashed border-border bg-surface/40 p-3">
                 <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-2">Password: demo</div>
                 <div className="grid grid-cols-1 gap-1">
-                  {SEED_USERS.map((u) => (
+                  {SEED_USERS.filter((u) => u.email !== "admin@demo.com").map((u) => (
                     <button
                       key={u.id}
                       type="button"
