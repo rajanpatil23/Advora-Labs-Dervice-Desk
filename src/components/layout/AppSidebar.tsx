@@ -3,7 +3,7 @@ import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, Ticket, AlertOctagon, ClipboardList, Users, UserCog,
   Timer, BookOpen, BarChart3, ScrollText, Settings, Sparkles, LogOut,
-  PanelLeftClose, PanelLeft, Inbox, UsersRound, CheckSquare, CreditCard, ShieldCheck, Plug, Zap, Smile, ListChecks, Palette, Bell, Bookmark, Layers, Database, Activity, Wand2, Webhook, Code2, KeyRound, FileCheck2, Globe2, Workflow as WorkflowIcon, Siren, CalendarRange, MessageSquareQuote, GitMerge
+  PanelLeftClose, PanelLeft, Inbox, UsersRound, CheckSquare, CreditCard, ShieldCheck, Plug, Zap, Smile, ListChecks, Palette, Bell, Bookmark, Layers, Database, Activity, Wand2, Webhook, Code2, KeyRound, FileCheck2, Globe2, Workflow as WorkflowIcon, Siren, CalendarRange, MessageSquareQuote, GitMerge, TrendingUp
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
