@@ -45,11 +45,33 @@ export default function Notifications() {
   const userId = (user as any).id ?? "anon";
 
   const [prefs, setPrefsState] = useState<NotificationPrefs>(() => readPrefs(userId));
+  const [feedback, setFeedbackState] = useState<FeedbackPrefs>(() => readFeedback(userId));
+  const [perm, setPerm] = useState<NotificationPermission | "unsupported">(() => desktopPermission());
 
   const update = (patch: Partial<NotificationPrefs>) => {
     const next = { ...prefs, ...patch };
     setPrefsState(next);
     writePrefs(userId, next);
+  };
+
+  const updateFeedback = (patch: Partial<FeedbackPrefs>) => {
+    const next = { ...feedback, ...patch };
+    setFeedbackState(next);
+    writeFeedback(userId, next);
+  };
+
+  const enableDesktop = async () => {
+    const result = await requestDesktopPermission();
+    setPerm(result);
+    if (result === "granted") {
+      updateFeedback({ desktopEnabled: true });
+      previewDesktop("Desktop notifications enabled", "You'll see alerts here when the app is in the background.");
+      toast.success("Desktop notifications enabled");
+    } else if (result === "denied") {
+      toast.error("Permission denied", { description: "Enable notifications in your browser settings." });
+    } else if (result === "unsupported") {
+      toast.error("Not supported in this browser");
+    }
   };
 
   const toggleMatrix = (key: NotificationEventKey, channel: Channel, value: boolean) => {
