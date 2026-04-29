@@ -1,5 +1,6 @@
 import { Bell, Search, Sun, Moon, Plus, HelpCircle, LogOut, User as UserIcon, Settings as SettingsIcon, Building2, Check, ChevronsUpDown, Sparkles } from "lucide-react";
 import { startProductTour } from "@/components/common/ProductTour";
+import { LanguageSwitcher } from "@/components/common/LanguageSwitcher";
 import { useAppStore } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { NewTicketDialog } from "@/components/dialogs/NewTicketDialog";
@@ -100,6 +101,7 @@ export function Topbar() {
             </Button>
           }
         />
+        <LanguageSwitcher />
         <button onClick={toggleTheme} className="h-9 w-9 rounded-lg flex items-center justify-center hover:bg-surface-2 transition-colors" aria-label="Toggle theme" title="Toggle theme">
           {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
         </button>
