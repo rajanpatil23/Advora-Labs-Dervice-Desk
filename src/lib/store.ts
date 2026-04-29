@@ -154,6 +154,8 @@ interface AppState {
   // Service requests
   addServiceRequest: (itemId: string) => ServiceRequest;
   advanceServiceRequest: (id: string) => void;
+  approveServiceRequest: (id: string) => void;
+  rejectServiceRequest: (id: string, reason?: string) => void;
 
   // Settings
   setCategories: (cats: string[]) => void;
@@ -545,6 +547,45 @@ export const useAppStore = create<AppState>((set, get) => {
         ),
       }));
       pushLog({ actor: meName(), action: `advanced to ${nextStatus}`, target: sr.number, type: "ticket" });
+    },
+
+    approveServiceRequest: (id) => {
+      const sr = get()._allRequests.find((r) => r.id === id);
+      if (!sr) return;
+      const stepNames = ["Submitted", "Approval", "Fulfillment", "Completed"];
+      set(reslice({
+        _allRequests: get()._allRequests.map((r) =>
+          r.id === id
+            ? {
+                ...r,
+                status: "fulfilling",
+                updatedAt: new Date().toISOString(),
+                approver: meName(),
+                steps: stepNames.map((n, i) => ({ name: n, status: i < 2 ? "done" : i === 2 ? "current" : "pending" })),
+              }
+            : r,
+        ),
+      }));
+      pushLog({ actor: meName(), action: "approved request", target: sr.number, type: "ticket" });
+    },
+
+    rejectServiceRequest: (id, reason) => {
+      const sr = get()._allRequests.find((r) => r.id === id);
+      if (!sr) return;
+      set(reslice({
+        _allRequests: get()._allRequests.map((r) =>
+          r.id === id
+            ? {
+                ...r,
+                status: "rejected",
+                updatedAt: new Date().toISOString(),
+                approver: meName(),
+                steps: r.steps.map((s, i) => ({ ...s, status: i === 1 ? "current" : i === 0 ? "done" : "pending" })),
+              }
+            : r,
+        ),
+      }));
+      pushLog({ actor: meName(), action: `rejected request${reason ? ` (${reason})` : ""}`, target: sr.number, type: "ticket" });
     },
 
     // ----- Settings -----
