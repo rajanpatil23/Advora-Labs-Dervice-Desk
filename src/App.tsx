@@ -51,6 +51,7 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <BrowserRouter>
       <AuthProvider>
+        <BrandingProvider>
         <TooltipProvider>
           <Toaster />
           <Sonner />
@@ -86,6 +87,7 @@ const App = () => (
                 <Route path="automations" element={<Automations />} />
                 <Route path="csat" element={<Csat />} />
                 <Route path="fields" element={<CustomFields />} />
+                <Route path="branding" element={<Branding />} />
               </Route>
             </Route>
 
