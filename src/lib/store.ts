@@ -133,6 +133,7 @@ interface AppState {
   setAssignee: (id: string, agentId: string | undefined) => void;
   addTicket: (input: NewTicketInput) => Ticket;
   deleteTicket: (id: string) => void;
+  toggleWatcher: (id: string, userId: string) => void;
 
   // incident
   addIncident: (input: NewIncidentInput) => Incident;
@@ -361,6 +362,22 @@ export const useAppStore = create<AppState>((set, get) => {
         selectedTicketId: get().selectedTicketId === id ? null : get().selectedTicketId,
       }));
       if (t) pushLog({ actor: meName(), action: "deleted", target: t.number, type: "ticket" });
+    },
+
+    toggleWatcher: (id, userId) => {
+      const t = get()._allTickets.find((x) => x.id === id);
+      if (!t) return;
+      const watchers = t.watcherIds ?? [];
+      const isWatching = watchers.includes(userId);
+      const next = isWatching ? watchers.filter((w) => w !== userId) : [...watchers, userId];
+      get().updateTicket(id, { watcherIds: next });
+      const u = get()._allAgents.find((a) => a.id === userId) ?? get()._allCustomers.find((c) => c.id === userId);
+      const name = u?.name ?? "User";
+      get().addActivity(id, {
+        type: "tag",
+        text: isWatching ? `${name} stopped watching` : `${name} is now watching`,
+        by: meName(),
+      });
     },
 
     // ----- Incidents -----

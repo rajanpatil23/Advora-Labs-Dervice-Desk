@@ -36,10 +36,13 @@ const replyTemplates = [
 ];
 
 export default function Tickets() {
-  const { tickets: allTickets, selectedTicketId, setSelectedTicket, addMessage, setStatus, setPriority, setAssignee } = useAppStore();
+  const { tickets: allTickets, selectedTicketId, setSelectedTicket, addMessage, setStatus, setPriority, setAssignee, toggleWatcher, deleteTicket } = useAppStore();
   const orgAgents = useOrgAgents();
   const me = useCurrentOrgUser();
   const isRequester = me?.role === "requester";
+  const role = me?.role;
+  const canManage = role === "owner" || role === "admin" || role === "manager";
+  const canWork = canManage || role === "agent" || role === "resolver";
   const tickets = useMemo(
     () => (isRequester && me ? allTickets.filter(t => t.requesterId === me.id) : allTickets),
     [allTickets, isRequester, me?.id]
@@ -360,32 +363,52 @@ export default function Tickets() {
                 <h1 className="mt-0.5 font-display font-bold text-[18px] leading-tight truncate">{selected.title}</h1>
               </div>
               <div className="flex items-center gap-1 shrink-0">
-                <button
-                  onClick={() => setStatus(selected.id, "resolved")}
-                  className="h-8 px-2.5 rounded-md text-xs font-medium bg-success/10 text-success border border-success/20 hover:bg-success/20 transition-colors flex items-center gap-1.5"
-                >
-                  <CheckCircle2 className="h-3.5 w-3.5" /> Resolve
-                </button>
-                <button
-                  onClick={() => setPriority(selected.id, "critical")}
-                  className="h-8 px-2.5 rounded-md text-xs font-medium bg-destructive/10 text-destructive border border-destructive/20 hover:bg-destructive/20 transition-colors flex items-center gap-1.5"
-                >
-                  <ArrowUpRight className="h-3.5 w-3.5" /> Escalate
-                </button>
+                {canWork && (
+                  <button
+                    onClick={() => me && toggleWatcher(selected.id, me.id)}
+                    className={cn(
+                      "h-8 px-2.5 rounded-md text-xs font-medium border transition-colors flex items-center gap-1.5",
+                      me && selected.watcherIds?.includes(me.id)
+                        ? "bg-primary/10 text-primary border-primary/30"
+                        : "bg-surface border-border text-muted-foreground hover:text-foreground"
+                    )}
+                    title={me && selected.watcherIds?.includes(me.id) ? "Stop watching" : "Watch ticket"}
+                  >
+                    <Bookmark className="h-3.5 w-3.5" />
+                    {me && selected.watcherIds?.includes(me.id) ? "Watching" : "Watch"}
+                  </button>
+                )}
+                {canWork && (
+                  <button
+                    onClick={() => setStatus(selected.id, "resolved")}
+                    className="h-8 px-2.5 rounded-md text-xs font-medium bg-success/10 text-success border border-success/20 hover:bg-success/20 transition-colors flex items-center gap-1.5"
+                  >
+                    <CheckCircle2 className="h-3.5 w-3.5" /> Resolve
+                  </button>
+                )}
+                {canManage && (
+                  <button
+                    onClick={() => setPriority(selected.id, "critical")}
+                    className="h-8 px-2.5 rounded-md text-xs font-medium bg-destructive/10 text-destructive border border-destructive/20 hover:bg-destructive/20 transition-colors flex items-center gap-1.5"
+                  >
+                    <ArrowUpRight className="h-3.5 w-3.5" /> Escalate
+                  </button>
+                )}
                 <div className="w-px h-5 bg-border mx-1" />
-                <button onClick={() => toast.success("Bookmarked")} className="h-8 w-8 rounded-md flex items-center justify-center hover:bg-surface-2 text-muted-foreground" title="Bookmark"><Bookmark className="h-4 w-4" /></button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button className="h-8 w-8 rounded-md flex items-center justify-center hover:bg-surface-2 text-muted-foreground" title="More"><MoreHorizontal className="h-4 w-4" /></button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-48">
-                    <DropdownMenuItem onClick={() => useAppStore.getState().setStatus(selected.id, "on_hold")}>Put on hold</DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => useAppStore.getState().setStatus(selected.id, "closed")}>Close ticket</DropdownMenuItem>
+                    {canWork && <DropdownMenuItem onClick={() => useAppStore.getState().setStatus(selected.id, "on_hold")}>Put on hold</DropdownMenuItem>}
+                    {canWork && <DropdownMenuItem onClick={() => useAppStore.getState().setStatus(selected.id, "closed")}>Close ticket</DropdownMenuItem>}
                     <DropdownMenuItem onClick={() => { navigator.clipboard?.writeText(selected.number); toast.success("Ticket number copied"); }}>Copy ticket number</DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => { useAppStore.getState().deleteTicket(selected.id); toast.success("Ticket deleted"); }} className="text-destructive">
-                      <Trash2 className="h-4 w-4 mr-2" /> Delete
-                    </DropdownMenuItem>
+                    {canManage && <DropdownMenuSeparator />}
+                    {canManage && (
+                      <DropdownMenuItem onClick={() => { deleteTicket(selected.id); toast.success("Ticket deleted"); }} className="text-destructive">
+                        <Trash2 className="h-4 w-4 mr-2" /> Delete
+                      </DropdownMenuItem>
+                    )}
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
@@ -549,6 +572,46 @@ export default function Tickets() {
                       <Plus className="h-2.5 w-2.5" /> Add
                     </button>
                   </div>
+                </div>
+              </Section>
+
+              <Section title={`Watchers · ${selected.watcherIds?.length ?? 0}`}>
+                <div className="space-y-1.5">
+                  {(selected.watcherIds ?? []).length === 0 && (
+                    <div className="text-[11px] text-muted-foreground">No watchers yet. Watchers get notified on every reply or status change.</div>
+                  )}
+                  {(selected.watcherIds ?? []).map((wid) => {
+                    const w = findUser(wid) ?? findAgent(wid);
+                    if (!w) return null;
+                    return (
+                      <div key={wid} className="flex items-center gap-2 text-[11px]">
+                        <Avatar initials={w.initials} color={w.avatarColor} size={20} />
+                        <span className="flex-1 truncate">{w.name}</span>
+                        {canManage && (
+                          <button onClick={() => toggleWatcher(selected.id, wid)} className="text-muted-foreground hover:text-destructive p-0.5"><X className="h-3 w-3" /></button>
+                        )}
+                      </div>
+                    );
+                  })}
+                  {canManage && (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button className="mt-1 text-[11px] px-2 py-1 rounded-md border border-dashed border-border text-muted-foreground hover:text-foreground hover:border-foreground/40 flex items-center gap-1">
+                          <Plus className="h-3 w-3" /> Add watcher
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="start" className="w-56 max-h-72 overflow-y-auto">
+                        {orgAgents
+                          .filter((a) => !(selected.watcherIds ?? []).includes(a.id))
+                          .map((a) => (
+                            <DropdownMenuItem key={a.id} onClick={() => toggleWatcher(selected.id, a.id)}>
+                              <Avatar initials={a.initials} color={a.avatarColor} size={18} />
+                              <span className="ml-2 truncate">{a.name}</span>
+                            </DropdownMenuItem>
+                          ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
                 </div>
               </Section>
 

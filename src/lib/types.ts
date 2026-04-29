@@ -76,6 +76,7 @@ export interface Ticket {
   messages: Message[];
   activity: ActivityEvent[];
   attachments?: { name: string; size: string }[];
+  watcherIds?: string[];
 }
 
 export interface Incident {
