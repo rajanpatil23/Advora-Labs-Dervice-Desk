@@ -1,6 +1,7 @@
 import { Bell, Search, Sun, Moon, Plus, HelpCircle, LogOut, User as UserIcon, Settings as SettingsIcon, Building2, Check, ChevronsUpDown, Sparkles } from "lucide-react";
 import { startProductTour } from "@/components/common/ProductTour";
 import { LanguageSwitcher } from "@/components/common/LanguageSwitcher";
+import { openShortcutsHelp } from "@/components/common/ShortcutsDialog";
 import { useAppStore } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { NewTicketDialog } from "@/components/dialogs/NewTicketDialog";
@@ -109,8 +110,11 @@ export function Topbar() {
           {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
         </button>
         <button
-          onClick={() => nav("/app/kb")}
-          className="h-9 w-9 rounded-lg flex items-center justify-center hover:bg-surface-2 transition-colors" aria-label="Help" title="Help & Knowledge Base">
+          onClick={() => openShortcutsHelp()}
+          className="h-9 w-9 rounded-lg flex items-center justify-center hover:bg-surface-2 transition-colors"
+          aria-label="Keyboard shortcuts"
+          title="Keyboard shortcuts (?)"
+        >
           <HelpCircle className="h-4 w-4" />
         </button>
 
