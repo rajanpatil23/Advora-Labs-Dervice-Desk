@@ -1,0 +1,47 @@
+# Hostinger / Apache SPA routing for Vite + React Router
+Options -MultiViews
+RewriteEngine On
+RewriteBase /
+
+# Force HTTPS (optional but recommended)
+# RewriteCond %{HTTPS} off
+# RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Don't rewrite real files or directories
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Send everything else to index.html so React Router can handle it
+RewriteRule ^ index.html [L]
+
+# ---- Caching ----
+<IfModule mod_headers.c>
+  # Never cache the HTML shell (so new deploys are picked up immediately)
+  <FilesMatch "\.(html)$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires "0"
+  </FilesMatch>
+
+  # Cache fingerprinted assets for a year
+  <FilesMatch "\.(js|css|woff2?|ttf|otf|eot|svg|png|jpg|jpeg|gif|webp|ico)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+</IfModule>
+
+# ---- Compression ----
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/css text/javascript application/javascript application/json application/xml image/svg+xml
+</IfModule>
+
+# ---- MIME ----
+<IfModule mod_mime.c>
+  AddType application/javascript .js .mjs
+  AddType text/css .css
+  AddType image/svg+xml .svg
+  AddType image/webp .webp
+</IfModule>
+
+# Custom 404 also falls back to SPA
+ErrorDocument 404 /index.html
