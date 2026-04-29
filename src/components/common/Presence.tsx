@@ -57,16 +57,27 @@ export function PresenceBubbles({ ticketId }: { ticketId: string }) {
           )}
         </div>
         {typers.length > 0 && (
-          <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-            <span className="flex gap-0.5">
-              <span className="h-1.5 w-1.5 rounded-full bg-primary animate-bounce" style={{ animationDelay: "0ms" }} />
-              <span className="h-1.5 w-1.5 rounded-full bg-primary animate-bounce" style={{ animationDelay: "120ms" }} />
-              <span className="h-1.5 w-1.5 rounded-full bg-primary animate-bounce" style={{ animationDelay: "240ms" }} />
-            </span>
-            <span className="truncate max-w-[140px]">
-              {typers.length === 1 ? `${typers[0].name} is typing` : `${typers.length} people typing`}
-            </span>
-          </div>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex items-center gap-1 text-[11px] text-muted-foreground rounded-full bg-surface-2/70 border border-border px-1.5 py-0.5">
+                <span className="flex gap-0.5">
+                  <span className="h-1 w-1 rounded-full bg-primary animate-bounce" style={{ animationDelay: "0ms" }} />
+                  <span className="h-1 w-1 rounded-full bg-primary animate-bounce" style={{ animationDelay: "120ms" }} />
+                  <span className="h-1 w-1 rounded-full bg-primary animate-bounce" style={{ animationDelay: "240ms" }} />
+                </span>
+                <span className="hidden xl:inline truncate max-w-[120px]">
+                  {typers.length === 1 ? `${typers[0].name.split(" ")[0]} typing…` : `${typers.length} typing…`}
+                </span>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">
+              <div className="text-xs">
+                {typers.length === 1
+                  ? `${typers[0].name} is typing…`
+                  : `${typers.map((t) => t.name).join(", ")} are typing…`}
+              </div>
+            </TooltipContent>
+          </Tooltip>
         )}
       </div>
     </TooltipProvider>
