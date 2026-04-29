@@ -84,9 +84,14 @@ export default function Csat() {
             <p className="text-sm text-muted-foreground">Surveys, scores, and feedback from resolved tickets.</p>
           </div>
         </div>
-        <Button onClick={() => setEditing(csatApi.newSurvey())}>
-          <Plus className="h-4 w-4 mr-1" /> New survey
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" asChild>
+            <a href="/app/csat/trends"><TrendingUp className="h-4 w-4 mr-1.5" /> Trends & cohorts</a>
+          </Button>
+          <Button onClick={() => setEditing(csatApi.newSurvey())}>
+            <Plus className="h-4 w-4 mr-1" /> New survey
+          </Button>
+        </div>
       </header>
 
       {/* KPIs */}
