@@ -1,97 +1,77 @@
-// Client wrapper for the ai-ticket-assist edge function.
 import { supabase } from "@/integrations/supabase/client";
-import type { Ticket } from "@/lib/types";
 
-export type AssistTone = "friendly" | "formal" | "concise" | "empathetic";
+export type Tone = "friendly" | "formal" | "concise" | "empathetic";
 
-function ticketPayload(ticket: Ticket, requesterName?: string) {
-  return {
-    title: ticket.title,
-    number: ticket.number,
-    priority: ticket.priority,
-    status: ticket.status,
-    category: ticket.category,
-    subcategory: ticket.subcategory,
-    requesterName,
-    channel: ticket.channel,
-  };
+export interface ThreadMsg {
+  role: "agent" | "requester" | "system";
+  author?: string;
+  body: string;
+  internal?: boolean;
 }
 
-function messagesPayload(ticket: Ticket) {
-  return ticket.messages.map((m) => ({
-    role: m.authorRole,
-    author: m.authorName,
-    body: m.body,
-    internal: m.isInternal,
-  }));
+export interface AssistTicketCtx {
+  title: string;
+  number?: string;
+  priority?: string;
+  status?: string;
+  category?: string;
+  subcategory?: string;
+  requesterName?: string;
+  channel?: string;
 }
 
-async function invoke<T>(body: Record<string, unknown>): Promise<T> {
-  const { data, error } = await supabase.functions.invoke("ai-ticket-assist", { body });
-  if (error) throw error;
-  if ((data as { error?: string })?.error) throw new Error((data as { error: string }).error);
-  return data as T;
+export interface DraftReply {
+  label: string;
+  body: string;
+  groundedArticles: number[];
+  asksClarifyingQuestion: boolean;
 }
 
-export const aiAssist = {
-  summarize: (ticket: Ticket, requesterName?: string) =>
-    invoke<{ summary: string }>({
-      mode: "summarize",
-      ticket: ticketPayload(ticket, requesterName),
-      messages: messagesPayload(ticket),
-    }),
+export interface Classification {
+  category: string;
+  subcategory: string;
+  priority: "low" | "medium" | "high" | "critical";
+  tags: string[];
+  confidence: number;
+  rationale: string;
+}
 
-  suggestReply: (ticket: Ticket, requesterName?: string, tone: AssistTone = "friendly") =>
-    invoke<{ reply: string }>({
-      mode: "suggest_reply",
-      ticket: ticketPayload(ticket, requesterName),
-      messages: messagesPayload(ticket),
-      tone,
-    }),
+interface BasePayload {
+  ticket: AssistTicketCtx;
+  messages: ThreadMsg[];
+  tone?: Tone;
+  agentName?: string;
+  customInstructions?: string;
+  categories?: string[];
+  kbArticles?: { title: string; excerpt: string }[];
+  variantCount?: number;
+}
 
-  suggestDrafts: (
-    ticket: Ticket,
-    opts: {
-      requesterName?: string;
-      agentName?: string;
-      tone?: AssistTone;
-      variantCount?: 2 | 3 | 4;
-      kbArticles?: { title: string; excerpt: string }[];
-      customInstructions?: string;
-    } = {},
-  ) =>
-    invoke<{
-      drafts: Array<{
-        label: string;
-        body: string;
-        groundedArticles: number[];
-        asksClarifyingQuestion: boolean;
-      }>;
-    }>({
-      mode: "suggest_drafts",
-      ticket: ticketPayload(ticket, opts.requesterName),
-      messages: messagesPayload(ticket),
-      tone: opts.tone ?? "friendly",
-      variantCount: opts.variantCount ?? 3,
-      kbArticles: opts.kbArticles ?? [],
-      agentName: opts.agentName,
-      customInstructions: opts.customInstructions,
-    }),
+async function call(mode: string, payload: BasePayload) {
+  const { data, error } = await supabase.functions.invoke("ai-ticket-assist", {
+    body: { mode, ...payload },
+  });
+  if (error) throw new Error(error.message);
+  if ((data as any)?.error) throw new Error((data as any).error);
+  return data;
+}
 
-  categorize: (ticket: Ticket, requesterName?: string, categories?: string[]) =>
-    invoke<{
-      classification: {
-        category: string;
-        subcategory: string;
-        priority: "low" | "medium" | "high" | "critical";
-        tags: string[];
-        confidence: number;
-        rationale: string;
-      };
-    }>({
-      mode: "categorize",
-      ticket: ticketPayload(ticket, requesterName),
-      messages: messagesPayload(ticket),
-      categories,
-    }),
-};
+export async function summarizeThread(p: BasePayload): Promise<string> {
+  const data = await call("summarize", p);
+  return (data as any).summary ?? "";
+}
+
+export async function suggestDrafts(p: BasePayload): Promise<DraftReply[]> {
+  const data = await call("suggest_drafts", p);
+  return (data as any).drafts ?? [];
+}
+
+export async function suggestSingleReply(p: BasePayload): Promise<string> {
+  const data = await call("suggest_reply", p);
+  return (data as any).reply ?? "";
+}
+
+export async function categorizeTicket(p: BasePayload): Promise<Classification> {
+  const data = await call("categorize", p);
+  return (data as any).classification;
+}
