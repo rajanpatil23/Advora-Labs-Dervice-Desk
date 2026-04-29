@@ -50,6 +50,7 @@ import SavedViews from "./pages/SavedViews";
 import BulkActions from "./pages/BulkActions";
 import ImportExport from "./pages/ImportExport";
 import ActivityFeed from "./pages/ActivityFeed";
+import Macros from "./pages/Macros";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -102,6 +103,7 @@ const App = () => (
                 <Route path="bulk" element={<BulkActions />} />
                 <Route path="data" element={<ImportExport />} />
                 <Route path="activity" element={<ActivityFeed />} />
+                <Route path="macros" element={<Macros />} />
               </Route>
             </Route>
 
