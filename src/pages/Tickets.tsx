@@ -534,7 +534,14 @@ export default function Tickets() {
                     />
                   </div>
                 </div>
-                <div className={cn("rounded-xl border bg-surface p-2.5 transition-all focus-within:ring-2 focus-within:ring-ring/30", internal && "border-warning/40 bg-warning/5")}>
+                <div className={cn("relative rounded-xl border bg-surface p-2.5 transition-all focus-within:ring-2 focus-within:ring-ring/30", internal && "border-warning/40 bg-warning/5")}>
+                  <MentionAutocomplete
+                    ref={mentionRef}
+                    value={reply}
+                    textareaRef={composerRef}
+                    people={mentionables}
+                    onInsert={(next) => setReply(next)}
+                  />
                   <textarea
                     ref={composerRef}
                     value={reply} onChange={e => {
@@ -543,7 +550,10 @@ export default function Tickets() {
                         presenceApi.setTyping({ id: me.id }, selected.id, e.target.value.length > 0);
                       }
                     }}
-                    placeholder={internal ? "Write an internal note for the team…" : `Reply to ${requester?.name.split(" ")[0] ?? "customer"}…`}
+                    onKeyDown={(e) => {
+                      if (mentionRef.current?.handleKeyDown(e)) return;
+                    }}
+                    placeholder={internal ? "Write an internal note for the team… (use @ to mention)" : `Reply to ${requester?.name.split(" ")[0] ?? "customer"}… (use @ to mention)`}
                     rows={3}
                     className="w-full resize-none bg-transparent text-[13px] outline-none placeholder:text-muted-foreground leading-relaxed"
                   />
