@@ -4,7 +4,11 @@
  */
 
 import type { ApiRequest } from "./client";
-import { SEED_USERS, SEED_ORGS, getOrg, getTeam, type SeedUser } from "./seedUsers";
+import {
+  SEED_USERS, SEED_ORGS, SEED_PLATFORM_ADMINS, SEED_AUDIT_LOG,
+  getOrg, getTeam, getPlatformAdmin, getUser,
+  type SeedUser, type PlatformRole, type SeedAuditEntry,
+} from "./seedUsers";
 import type { AuthUser, Membership, Session } from "./auth";
 
 const delay = (ms = 200) => new Promise((r) => setTimeout(r, ms));
@@ -105,6 +109,9 @@ export async function mockHandlers<T>(req: ApiRequest): Promise<T> {
       slug: newOrgName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""),
       industry: "Custom",
       domain: email.split("@")[1] ?? "example.com",
+      status: "active",
+      created_at: new Date().toISOString().slice(0, 10),
+      plan: "free",
     });
     const newUser: SeedUser = {
       id: `u_${Date.now()}`,
