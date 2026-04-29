@@ -2,6 +2,7 @@ import { Outlet } from "react-router-dom";
 import { AppSidebar } from "./AppSidebar";
 import { Topbar } from "./Topbar";
 import { ShortcutsDialog } from "@/components/common/ShortcutsDialog";
+import { CommandPalette } from "@/components/common/CommandPalette";
 import { useOrgSync } from "@/lib/store";
 
 export function AppLayout() {
@@ -16,6 +17,7 @@ export function AppLayout() {
         </main>
       </div>
       <ShortcutsDialog />
+      <CommandPalette />
     </div>
   );
 }
