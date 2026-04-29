@@ -33,6 +33,7 @@ import Reports from "./pages/Reports";
 import Logs from "./pages/Logs";
 import Settings from "./pages/Settings";
 import Platform from "./pages/Platform";
+import Approvals from "./pages/Approvals";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -61,7 +62,7 @@ const App = () => (
                 <Route path="tickets" element={<Tickets />} />
                 <Route path="incidents" element={<Incidents />} />
                 <Route path="requests" element={<Requests />} />
-                <Route path="approvals" element={<ComingSoon phase="Phase 6" title="Approvals inbox" description="Manager approval queue for service requests, with one-click approve/reject and audit trail." />} />
+                <Route path="approvals" element={<Approvals />} />
                 <Route path="users" element={<Users />} />
                 <Route path="agents" element={<Agents />} />
                 <Route path="sla" element={<SLA />} />
