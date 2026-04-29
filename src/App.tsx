@@ -60,6 +60,7 @@ import StatusPage from "./pages/StatusPage";
 import MobileAgent from "./pages/MobileAgent";
 import Workflows from "./pages/Workflows";
 import Escalations from "./pages/Escalations";
+import UnifiedInbox from "./pages/UnifiedInbox";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -122,6 +123,7 @@ const App = () => (
                 <Route path="mobile" element={<MobileAgent />} />
                 <Route path="workflows" element={<Workflows />} />
                 <Route path="escalations" element={<Escalations />} />
+                <Route path="inbox" element={<UnifiedInbox />} />
               </Route>
             </Route>
 
