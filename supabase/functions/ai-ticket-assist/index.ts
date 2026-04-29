@@ -10,13 +10,18 @@ const corsHeaders = {
 const GATEWAY = "https://ai.gateway.lovable.dev/v1/chat/completions";
 const MODEL = "google/gemini-3-flash-preview";
 
-type Mode = "summarize" | "suggest_reply" | "categorize";
+type Mode = "summarize" | "suggest_reply" | "suggest_drafts" | "categorize";
 
 interface ThreadMsg {
   role: "agent" | "requester" | "system";
   author?: string;
   body: string;
   internal?: boolean;
+}
+
+interface KbArticle {
+  title: string;
+  excerpt: string;
 }
 
 interface Body {
@@ -34,6 +39,10 @@ interface Body {
   messages: ThreadMsg[];
   tone?: "friendly" | "formal" | "concise" | "empathetic";
   categories?: string[]; // hint set
+  kbArticles?: KbArticle[]; // grounding context for suggest_drafts
+  variantCount?: number;   // 2..4
+  agentName?: string;
+  customInstructions?: string;
 }
 
 function buildThread(messages: ThreadMsg[]): string {
