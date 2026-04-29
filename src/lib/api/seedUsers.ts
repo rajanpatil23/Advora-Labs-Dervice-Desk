@@ -1,6 +1,9 @@
-// Seeded multi-tenant data: 3 organizations + 5 users with cross-org memberships.
+// Seeded multi-tenant data: 3 organizations + users with cross-org memberships,
+// PLUS a separate platform-staff layer (super_admin / support / billing_admin).
 
 export type AppRole = "owner" | "admin" | "manager" | "agent" | "resolver" | "requester";
+export type PlatformRole = "super_admin" | "support" | "billing_admin";
+export type OrgStatus = "active" | "suspended";
 
 export interface SeedOrg {
   id: string;
@@ -33,10 +36,18 @@ export interface SeedUser {
 }
 
 // ---- Orgs ----
-export const SEED_ORGS: SeedOrg[] = [
-  { id: "org_acme",    name: "Acme Cloud",       slug: "acme",    industry: "SaaS / Tech",     domain: "acme.com" },
-  { id: "org_globex",  name: "Globex Industries",slug: "globex",  industry: "Manufacturing",   domain: "globex.com" },
-  { id: "org_initech", name: "Initech Health",   slug: "initech", industry: "Healthcare",      domain: "initech.com" },
+export interface SeedOrgFull extends SeedOrg {
+  status: OrgStatus;
+  suspended_at?: string | null;
+  suspended_reason?: string | null;
+  created_at: string;
+  plan: "free" | "pro" | "enterprise";
+}
+
+export const SEED_ORGS: SeedOrgFull[] = [
+  { id: "org_acme",    name: "Acme Cloud",        slug: "acme",    industry: "SaaS / Tech",   domain: "acme.com",    status: "active", created_at: "2024-09-12", plan: "enterprise" },
+  { id: "org_globex",  name: "Globex Industries", slug: "globex",  industry: "Manufacturing", domain: "globex.com",  status: "active", created_at: "2025-01-04", plan: "pro" },
+  { id: "org_initech", name: "Initech Health",    slug: "initech", industry: "Healthcare",    domain: "initech.com", status: "active", created_at: "2025-06-22", plan: "pro" },
 ];
 
 // ---- Teams (per org) ----
