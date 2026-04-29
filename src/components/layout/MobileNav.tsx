@@ -97,7 +97,7 @@ export function MobileNav() {
                 </div>
                 <div className="text-left flex-1 min-w-0">
                   <SheetTitle className="text-base truncate">{profile?.full_name || profile?.email}</SheetTitle>
-                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{currentRole || "—"}</div>
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{currentRole || "-"}</div>
                 </div>
               </div>
             </SheetHeader>

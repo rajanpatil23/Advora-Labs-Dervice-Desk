@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { tenantRoleHome } from "@/lib/roleRoutes";
 
 /**
- * Renders at /app — sends the user to the right home based on their role.
+ * Renders at /app - sends the user to the right home based on their role.
  * (Phase 2 of the role-aware shell.)
  */
 export default function AppHome() {

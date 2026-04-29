@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
 /**
- * Agent / Resolver landing page — the personal work queue.
+ * Agent / Resolver landing page - the personal work queue.
  * Resolvers default to ?filter=escalated.
  */
 export default function MyQueue() {

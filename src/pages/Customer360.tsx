@@ -158,11 +158,11 @@ export default function Customer360() {
               <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
                 <MetricCard label="Health score" value={`${active.healthScore}`} suffix="/100" tone={active.healthScore >= 70 ? "good" : active.healthScore >= 40 ? "warn" : "bad"} icon={Heart} />
                 <MetricCard label="Lifetime value" value={`$${active.lifetimeValue.toLocaleString()}`} icon={DollarSign} />
-                <MetricCard label="MRR" value={active.mrr ? `$${active.mrr.toLocaleString()}` : "—"} icon={TrendingUp} />
+                <MetricCard label="MRR" value={active.mrr ? `$${active.mrr.toLocaleString()}` : "-"} icon={TrendingUp} />
                 <MetricCard label="Tickets opened" value={`${metrics?.opened ?? 0}`} icon={Ticket} />
                 <MetricCard
                   label="Avg CSAT"
-                  value={metrics?.avgCsat ? `${metrics.avgCsat.toFixed(1)}/5` : "—"}
+                  value={metrics?.avgCsat ? `${metrics.avgCsat.toFixed(1)}/5` : "-"}
                   icon={Smile}
                   tone={metrics?.avgCsat && metrics.avgCsat >= 4 ? "good" : metrics?.avgCsat && metrics.avgCsat < 3 ? "bad" : undefined}
                 />
@@ -177,7 +177,7 @@ export default function Customer360() {
                   <CardContent className="space-y-2.5 text-xs">
                     <Detail label="Timezone" value={active.timezone} />
                     <Detail label="Renewal" value={new Date(active.contractRenewal).toLocaleDateString()} />
-                    <Detail label="NPS" value={active.npsScore == null ? "—" : `${active.npsScore > 0 ? "+" : ""}${active.npsScore}`} />
+                    <Detail label="NPS" value={active.npsScore == null ? "-" : `${active.npsScore > 0 ? "+" : ""}${active.npsScore}`} />
                     <Separator className="my-2" />
                     {Object.entries(active.customFields).map(([k, v]) => (
                       <Detail key={k} label={k} value={v} />

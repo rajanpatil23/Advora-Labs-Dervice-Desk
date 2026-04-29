@@ -62,9 +62,9 @@ export default function Settings() {
     { role: "owner", tickets: "Full", settings: "Full", billing: "Full" },
     { role: "admin", tickets: "Full", settings: "Full", billing: "Full" },
     { role: "manager", tickets: "Full", settings: "Limited", billing: "View" },
-    { role: "agent", tickets: "Read/Write", settings: "—", billing: "—" },
-    { role: "resolver", tickets: "Read/Write", settings: "—", billing: "—" },
-    { role: "requester", tickets: "Own only", settings: "—", billing: "—" },
+    { role: "agent", tickets: "Read/Write", settings: "-", billing: "-" },
+    { role: "resolver", tickets: "Read/Write", settings: "-", billing: "-" },
+    { role: "requester", tickets: "Own only", settings: "-", billing: "-" },
   ];
 
   return (

@@ -91,7 +91,7 @@ export function NewTicketDialog({ trigger, onCreated }: Props) {
             </Field>
             <Field label="Assignee">
               <Select value={assigneeId} onChange={setAssigneeId}
-                options={[["", "— Unassigned —"], ...orgAgents.map(a => [a.id, a.name] as [string, string])]} />
+                options={[["", "- Unassigned -"], ...orgAgents.map(a => [a.id, a.name] as [string, string])]} />
             </Field>
             <Field label="Priority">
               <Select value={priority} onChange={(v) => setPriority(v as Priority)}

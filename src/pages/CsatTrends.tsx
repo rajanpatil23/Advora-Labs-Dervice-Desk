@@ -101,7 +101,7 @@ export default function CsatTrends() {
   const csatDelta = csat - csatPrev;
   const avgScore = inRange.length ? inRange.reduce((s, r) => s + r.score, 0) / inRange.length : 0;
   const avgPrev = prevRange.length ? prevRange.reduce((s, r) => s + r.score, 0) / prevRange.length : 0;
-  const responseRate = Math.round(60 + Math.random() * 25); // mock — surveys sent vs submitted
+  const responseRate = Math.round(60 + Math.random() * 25); // mock - surveys sent vs submitted
 
   const trend = useMemo(() => bucketByDay(inRange, days), [inRange, days]);
   const heatmap = useMemo(() => buildHeatmap(responses, 12), [responses]);
@@ -319,7 +319,7 @@ export default function CsatTrends() {
         <TabsContent value="heatmap">
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-base">Cohort heatmap — last 12 weeks</CardTitle>
+              <CardTitle className="text-base">Cohort heatmap - last 12 weeks</CardTitle>
               <p className="text-xs text-muted-foreground">Average rating per day. Darker = more responses, color = score.</p>
             </CardHeader>
             <CardContent>

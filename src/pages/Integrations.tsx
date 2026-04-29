@@ -89,7 +89,7 @@ export default function Integrations() {
             <CardContent>
               {revealed && (
                 <div className="mb-4 rounded-lg border border-primary/40 bg-primary/5 p-4">
-                  <p className="text-sm font-medium">Signing secret — shown only once</p>
+                  <p className="text-sm font-medium">Signing secret - shown only once</p>
                   <p className="text-xs text-muted-foreground mt-1">Use this to verify the <code>X-Signature</code> header on incoming requests.</p>
                   <div className="mt-2 flex items-center gap-2">
                     <code className="flex-1 rounded bg-background px-3 py-2 font-mono text-sm break-all">{revealed.secret}</code>

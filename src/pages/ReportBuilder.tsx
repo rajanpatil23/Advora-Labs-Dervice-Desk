@@ -509,7 +509,7 @@ function BuilderTab({
                   <tr key={i} className="border-b border-border/50 hover:bg-surface-2/40">
                     {draft.columns.map((c) => (
                       <td key={c} className="px-2 py-2 truncate max-w-[200px]">
-                        {String(r[c] ?? "—")}
+                        {String(r[c] ?? "-")}
                       </td>
                     ))}
                   </tr>

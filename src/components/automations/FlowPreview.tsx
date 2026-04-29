@@ -30,7 +30,7 @@ export function FlowPreview({ rule }: { rule: Rule }) {
                   const ol = CONDITION_OPS.find((o) => o.value === c.op)?.label ?? c.op;
                   return (
                     <li key={c.id} className="font-mono text-[11px] truncate max-w-[180px]">
-                      {fl} <span className="opacity-60">{ol}</span> {c.value || "—"}
+                      {fl} <span className="opacity-60">{ol}</span> {c.value || "-"}
                     </li>
                   );
                 })}
@@ -72,7 +72,7 @@ export function FlowPreview({ rule }: { rule: Rule }) {
       </div>
       {!rule.enabled && (
         <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
-          <Workflow className="h-3.5 w-3.5" /> This rule is paused — it will not run on matching events.
+          <Workflow className="h-3.5 w-3.5" /> This rule is paused - it will not run on matching events.
         </div>
       )}
     </div>

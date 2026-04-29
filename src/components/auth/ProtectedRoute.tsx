@@ -22,7 +22,7 @@ export function ProtectedRoute({ roles }: { roles?: AppRole[] }) {
     return <Navigate to="/platform" replace />;
   }
 
-  // Requesters live in /portal — never the agent app
+  // Requesters live in /portal - never the agent app
   if (currentRole === "requester" && loc.pathname.startsWith("/app")) {
     return <Navigate to="/portal" replace />;
   }

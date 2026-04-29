@@ -7,7 +7,7 @@ import { Star, CheckCircle2 } from "lucide-react";
 import { csatApi } from "@/lib/api/csat";
 import { toast } from "sonner";
 
-// Public survey page — the link sent in the post-resolution email lands here.
+// Public survey page - the link sent in the post-resolution email lands here.
 // Route: /survey/:ticketNumber?token=...
 export default function PublicSurvey() {
   const { ticketNumber = "TKT-DEMO" } = useParams();

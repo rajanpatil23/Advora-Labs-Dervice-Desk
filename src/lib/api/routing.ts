@@ -24,7 +24,7 @@ export interface AgentSkillProfile {
   agentId: string;
   skills: string[];        // e.g. "billing", "vpn", "macos"
   maxConcurrent: number;   // capacity
-  awayUntil?: string;      // ISO – treated as offline
+  awayUntil?: string;      // ISO - treated as offline
 }
 
 export interface RoutingDecision {
@@ -179,7 +179,7 @@ export function routeTicket(ticket: Ticket, agents: Agent[]): RoutingDecision {
   }
 
   if (pool.length === 0) {
-    decision.reasoning.push("No agents in pool — leaving unassigned");
+    decision.reasoning.push("No agents in pool - leaving unassigned");
     return decision;
   }
 

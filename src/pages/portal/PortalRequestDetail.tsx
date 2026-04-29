@@ -22,7 +22,7 @@ export default function PortalRequestDetail() {
     return <Navigate to="/portal/requests" replace />;
   }
 
-  // Public messages only — never show internal notes to requesters
+  // Public messages only - never show internal notes to requesters
   const visibleMessages = ticket.messages.filter((m) => !m.isInternal);
 
   const send = async (e: React.FormEvent) => {

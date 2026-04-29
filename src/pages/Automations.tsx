@@ -324,7 +324,7 @@ function RuleEditor({ rule, onClose, onSaved }: { rule: Rule | null; onClose: ()
                 <Plus className="h-3.5 w-3.5 mr-1" /> Add condition
               </Button>
               {draft.conditions.length === 0 && (
-                <p className="text-xs text-muted-foreground">No conditions — rule will run on every trigger event.</p>
+                <p className="text-xs text-muted-foreground">No conditions - rule will run on every trigger event.</p>
               )}
             </div>
           </Section>

@@ -154,7 +154,7 @@ export default function TicketLinks() {
                       <span className="font-mono">
                         {ticketById.get(mergedAway.targetTicketId)?.number ?? mergedAway.targetTicketId}
                       </span>
-                      {mergedAway.reason && <> — {mergedAway.reason}</>}
+                      {mergedAway.reason && <> - {mergedAway.reason}</>}
                     </span>
                   </div>
                 )}
@@ -253,7 +253,7 @@ export default function TicketLinks() {
                                   <span className="font-mono">{src?.number ?? m.sourceTicketId}</span>
                                   <span className="mx-2 text-muted-foreground">merged into</span>
                                   <span className="font-mono">{tgt?.number ?? m.targetTicketId}</span>
-                                  {m.reason && <span className="ml-2 text-muted-foreground">— {m.reason}</span>}
+                                  {m.reason && <span className="ml-2 text-muted-foreground">- {m.reason}</span>}
                                 </div>
                                 <div className="text-xs text-muted-foreground">
                                   by {m.mergedBy} · {new Date(m.mergedAt).toLocaleString()}

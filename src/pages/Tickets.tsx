@@ -38,7 +38,7 @@ const quickFilters = [
 ] as const;
 
 const replyTemplates = [
-  { label: "Greeting", body: "Hi {name}, thanks for reaching out — I'm looking into this now and will get back to you shortly." },
+  { label: "Greeting", body: "Hi {name}, thanks for reaching out - I'm looking into this now and will get back to you shortly." },
   { label: "Need info", body: "Could you share the exact error message and a screenshot if possible? That will help me pinpoint the issue." },
   { label: "Resolved", body: "This should be resolved now. Please confirm on your end and I'll close the ticket. Thanks!" },
 ];
@@ -179,7 +179,7 @@ export default function Tickets() {
 
   return (
     <div className="h-full flex bg-background">
-      {/* Queue rail — expanded with labels */}
+      {/* Queue rail - expanded with labels */}
       <div className="hidden lg:flex w-[200px] shrink-0 flex-col border-r border-border bg-surface/40 py-3 px-2 gap-0.5">
         <div className="px-2 pb-1 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Queue</div>
         {queues.map(q => {

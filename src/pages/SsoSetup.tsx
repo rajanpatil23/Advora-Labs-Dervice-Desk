@@ -58,7 +58,7 @@ export default function SsoSetup() {
           <div>
             <h1 className="text-2xl font-semibold tracking-tight">Single sign-on</h1>
             <p className="text-sm text-muted-foreground">
-              Let your team sign in with your identity provider — Okta, Entra ID, Google Workspace, or any SAML/OIDC IdP.
+              Let your team sign in with your identity provider - Okta, Entra ID, Google Workspace, or any SAML/OIDC IdP.
             </p>
           </div>
         </div>
@@ -90,7 +90,7 @@ export default function SsoSetup() {
                 Next <ArrowRight className="h-4 w-4 ml-1" />
               </Button>
             ) : (
-              <span className="text-xs text-muted-foreground">All set — toggle SSO on once tests pass.</span>
+              <span className="text-xs text-muted-foreground">All set - toggle SSO on once tests pass.</span>
             )}
           </div>
         </div>
@@ -194,7 +194,7 @@ function MetadataStep({ cfg, update }: { cfg: SsoConfig; update: (p: Partial<Sso
         <CardTitle className="text-base">Connect your IdP</CardTitle>
         <CardDescription>
           {cfg.protocol === "saml"
-            ? "Provide a metadata URL or paste the XML — we accept either."
+            ? "Provide a metadata URL or paste the XML - we accept either."
             : "Enter your OIDC issuer and client credentials."}
         </CardDescription>
       </CardHeader>
@@ -348,7 +348,7 @@ function JitStep({ cfg, onChanged }: { cfg: SsoConfig; onChanged: () => void }) 
         <CardContent className="space-y-2">
           {cfg.roleMappings.length === 0 ? (
             <p className="text-xs text-muted-foreground py-3">
-              No mappings yet — every user receives the default role.
+              No mappings yet - every user receives the default role.
             </p>
           ) : cfg.roleMappings.map(rm => (
             <div key={rm.id} className="grid grid-cols-12 gap-2 items-center">

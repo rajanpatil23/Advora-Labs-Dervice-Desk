@@ -317,7 +317,7 @@ function UpgradeModal({ tier, cycle, currentSeats, onClose, onConfirm }: {
             {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Confirm & pay <CreditCard className="h-4 w-4" /></>}
           </button>
           <p className="text-[11px] text-center text-muted-foreground">
-            Test mode — no real charge. Connect Lovable Payments to accept live cards.
+            Test mode - no real charge. Connect Lovable Payments to accept live cards.
           </p>
         </div>
       </div>

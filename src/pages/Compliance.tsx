@@ -471,7 +471,7 @@ function VerifyPanel({ keyId }: { keyId: string }) {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="rounded-md bg-muted/40 border p-2 text-xs">
-          Active key ID: <code className="font-mono">{keyId}</code> — manifests signed with a different key will fail.
+          Active key ID: <code className="font-mono">{keyId}</code> - manifests signed with a different key will fail.
         </div>
 
         <div className="grid gap-3 md:grid-cols-2">

@@ -53,7 +53,7 @@ export function MacroPicker({ ticket, me, requesterName }: Props) {
     });
     setOpen(false);
     if (result.changed.length === 0) {
-      toast.message(`Macro "${m.name}" — nothing to change`);
+      toast.message(`Macro "${m.name}" - nothing to change`);
     } else {
       toast.success(`Macro "${m.name}" applied`, { description: result.changed.join(" · ") });
     }

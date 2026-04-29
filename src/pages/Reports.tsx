@@ -124,7 +124,7 @@ export default function Reports() {
       ["Number", "Title", "Status", "Priority", "Category", "SLA", "Assignee", "Created", "Updated"],
       ...scoped.map(t => {
         const a = agents.find(x => x.id === t.assigneeId);
-        return [t.number, t.title.replace(/,/g, ";"), t.status, t.priority, t.category, t.slaState, a?.name ?? "—", t.createdAt, t.updatedAt];
+        return [t.number, t.title.replace(/,/g, ";"), t.status, t.priority, t.category, t.slaState, a?.name ?? "-", t.createdAt, t.updatedAt];
       }),
     ];
     const csv = rows.map(r => r.join(",")).join("\n");

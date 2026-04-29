@@ -150,7 +150,7 @@ export function Topbar() {
               </div>
               <div className="hidden md:block leading-tight text-left">
                 <div className="text-sm font-semibold">{profile?.full_name || profile?.email}</div>
-                <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{currentRole || "—"}</div>
+                <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{currentRole || "-"}</div>
               </div>
             </button>
           </DropdownMenuTrigger>

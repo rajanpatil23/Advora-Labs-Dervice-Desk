@@ -252,7 +252,7 @@ function RevealDialog({ payload, onClose }: { payload: { token: ApiToken; secret
       <DialogContent>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2"><ShieldAlert className="h-5 w-5 text-amber-500" /> Save your token now</DialogTitle>
-          <DialogDescription>This is the only time the full secret is shown. Store it somewhere safe — we only keep a masked preview.</DialogDescription>
+          <DialogDescription>This is the only time the full secret is shown. Store it somewhere safe - we only keep a masked preview.</DialogDescription>
         </DialogHeader>
         <div className="space-y-3">
           <div className="flex gap-2">

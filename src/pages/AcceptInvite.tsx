@@ -18,7 +18,7 @@ export default function AcceptInvite() {
           <div className="font-display font-bold text-lg">Invite preview</div>
         </div>
         <div className="rounded-xl border border-border bg-surface-2 p-4 text-sm space-y-2">
-          <div className="flex items-center gap-2 text-muted-foreground"><MailCheck className="h-4 w-4" /> Token: <span className="font-mono text-foreground">{token || "—"}</span></div>
+          <div className="flex items-center gap-2 text-muted-foreground"><MailCheck className="h-4 w-4" /> Token: <span className="font-mono text-foreground">{token || "-"}</span></div>
           <p className="text-xs text-muted-foreground">
             Invite acceptance will work once the backend implements <code className="text-foreground">/invites/:token</code>.
             For now, sign in with one of the demo accounts on the login page.

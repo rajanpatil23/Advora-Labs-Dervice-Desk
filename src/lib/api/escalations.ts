@@ -193,7 +193,7 @@ export const TRIGGER_META: Record<EscalationTrigger, { label: string; descriptio
   reopened:    { label: "Ticket reopened",     description: "Fires when a closed ticket re-opens" },
 };
 
-/** Classify a ticket against active policies — returns matched policies + the next step. */
+/** Classify a ticket against active policies - returns matched policies + the next step. */
 export interface PendingEscalation {
   ticketId: string;
   ticketSubject: string;

@@ -213,7 +213,7 @@ export default function Notifications() {
                   {SOUND_PACKS.map((p) => (
                     <SelectItem key={p.value} value={p.value}>
                       <span className="font-medium">{p.label}</span>
-                      <span className="text-muted-foreground ml-2 text-xs">— {p.description}</span>
+                      <span className="text-muted-foreground ml-2 text-xs">- {p.description}</span>
                     </SelectItem>
                   ))}
                 </SelectContent>

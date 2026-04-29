@@ -20,7 +20,7 @@ export const SOUND_PACKS: { value: SoundPack; label: string; description: string
   { value: "off", label: "Off", description: "No sound." },
 ];
 
-// Severity per event — drives base pitch and desktop notification urgency.
+// Severity per event - drives base pitch and desktop notification urgency.
 const EVENT_SEVERITY: Record<NotificationEventKey, "low" | "med" | "high"> = {
   ticket_assigned: "med",
   ticket_mentioned: "high",

@@ -78,7 +78,7 @@ export default function PortalNewRequest() {
           />
         </Field>
 
-        <Field label="More details" hint="Steps to reproduce, screenshots, error messages — anything helps.">
+        <Field label="More details" hint="Steps to reproduce, screenshots, error messages - anything helps.">
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}

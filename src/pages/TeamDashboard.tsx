@@ -6,7 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 
 /**
- * Manager landing page — team-scoped overview.
+ * Manager landing page - team-scoped overview.
  * Phase 7 will expand this with workload balancing, drag-drop reassign, team reports.
  */
 export default function TeamDashboard() {

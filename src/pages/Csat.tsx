@@ -33,7 +33,7 @@ export default function Csat() {
   const csat = csatPercent(responses);
   const totalResponses = responses.length;
   const avgScore = totalResponses ? responses.reduce((s, r) => s + r.score, 0) / totalResponses : 0;
-  const responseRate = 68; // placeholder — backend will compute (responses / surveys sent)
+  const responseRate = 68; // placeholder - backend will compute (responses / surveys sent)
 
   // distribution
   const dist = useMemo(() => {
@@ -129,7 +129,7 @@ export default function Csat() {
                       <CartesianGrid stroke="hsl(var(--border))" strokeDasharray="3 3" vertical={false} />
                       <XAxis dataKey="label" stroke="hsl(var(--muted-foreground))" fontSize={11} tickLine={false} axisLine={false} />
                       <YAxis stroke="hsl(var(--muted-foreground))" fontSize={11} tickLine={false} axisLine={false} domain={[0, 100]} />
-                      <Tooltip contentStyle={{ background: "hsl(var(--popover))", border: "1px solid hsl(var(--border))", borderRadius: 12 }} formatter={(v: any) => v === null ? "—" : `${v}%`} />
+                      <Tooltip contentStyle={{ background: "hsl(var(--popover))", border: "1px solid hsl(var(--border))", borderRadius: 12 }} formatter={(v: any) => v === null ? "-" : `${v}%`} />
                       <Area type="monotone" dataKey="csat" stroke="hsl(var(--primary))" strokeWidth={2.5} fill="url(#csat-grad)" connectNulls />
                     </AreaChart>
                   </ResponsiveContainer>
@@ -244,7 +244,7 @@ export default function Csat() {
 }
 
 const TRIG_LABEL = { on_resolved: "On resolved", on_closed: "On closed", manual: "Manual" } as const;
-const SCALE_LABEL = { csat_5: "5-star", csat_3: "3-emoji", nps: "NPS 0–10" } as const;
+const SCALE_LABEL = { csat_5: "5-star", csat_3: "3-emoji", nps: "NPS 0-10" } as const;
 
 function KpiCard({ label, value, sub, icon, tone }: { label: string; value: string; sub?: string; icon: React.ReactNode; tone?: "good" | "warn" | "bad" }) {
   const t = tone === "good" ? "text-green-500" : tone === "warn" ? "text-yellow-500" : tone === "bad" ? "text-destructive" : "";
@@ -332,7 +332,7 @@ function SurveyEditor({ survey, onClose, onSaved }: { survey: Survey | null; onC
                 <SelectContent>
                   <SelectItem value="csat_5">5-star CSAT</SelectItem>
                   <SelectItem value="csat_3">3-emoji 😞 😐 😀</SelectItem>
-                  <SelectItem value="nps">NPS (0–10)</SelectItem>
+                  <SelectItem value="nps">NPS (0-10)</SelectItem>
                 </SelectContent>
               </Select>
             </div>

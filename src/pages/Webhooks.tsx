@@ -201,7 +201,7 @@ function DeliveryRow({ delivery, onView, onRetry }: { delivery: Delivery; onView
         <p className="text-xs text-muted-foreground font-mono truncate">{delivery.url}</p>
       </div>
       <div className="hidden sm:flex flex-col items-end text-[11px] text-muted-foreground tabular-nums">
-        <span>HTTP {delivery.httpCode ?? "—"} · {delivery.durationMs}ms</span>
+        <span>HTTP {delivery.httpCode ?? "-"} · {delivery.durationMs}ms</span>
         <span>{new Date(delivery.at).toLocaleString()}</span>
       </div>
       <Button variant="ghost" size="sm" onClick={onView}>
@@ -437,7 +437,7 @@ function DeliveryDetail({ delivery, onClose }: { delivery: Delivery | null; onCl
           <div className="space-y-1.5">
             <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Response</Label>
             <code className="block rounded-md bg-muted p-2 text-[11px] font-mono break-all">
-              {delivery.responseBody ?? "—"}
+              {delivery.responseBody ?? "-"}
             </code>
             {delivery.errorMessage && (
               <p className="text-xs text-destructive">{delivery.errorMessage}</p>
