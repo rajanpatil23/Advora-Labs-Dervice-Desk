@@ -1,16 +1,20 @@
-import { useAppStore } from "@/lib/store";
-import { agents } from "@/lib/mockData";
+import { useAppStore, useOrgAgents } from "@/lib/store";
 import { Download } from "lucide-react";
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, BarChart, Bar, CartesianGrid } from "recharts";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 export default function Reports() {
   const { tickets } = useAppStore();
+  const agents = useOrgAgents();
   const [period, setPeriod] = useState("Last 12 months");
-  const volume = Array.from({ length: 12 }, (_, i) => ({ m: `M${i+1}`, vol: 80 + Math.round(Math.sin(i/2)*30 + Math.random()*40) }));
-  const resTime = Array.from({ length: 12 }, (_, i) => ({ m: `M${i+1}`, h: 6 + Math.round(Math.cos(i/2)*3 + Math.random()*4) }));
-  const cats = ["Network","Hardware","Access","Software","Email","Security","Cloud"].map(c => ({ name: c, count: tickets.filter(t => t.category === c).length }));
+  const periodDays = period === "Last 30 days" ? 30 : period === "Last 90 days" ? 90 : 365;
+  const cutoff = Date.now() - periodDays * 86400000;
+  const scoped = useMemo(() => tickets.filter(t => new Date(t.createdAt).getTime() >= cutoff), [tickets, cutoff]);
+  const buckets = period === "Last 30 days" ? 30 : period === "Last 90 days" ? 12 : 12;
+  const volume = Array.from({ length: buckets }, (_, i) => ({ m: `${i+1}`, vol: 80 + Math.round(Math.sin(i/2)*30 + Math.random()*40) }));
+  const resTime = Array.from({ length: buckets }, (_, i) => ({ m: `${i+1}`, h: 6 + Math.round(Math.cos(i/2)*3 + Math.random()*4) }));
+  const cats = Array.from(new Set(scoped.map(t => t.category))).map(c => ({ name: c, count: scoped.filter(t => t.category === c).length }));
   const perf = agents.slice(0,8).map(a => ({ name: a.name.split(" ")[0], resolved: a.resolved, rating: a.rating * 20 }));
 
   const exportCsv = () => {
