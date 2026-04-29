@@ -88,6 +88,7 @@ export const tourApi = {
   },
   markComplete(userId: string, tourId = PRODUCT_TOUR.id) {
     localStorage.setItem(KEY(userId, tourId), "done");
+    try { window.dispatchEvent(new Event("lov:tour-completed")); } catch {}
   },
   reset(userId: string, tourId = PRODUCT_TOUR.id) {
     localStorage.removeItem(KEY(userId, tourId));
