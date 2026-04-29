@@ -1,13 +1,16 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Sparkles, ArrowRight, Loader2 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { authApi } from "@/lib/api/auth";
+import { useAuth } from "@/contexts/AuthContext";
+import { SEED_USERS } from "@/lib/api/seedUsers";
 import { toast } from "sonner";
 
 export default function Login() {
   const nav = useNavigate();
   const loc = useLocation() as { state?: { from?: { pathname?: string } } };
   const redirect = loc.state?.from?.pathname || "/app";
+  const { setSessionUser } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
@@ -15,14 +18,21 @@ export default function Login() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setBusy(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setBusy(false);
-    if (error) {
-      toast.error(error.message);
-      return;
+    try {
+      const session = await authApi.login(email, password);
+      setSessionUser(session.user);
+      toast.success(`Welcome back, ${session.user.full_name}`);
+      nav(redirect, { replace: true });
+    } catch (err) {
+      toast.error((err as Error).message || "Sign in failed");
+    } finally {
+      setBusy(false);
     }
-    toast.success("Welcome back");
-    nav(redirect, { replace: true });
+  };
+
+  const quickFill = (e: string) => {
+    setEmail(e);
+    setPassword("demo");
   };
 
   return (
@@ -65,9 +75,7 @@ export default function Login() {
               />
             </div>
             <div>
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-medium text-muted-foreground">Password</label>
-              </div>
+              <label className="text-xs font-medium text-muted-foreground">Password</label>
               <input
                 type="password"
                 required
@@ -86,6 +94,24 @@ export default function Login() {
               No account? <Link to="/signup" className="text-primary hover:underline">Create one</Link>
             </p>
           </form>
+
+          {/* Demo accounts */}
+          <div className="mt-8 rounded-xl border border-dashed border-border bg-surface/40 p-4">
+            <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-2">Demo accounts (password: demo)</div>
+            <div className="grid grid-cols-1 gap-1.5">
+              {SEED_USERS.map((u) => (
+                <button
+                  key={u.id}
+                  type="button"
+                  onClick={() => quickFill(u.email)}
+                  className="flex items-center justify-between text-xs px-2.5 py-1.5 rounded-md hover:bg-surface-2 transition-colors text-left"
+                >
+                  <span className="font-mono">{u.email}</span>
+                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground">{u.role}</span>
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Sparkles, ArrowRight, Loader2 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { authApi } from "@/lib/api/auth";
+import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
 export default function SignUp() {
   const nav = useNavigate();
+  const { setSessionUser } = useAuth();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -14,21 +16,16 @@ export default function SignUp() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setBusy(true);
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/app`,
-        data: { full_name: fullName },
-      },
-    });
-    setBusy(false);
-    if (error) {
-      toast.error(error.message);
-      return;
+    try {
+      const session = await authApi.signup(email, password, fullName);
+      setSessionUser(session.user);
+      toast.success("Workspace created");
+      nav("/app", { replace: true });
+    } catch (err) {
+      toast.error((err as Error).message || "Sign up failed");
+    } finally {
+      setBusy(false);
     }
-    toast.success("Account created");
-    nav("/onboarding", { replace: true });
   };
 
   return (
@@ -46,34 +43,55 @@ export default function SignUp() {
         </div>
         <div className="relative space-y-6 max-w-md">
           <h1 className="font-display font-bold text-4xl xl:text-5xl leading-tight text-sidebar-accent-foreground">
-            Spin up your workspace in <span className="gradient-text">under a minute</span>.
+            Spin up your <span className="gradient-text">support workspace</span> in seconds.
           </h1>
+          <p className="text-sidebar-foreground/70 text-lg">Tickets, incidents, SLAs and a knowledge base — all in one focused workspace.</p>
         </div>
         <div className="relative text-xs text-sidebar-foreground/50">© Connecttly 2026</div>
       </div>
 
       <div className="flex flex-col justify-center p-6 sm:p-12">
         <div className="max-w-md w-full mx-auto">
-          <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Create account</div>
-          <h2 className="mt-1 font-display font-bold text-3xl">Get started</h2>
-          <p className="text-sm text-muted-foreground mt-1">You'll create your organization next.</p>
+          <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Get started</div>
+          <h2 className="mt-1 font-display font-bold text-3xl">Create your workspace</h2>
+          <p className="text-sm text-muted-foreground mt-1">You'll be the admin of a new organization.</p>
 
           <form onSubmit={submit} className="mt-8 space-y-4">
             <div>
               <label className="text-xs font-medium text-muted-foreground">Full name</label>
-              <input required value={fullName} onChange={(e) => setFullName(e.target.value)} className="mt-1 w-full h-11 px-3.5 rounded-xl bg-surface border border-border focus:border-ring outline-none focus:ring-4 focus:ring-ring/15 text-sm" />
+              <input
+                required
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                className="mt-1 w-full h-11 px-3.5 rounded-xl bg-surface border border-border focus:border-ring outline-none focus:ring-4 focus:ring-ring/15 text-sm"
+              />
             </div>
             <div>
               <label className="text-xs font-medium text-muted-foreground">Work email</label>
-              <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="mt-1 w-full h-11 px-3.5 rounded-xl bg-surface border border-border focus:border-ring outline-none focus:ring-4 focus:ring-ring/15 text-sm" />
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="mt-1 w-full h-11 px-3.5 rounded-xl bg-surface border border-border focus:border-ring outline-none focus:ring-4 focus:ring-ring/15 text-sm"
+              />
             </div>
             <div>
               <label className="text-xs font-medium text-muted-foreground">Password</label>
-              <input type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} className="mt-1 w-full h-11 px-3.5 rounded-xl bg-surface border border-border focus:border-ring outline-none focus:ring-4 focus:ring-ring/15 text-sm" />
-              <p className="mt-1 text-[11px] text-muted-foreground">Min 8 characters. Avoid breached passwords.</p>
+              <input
+                type="password"
+                required
+                minLength={4}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="mt-1 w-full h-11 px-3.5 rounded-xl bg-surface border border-border focus:border-ring outline-none focus:ring-4 focus:ring-ring/15 text-sm"
+              />
             </div>
-            <button disabled={busy} className="w-full h-11 rounded-xl bg-gradient-primary text-primary-foreground font-semibold text-sm hover:shadow-glow transition-shadow flex items-center justify-center gap-2 disabled:opacity-60">
-              {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Create account <ArrowRight className="h-4 w-4" /></>}
+            <button
+              disabled={busy}
+              className="w-full h-11 rounded-xl bg-gradient-primary text-primary-foreground font-semibold text-sm hover:shadow-glow transition-shadow flex items-center justify-center gap-2 disabled:opacity-60"
+            >
+              {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Create workspace <ArrowRight className="h-4 w-4" /></>}
             </button>
             <p className="text-center text-xs text-muted-foreground">
               Already have an account? <Link to="/login" className="text-primary hover:underline">Sign in</Link>
