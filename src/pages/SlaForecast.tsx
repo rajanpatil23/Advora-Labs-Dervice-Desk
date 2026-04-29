@@ -123,7 +123,7 @@ export default function SlaForecast() {
             <div>
               <div className="font-medium mb-2">By assignee</div>
               {Object.entries(summary.byAssignee).length === 0 ? (
-                <p className="text-muted-foreground">—</p>
+                <p className="text-muted-foreground">-</p>
               ) : (
                 <div className="space-y-1.5 max-h-40 overflow-auto">
                   {Object.entries(summary.byAssignee)

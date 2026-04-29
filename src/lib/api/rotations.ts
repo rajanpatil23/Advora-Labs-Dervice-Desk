@@ -22,7 +22,7 @@ export interface Rotation {
   /** Optional restriction: only count these weekly blocks toward "on call" */
   blocks: ShiftBlock[];
   timezone: string;
-  /** Anchor date — the first participant starts on this date */
+  /** Anchor date - the first participant starts on this date */
   anchorDate: string;
   enabled: boolean;
   color: string;
@@ -73,7 +73,7 @@ function seed(): Rotation[] {
     {
       id: "rot_secondary",
       name: "Secondary on-call",
-      description: "Backup pager — escalates after primary has not responded in 10m.",
+      description: "Backup pager - escalates after primary has not responded in 10m.",
       participants: ["Lena Park", "Hiro Singh", "Amina Müller"],
       rotationDays: 7,
       blocks: [],
@@ -85,7 +85,7 @@ function seed(): Rotation[] {
     {
       id: "rot_eu_business",
       name: "EU business hours",
-      description: "Daytime cover Mon–Fri 09:00–18:00 CET.",
+      description: "Daytime cover Mon-Fri 09:00-18:00 CET.",
       participants: ["Sofia Costa", "Theo Kim", "Wren Lopez"],
       rotationDays: 1,
       blocks: [

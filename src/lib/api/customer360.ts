@@ -106,9 +106,9 @@ function seedCustomers(): Customer360[] {
 
 const TIMELINE_TEMPLATES: Array<{ kind: TimelineEventKind; title: string; detail?: string }> = [
   { kind: "ticket_opened",    title: "Opened ticket",            detail: "Login fails after password reset" },
-  { kind: "message_received", title: "Replied via email",        detail: "Thanks for the quick response — applying the fix now." },
+  { kind: "message_received", title: "Replied via email",        detail: "Thanks for the quick response - applying the fix now." },
   { kind: "ticket_resolved",  title: "Ticket resolved",          detail: "Resolved in 2h 14m" },
-  { kind: "csat_submitted",   title: "Submitted CSAT survey",    detail: "Rated 5/5 — \"Fast and friendly\"" },
+  { kind: "csat_submitted",   title: "Submitted CSAT survey",    detail: "Rated 5/5 - \"Fast and friendly\"" },
   { kind: "billing_event",    title: "Upgraded plan",            detail: "pro → enterprise" },
   { kind: "login",            title: "Signed in to portal" },
   { kind: "feature_used",     title: "Used integration",         detail: "Triggered Slack notification webhook" },

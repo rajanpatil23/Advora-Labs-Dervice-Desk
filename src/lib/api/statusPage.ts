@@ -98,7 +98,7 @@ let incidents: PublicIncident[] = [
     updates: [
       { id: RAND(), at: new Date(Date.now() - 1000 * 60 * 90).toISOString(), status: "investigating", body: "We are investigating reports of slow page loads on the customer portal.", authorName: "On-call Engineer" },
       { id: RAND(), at: new Date(Date.now() - 1000 * 60 * 50).toISOString(), status: "identified", body: "A backend cache node was misbehaving. Failing it over now.", authorName: "On-call Engineer" },
-      { id: RAND(), at: new Date(Date.now() - 1000 * 60 * 15).toISOString(), status: "monitoring", body: "Failover complete. Latency has returned to normal — monitoring for 30 minutes before resolving.", authorName: "On-call Engineer" },
+      { id: RAND(), at: new Date(Date.now() - 1000 * 60 * 15).toISOString(), status: "monitoring", body: "Failover complete. Latency has returned to normal - monitoring for 30 minutes before resolving.", authorName: "On-call Engineer" },
     ],
   },
   {
@@ -112,7 +112,7 @@ let incidents: PublicIncident[] = [
     updates: [
       { id: RAND(), at: new Date(Date.now() - 1000 * 60 * 60 * 30).toISOString(), status: "investigating", body: "Customers reported delayed notification emails.", authorName: "Support" },
       { id: RAND(), at: new Date(Date.now() - 1000 * 60 * 60 * 28).toISOString(), status: "identified", body: "Upstream SMTP provider was rate-limiting us.", authorName: "Support" },
-      { id: RAND(), at: new Date(Date.now() - 1000 * 60 * 60 * 27).toISOString(), status: "resolved", body: "Quotas restored — backlog drained.", authorName: "Support" },
+      { id: RAND(), at: new Date(Date.now() - 1000 * 60 * 60 * 27).toISOString(), status: "resolved", body: "Quotas restored - backlog drained.", authorName: "Support" },
     ],
   },
 ];

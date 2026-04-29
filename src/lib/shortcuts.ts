@@ -108,7 +108,7 @@ export function displayKey(k: string): string {
 }
 
 export function shortcutToString(s: Shortcut): string {
-  return `${s.keys.map(displayKey).join(" + ")} — ${s.description}`;
+  return `${s.keys.map(displayKey).join(" + ")} - ${s.description}`;
 }
 
 // Match an event against a single keystroke spec like "mod+k", "shift+x", "?", "Escape"

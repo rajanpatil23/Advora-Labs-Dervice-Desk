@@ -53,8 +53,8 @@ export function NewIncidentDialog({ trigger }: Props) {
               <label className="text-xs font-medium text-muted-foreground">Severity</label>
               <select value={severity} onChange={e => setSeverity(Number(e.target.value) as 1 | 2 | 3 | 4)}
                 className="mt-1 w-full h-10 px-3 rounded-lg bg-surface border border-border text-sm">
-                <option value={1}>SEV 1 — Critical</option><option value={2}>SEV 2 — High</option>
-                <option value={3}>SEV 3 — Medium</option><option value={4}>SEV 4 — Low</option>
+                <option value={1}>SEV 1 - Critical</option><option value={2}>SEV 2 - High</option>
+                <option value={3}>SEV 3 - Medium</option><option value={4}>SEV 4 - Low</option>
               </select>
             </div>
             <div>

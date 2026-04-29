@@ -257,7 +257,7 @@ export function groupRows(rows: any[], groupBy: ReportGroupBy): Record<string, a
   if (groupBy === "none") return { All: rows };
   const out: Record<string, any[]> = {};
   rows.forEach((r) => {
-    const k = String(r[groupBy] ?? "—");
+    const k = String(r[groupBy] ?? "-");
     (out[k] ??= []).push(r);
   });
   return out;
@@ -272,7 +272,7 @@ export function serializeReport(rows: any[], columns: string[], format: ReportFo
     // Lightweight pseudo-PDF (HTML-printable). Real PDFs need a backend.
     const html = `<!doctype html><meta charset="utf-8"><title>Report</title>
 <style>body{font:13px/1.4 -apple-system,sans-serif;padding:24px}h1{font-size:18px}table{border-collapse:collapse;width:100%}td,th{border:1px solid #ddd;padding:6px 8px;text-align:left;font-size:11px}th{background:#f5f5f5}</style>
-<h1>Report — ${new Date().toLocaleString()}</h1>
+<h1>Report - ${new Date().toLocaleString()}</h1>
 <table><thead><tr>${columns.map((c) => `<th>${c}</th>`).join("")}</tr></thead>
 <tbody>${rows.map((r) => `<tr>${columns.map((c) => `<td>${String(r[c] ?? "")}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
     return { blob: new Blob([html], { type: "text/html" }), ext: "html" };

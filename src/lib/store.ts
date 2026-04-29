@@ -638,7 +638,7 @@ export function useOrgCatalog() { return useAppStore((s) => s.catalog); }
 export function useOrgSettings() { return useAppStore((s) => s.settings); }
 
 /**
- * Returns the "effective" current org user — bridges the auth user
+ * Returns the "effective" current org user - bridges the auth user
  * (u_admin etc.) to a representation usable by ticket mutations as "me".
  * For requesters, also attempts to find the seeded customer by email.
  */
@@ -697,5 +697,5 @@ export function useOrgSync() {
   }, [currentOrgId, userId, userEmail, userName]);
 }
 
-// Backwards-compatibility (full datasets — used only by helpers like findUser).
+// Backwards-compatibility (full datasets - used only by helpers like findUser).
 export { allAgents as agents, allCustomers as customers };

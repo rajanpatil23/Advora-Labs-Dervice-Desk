@@ -125,7 +125,7 @@ export const SEED_USERS: SeedUser[] = [
       { org_id: "org_acme", role: "requester", team_id: null },
     ],
   },
-  // ---- Platform staff (SaaS operators) — NOT tenant members ----
+  // ---- Platform staff (SaaS operators) - NOT tenant members ----
   {
     id: "u_platform",
     email: "platform@demo.com",

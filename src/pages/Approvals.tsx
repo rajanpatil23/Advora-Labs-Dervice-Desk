@@ -79,7 +79,7 @@ export default function Approvals() {
             </div>
             <div className="mt-3 font-display font-semibold">Nothing here</div>
             <p className="text-sm text-muted-foreground mt-1">
-              {tab === "pending" ? "You're all caught up — no requests waiting for approval." : `No ${tab} requests yet.`}
+              {tab === "pending" ? "You're all caught up - no requests waiting for approval." : `No ${tab} requests yet.`}
             </p>
           </div>
         ) : (

@@ -171,7 +171,7 @@ export default function KnowledgeBase() {
                 </div>
                 <div className="flex gap-2">
                   <button onClick={() => { voteArticle(sel.id, true); toast.success("Thanks for your feedback!"); }} className="px-3 py-1.5 rounded-lg bg-success/10 text-success text-xs font-semibold flex items-center gap-1.5"><ThumbsUp className="h-3.5 w-3.5" /> Yes</button>
-                  <button onClick={() => { voteArticle(sel.id, false); toast.message("Thanks — we'll improve this article."); }} className="px-3 py-1.5 rounded-lg bg-surface-2 text-xs font-semibold">No</button>
+                  <button onClick={() => { voteArticle(sel.id, false); toast.message("Thanks - we'll improve this article."); }} className="px-3 py-1.5 rounded-lg bg-surface-2 text-xs font-semibold">No</button>
                 </div>
               </div>
             </>

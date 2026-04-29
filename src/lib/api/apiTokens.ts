@@ -117,7 +117,7 @@ export const apiTokensApi = {
   isExpired: (t: ApiToken): boolean => !!t.expiresAt && new Date(t.expiresAt).getTime() < Date.now(),
 };
 
-// Playground sample request specs — keep aligned with the scope catalog above.
+// Playground sample request specs - keep aligned with the scope catalog above.
 export type EndpointSpec = {
   id: string;
   method: "GET" | "POST" | "PATCH" | "DELETE";

@@ -62,10 +62,10 @@ export default function Login() {
 
         <div className="relative space-y-6 max-w-lg">
           <h1 className="font-display font-bold text-4xl xl:text-5xl leading-[1.1] text-white">
-            Run support for every team in your org — from one console.
+            Run support for every team in your org - from one console.
           </h1>
           <p className="text-white/80 text-base leading-relaxed">
-            SLA tracking, incident command, omnichannel inbox, knowledge base, and AI-powered routing — all in one focused workspace.
+            SLA tracking, incident command, omnichannel inbox, knowledge base, and AI-powered routing - all in one focused workspace.
           </p>
 
           <div className="grid grid-cols-3 gap-3 pt-4">
@@ -167,7 +167,7 @@ export default function Login() {
                       <span className="text-[10px] uppercase tracking-wider text-muted-foreground">{
                         SEED_PLATFORM_ADMINS.find(p => p.user_id === u.id)?.role
                         || u.memberships.map(m => m.role).join(" / ")
-                        || "—"
+                        || "-"
                       }</span>
                     </button>
                   ))}

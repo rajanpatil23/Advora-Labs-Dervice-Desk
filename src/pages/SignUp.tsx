@@ -51,7 +51,7 @@ export default function SignUp() {
             Spin up your support workspace in seconds.
           </h1>
           <p className="text-white/80 text-base leading-relaxed">
-            Tickets, incidents, SLAs, omnichannel inbox and a knowledge base — all in one focused workspace your agents will actually love.
+            Tickets, incidents, SLAs, omnichannel inbox and a knowledge base - all in one focused workspace your agents will actually love.
           </p>
 
           <div className="grid grid-cols-3 gap-3 pt-4">

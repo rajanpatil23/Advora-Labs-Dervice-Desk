@@ -125,9 +125,9 @@ export function predictAll(tickets: Ticket[], now = new Date()): BreachPredictio
 export function summarize(predictions: BreachPrediction[], now = new Date()): ForecastSummary {
   const buckets: ForecastBucket[] = [
     { label: "Next 1h", windowEndIso: new Date(now.getTime() + 60 * 60_000).toISOString(), predicted: 0, imminent: 0 },
-    { label: "1–4h", windowEndIso: new Date(now.getTime() + 4 * 60 * 60_000).toISOString(), predicted: 0, imminent: 0 },
-    { label: "4–12h", windowEndIso: new Date(now.getTime() + 12 * 60 * 60_000).toISOString(), predicted: 0, imminent: 0 },
-    { label: "12–24h", windowEndIso: new Date(now.getTime() + 24 * 60 * 60_000).toISOString(), predicted: 0, imminent: 0 },
+    { label: "1-4h", windowEndIso: new Date(now.getTime() + 4 * 60 * 60_000).toISOString(), predicted: 0, imminent: 0 },
+    { label: "4-12h", windowEndIso: new Date(now.getTime() + 12 * 60 * 60_000).toISOString(), predicted: 0, imminent: 0 },
+    { label: "12-24h", windowEndIso: new Date(now.getTime() + 24 * 60 * 60_000).toISOString(), predicted: 0, imminent: 0 },
   ];
 
   const summary: ForecastSummary = {

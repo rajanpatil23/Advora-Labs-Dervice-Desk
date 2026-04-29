@@ -52,7 +52,7 @@ function seed(): CannedResponse[] {
       title: "Friendly greeting",
       category: "Greetings",
       tags: ["greeting", "intro"],
-      body: "Hi {{customer.name}},\n\nThanks for reaching out — happy to help! I'm reviewing your ticket now and will follow up within the hour.\n\nBest,\n{{agent.name}}",
+      body: "Hi {{customer.name}},\n\nThanks for reaching out - happy to help! I'm reviewing your ticket now and will follow up within the hour.\n\nBest,\n{{agent.name}}",
       isFavorite: true,
     }),
     base({
@@ -60,7 +60,7 @@ function seed(): CannedResponse[] {
       title: "Standard refund policy",
       category: "Billing",
       tags: ["refund", "policy", "billing"],
-      body: "Hi {{customer.name}},\n\nOur refund policy allows full refunds within 30 days of purchase. Since your order ({{order.id}}) was placed on {{order.date}}, you're eligible.\n\nI've initiated the refund — please allow 5–7 business days for it to reflect on your statement.\n\nLet me know if you have questions.\n\n— {{agent.name}}",
+      body: "Hi {{customer.name}},\n\nOur refund policy allows full refunds within 30 days of purchase. Since your order ({{order.id}}) was placed on {{order.date}}, you're eligible.\n\nI've initiated the refund - please allow 5-7 business days for it to reflect on your statement.\n\nLet me know if you have questions.\n\n- {{agent.name}}",
     }),
     base({
       shortcut: "/password-reset",
@@ -82,7 +82,7 @@ function seed(): CannedResponse[] {
       title: "Closing & CSAT request",
       category: "Closings",
       tags: ["closing", "csat"],
-      body: "Hi {{customer.name}},\n\nGlad we could resolve this! I'll close the ticket — but feel free to reply anytime to reopen it.\n\nIf you have a moment, would you mind rating our help? It only takes 10 seconds.\n\nThank you!\n{{agent.name}}",
+      body: "Hi {{customer.name}},\n\nGlad we could resolve this! I'll close the ticket - but feel free to reply anytime to reopen it.\n\nIf you have a moment, would you mind rating our help? It only takes 10 seconds.\n\nThank you!\n{{agent.name}}",
     }),
     base({
       shortcut: "/known-issue",
@@ -104,7 +104,7 @@ function seed(): CannedResponse[] {
       title: "Feature request received",
       category: "Product",
       tags: ["feedback", "feature"],
-      body: "Hi {{customer.name}},\n\nThanks for the suggestion — I've logged this with our product team. We can't promise a timeline, but customer ideas like yours genuinely shape our roadmap.\n\nI'll let you know if/when there's news on this front.",
+      body: "Hi {{customer.name}},\n\nThanks for the suggestion - I've logged this with our product team. We can't promise a timeline, but customer ideas like yours genuinely shape our roadmap.\n\nI'll let you know if/when there's news on this front.",
     }),
   ];
 }

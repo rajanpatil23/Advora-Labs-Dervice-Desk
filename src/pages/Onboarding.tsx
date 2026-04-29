@@ -82,7 +82,7 @@ export default function Onboarding() {
   const skip = () => {
     if (!cfg) return;
     orgConfigApi.complete(cfg.org_id);
-    toast("Onboarding skipped — you can configure later in Settings.");
+    toast("Onboarding skipped - you can configure later in Settings.");
     nav(tenantRoleHome(currentRole), { replace: true });
   };
 
@@ -246,7 +246,7 @@ function StepInvites({ cfg, update }: { cfg: OrgConfig; update: (p: Partial<OrgC
 
       {cfg.pending_invites.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-          No invites queued. Add teammates above — invites will be sent when you finish setup.
+          No invites queued. Add teammates above - invites will be sent when you finish setup.
         </div>
       ) : (
         <ul className="rounded-xl border border-border divide-y divide-border bg-background/40">

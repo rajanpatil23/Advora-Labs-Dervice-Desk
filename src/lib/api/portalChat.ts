@@ -89,13 +89,13 @@ const KNOWLEDGE: { match: RegExp; reply: string; articles?: { id: string; title:
   {
     match: /\b(bill|invoice|charg|payment|subscription|refund)/i,
     reply:
-      "For billing questions I can route you to our billing team — they handle invoices, refunds, and plan changes. Want me to connect you now, or open a request you can track?",
+      "For billing questions I can route you to our billing team - they handle invoices, refunds, and plan changes. Want me to connect you now, or open a request you can track?",
     suggestions: ["Talk to an agent", "Open a request"],
   },
   {
     match: /\b(broke|broken|down|outage|not working|error|bug|crash)/i,
     reply:
-      "Got it — sounds like something is broken. Can you share **what you were doing**, **what you expected**, and **what happened instead**? A screenshot helps too. I'll create a request for an engineer to look at it.",
+      "Got it - sounds like something is broken. Can you share **what you were doing**, **what you expected**, and **what happened instead**? A screenshot helps too. I'll create a request for an engineer to look at it.",
     suggestions: ["Open a request", "Talk to an agent"],
   },
   {
@@ -166,7 +166,7 @@ export const portalChat = {
           role: "bot",
           authorName: "Advora Assistant",
           at: NOW(),
-          body: "On it — I'm finding an available agent for you. You're in the queue.",
+          body: "On it - I'm finding an available agent for you. You're in the queue.",
         },
         sessionPatch: { status: "queued", queuePosition: 1 + Math.floor(Math.random() * 3) },
       };
@@ -176,7 +176,7 @@ export const portalChat = {
       const agent = AGENT_POOL.find((a) => a.name === s.agentName) ?? AGENT_POOL[0];
       const replies = [
         "Got it. Let me check that for you.",
-        "Thanks for the details — looking into it now.",
+        "Thanks for the details - looking into it now.",
         "Could you share a screenshot of the error?",
         "I see the issue. Give me one moment to fix this.",
         "Done! Can you refresh and let me know if it's resolved?",
@@ -256,7 +256,7 @@ export const portalChat = {
       role: "agent",
       authorName: agent.name,
       at: NOW(),
-      body: `Hi! I'm ${agent.name.split(" ")[0]} from the support team. I've read the conversation so far — how can I help?`,
+      body: `Hi! I'm ${agent.name.split(" ")[0]} from the support team. I've read the conversation so far - how can I help?`,
     });
     if (!focused) s.unread += 2;
     write(s);

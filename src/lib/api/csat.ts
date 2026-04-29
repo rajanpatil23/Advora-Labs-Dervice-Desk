@@ -51,7 +51,7 @@ function seedResponses(): SurveyResponse[] {
   const comments = [
     "Quick and helpful, thanks!", "Resolved on first contact.", "Took a while but got there.",
     "Great communication throughout.", "Felt rushed, more empathy would help.",
-    undefined, "Perfect — issue solved instantly.", undefined, "Good experience overall.",
+    undefined, "Perfect - issue solved instantly.", undefined, "Good experience overall.",
   ];
   return Array.from({ length: 24 }, (_, i) => {
     const agent = agents[i % agents.length];

@@ -73,7 +73,7 @@ export function PresenceBubbles({ ticketId }: { ticketId: string }) {
   );
 }
 
-/** Inline mini variant for list rows — just the colored dots. */
+/** Inline mini variant for list rows - just the colored dots. */
 export function PresenceDots({ ticketId }: { ticketId: string }) {
   const [list, setList] = useState<Presence[]>([]);
   useEffect(() => presenceApi.subscribe(ticketId, setList), [ticketId]);

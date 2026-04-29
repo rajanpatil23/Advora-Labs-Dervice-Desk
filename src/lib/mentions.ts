@@ -26,7 +26,7 @@ export function toMentionable(p: Agent | User): Mentionable {
 }
 
 // Detect a mention trigger in a text input, returning the partial query and its
-// start index — e.g. "Hey @al|" → { query: "al", start: 4 }
+// start index - e.g. "Hey @al|" → { query: "al", start: 4 }
 export function detectMention(text: string, caret: number): { query: string; start: number } | null {
   const before = text.slice(0, caret);
   const at = before.lastIndexOf("@");

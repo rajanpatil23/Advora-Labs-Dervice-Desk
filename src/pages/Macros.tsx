@@ -259,7 +259,7 @@ export default function Macros() {
                   maxLength={1}
                   value={draft.shortcut ?? ""}
                   onChange={(e) => setDraft({ ...draft, shortcut: e.target.value.replace(/[^0-9a-zA-Z]/g, "").slice(0, 1) || undefined })}
-                  placeholder="1–9 or letter"
+                  placeholder="1-9 or letter"
                 />
               </div>
             </div>

@@ -286,9 +286,9 @@ function ChatThread({
           <div>
             <CardTitle className="text-base">{session.visitor.name}</CardTitle>
             <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
-              <span className="flex items-center gap-1"><Device className="h-3 w-3" />{session.visitor.device ?? "—"}</span>
+              <span className="flex items-center gap-1"><Device className="h-3 w-3" />{session.visitor.device ?? "-"}</span>
               <span>·</span>
-              <span>{session.visitor.country ?? "—"}</span>
+              <span>{session.visitor.country ?? "-"}</span>
               <span>·</span>
               <span className="font-mono">{session.visitor.page}</span>
               {session.visitor.email && <><span>·</span><span>{session.visitor.email}</span></>}
@@ -467,7 +467,7 @@ const REPLIES = [
   "Thanks, that helps!",
   "Hmm, still seeing the same issue.",
   "Could you share a link to the docs?",
-  "Got it — let me try that now.",
+  "Got it - let me try that now.",
   "Perfect. Anything else I should know?",
   "Where do I find that setting?",
 ];

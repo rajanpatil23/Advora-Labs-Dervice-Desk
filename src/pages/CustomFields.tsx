@@ -69,7 +69,7 @@ export default function CustomFields() {
                       {f.visibleWhen && <Badge variant="outline" className="text-xs">conditional</Badge>}
                     </div>
                     <p className="mt-1 text-xs text-muted-foreground">
-                      {f.helpText || "—"}
+                      {f.helpText || "-"}
                       <span className="ml-2">
                         {f.showOnPortal && "· portal"}
                         {f.showOnAgent && " · agent"}

@@ -153,7 +153,7 @@ export default function MobileAgent() {
               <div className="text-sm font-semibold">Push notifications</div>
               <div className="text-[11px] text-muted-foreground">Try a sample alert to preview the toast.</div>
             </div>
-            <Button size="sm" variant="outline" onClick={() => sendPush("New ticket assigned", "TKT-7421 — Login error on iOS app")}>
+            <Button size="sm" variant="outline" onClick={() => sendPush("New ticket assigned", "TKT-7421 - Login error on iOS app")}>
               Test
             </Button>
           </CardContent>
@@ -185,7 +185,7 @@ export default function MobileAgent() {
                 color: "bg-emerald-500",
                 onAction: () => {
                   updateTicket(t.id, { status: "resolved", resolvedAt: new Date().toISOString() });
-                  sendPush("Ticket resolved", `${t.number} — ${t.title}`);
+                  sendPush("Ticket resolved", `${t.number} - ${t.title}`);
                 },
               }}
               right={{
@@ -195,7 +195,7 @@ export default function MobileAgent() {
                 onAction: () => {
                   if (!myId) return toast.error("No agent profile linked to your account.");
                   updateTicket(t.id, { assigneeId: myId });
-                  sendPush("Assigned to you", `${t.number} — ${t.title}`);
+                  sendPush("Assigned to you", `${t.number} - ${t.title}`);
                 },
               }}
             >

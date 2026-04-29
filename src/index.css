@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Advora Service Desk — Calm, light-first conversational workspace.
+/* Advora Service Desk - Calm, light-first conversational workspace.
    Inspired by Intercom / Slack / Linear (light). All colors HSL.
 */
 
@@ -228,7 +228,7 @@
   }
 }
 
-/* Premium brand canvas — synced primary gradient with subtle dotted pattern + soft glow */
+/* Premium brand canvas - synced primary gradient with subtle dotted pattern + soft glow */
 @layer utilities {
   .brand-canvas {
     background-color: hsl(var(--primary));

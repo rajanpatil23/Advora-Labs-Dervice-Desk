@@ -317,7 +317,7 @@ export default function Scheduling() {
                   {/* People */}
                   <TabsContent value="people" className="mt-4 space-y-2">
                     {active.participants.length === 0 && (
-                      <p className="text-sm text-muted-foreground text-center py-4">No participants yet — add some below.</p>
+                      <p className="text-sm text-muted-foreground text-center py-4">No participants yet - add some below.</p>
                     )}
                     {active.participants.map((p, i) => (
                       <div key={p} className="flex items-center gap-2 rounded-lg border p-2">

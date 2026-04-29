@@ -24,19 +24,19 @@ export interface PendingInvite {
 
 export interface OrgConfig {
   org_id: string;
-  // step 1 — profile
+  // step 1 - profile
   display_name: string;
   industry: string;
   size: string;
   logo_url: string | null;
   primary_color: string;
-  // step 2 — invites
+  // step 2 - invites
   pending_invites: PendingInvite[];
-  // step 3 — categories
+  // step 3 - categories
   categories: string[];
-  // step 4 — SLA
+  // step 4 - SLA
   sla_defaults: SlaDefaults[];
-  // step 5 — business hours
+  // step 5 - business hours
   business_hours: BusinessHours;
   // lifecycle
   onboarding_completed_at: string | null;

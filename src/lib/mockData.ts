@@ -82,13 +82,13 @@ function buildOrgData(orgId: string, seed: number): OrgSeed {
     joined: new Date(Date.now() - (50+Math.floor(rand()*600))*86400000).toISOString(),
   }));
 
-  // Tickets — org-flavoured titles
+  // Tickets - org-flavoured titles
   const titlesByOrg: Record<string, string[]> = {
     org_acme: [
       "VPN connection drops every few minutes","Cannot reset Okta password","Slack notifications not working",
       "GitHub SSO returns 401","API rate limit exceeded on staging","Production database CPU spike",
       "Salesforce dashboard loads blank page","Sandbox environment provisioning failure","S3 bucket permissions request",
-      "New laptop request — Engineering team","Disk almost full on build agent","Two-factor backup codes regeneration",
+      "New laptop request - Engineering team","Disk almost full on build agent","Two-factor backup codes regeneration",
       "MFA token not received by SMS","Outlook calendar not syncing on mobile","Phishing email reported by Sales team",
     ],
     org_globex: [
@@ -118,13 +118,13 @@ function buildOrgData(orgId: string, seed: number): OrgSeed {
     const samples = [
       "Hi team, I started experiencing this issue this morning. Could you take a look?",
       "Thanks for reporting. We're investigating now and will update shortly.",
-      "Quick update — we identified the root cause and are deploying a fix.",
+      "Quick update - we identified the root cause and are deploying a fix.",
       "Could you confirm if the issue persists after restarting?",
       "Yes, just tried that and it's still happening.",
       "I've escalated this to the network team for further analysis.",
-      "Internal: noticed a firmware mismatch — opening change request.",
+      "Internal: noticed a firmware mismatch - opening change request.",
       "All clear on our side now, can you verify?",
-      "Confirmed — working perfectly. Thank you!",
+      "Confirmed - working perfectly. Thank you!",
     ];
     return range(count).map((i) => {
       const isReq = i % 2 === 0;
@@ -217,7 +217,7 @@ function buildOrgData(orgId: string, seed: number): OrgSeed {
   }));
 
   const catalog: ServiceRequestItem[] = [
-    { id: `sr_${orgId}_1`, org_id: orgId, catalog: "Hardware", title: "New Laptop", description: "Request a new laptop for an employee", icon: "Laptop", estimate: "3–5 days" },
+    { id: `sr_${orgId}_1`, org_id: orgId, catalog: "Hardware", title: "New Laptop", description: "Request a new laptop for an employee", icon: "Laptop", estimate: "3-5 days" },
     { id: `sr_${orgId}_2`, org_id: orgId, catalog: "Access", title: "Application Access", description: "Request access to a new application", icon: "Key", estimate: "1 day" },
     { id: `sr_${orgId}_3`, org_id: orgId, catalog: "Onboarding", title: "New Employee Setup", description: "Provision accounts and equipment", icon: "UserPlus", estimate: "5 days" },
     { id: `sr_${orgId}_4`, org_id: orgId, catalog: "Software", title: "Software License", description: "Order a software license", icon: "Package", estimate: "2 days" },
@@ -264,10 +264,10 @@ function buildOrgData(orgId: string, seed: number): OrgSeed {
   }));
 
   const slaPolicies: SlaPolicy[] = [
-    { id: `sla_${orgId}_1`, org_id: orgId, name: "Critical — P1", priority: "critical", responseMins: 15, resolutionMins: 240, active: true },
-    { id: `sla_${orgId}_2`, org_id: orgId, name: "High — P2",     priority: "high",     responseMins: 60, resolutionMins: 720, active: true },
-    { id: `sla_${orgId}_3`, org_id: orgId, name: "Medium — P3",   priority: "medium",   responseMins: 240, resolutionMins: 1440, active: true },
-    { id: `sla_${orgId}_4`, org_id: orgId, name: "Low — P4",      priority: "low",      responseMins: 480, resolutionMins: 4320, active: true },
+    { id: `sla_${orgId}_1`, org_id: orgId, name: "Critical - P1", priority: "critical", responseMins: 15, resolutionMins: 240, active: true },
+    { id: `sla_${orgId}_2`, org_id: orgId, name: "High - P2",     priority: "high",     responseMins: 60, resolutionMins: 720, active: true },
+    { id: `sla_${orgId}_3`, org_id: orgId, name: "Medium - P3",   priority: "medium",   responseMins: 240, resolutionMins: 1440, active: true },
+    { id: `sla_${orgId}_4`, org_id: orgId, name: "Low - P4",      priority: "low",      responseMins: 480, resolutionMins: 4320, active: true },
   ];
 
   const logs: LogEntry[] = range(30).map((i) => ({
@@ -290,7 +290,7 @@ const seedsByOrg: Record<string, OrgSeed> = {
   org_initech: buildOrgData("org_initech", 20240703),
 };
 
-// Aggregated, org-tagged exports — store filters by current org
+// Aggregated, org-tagged exports - store filters by current org
 export const agents:          Agent[]              = SEED_ORGS.flatMap(o => seedsByOrg[o.id].agents);
 export const customers:       User[]               = SEED_ORGS.flatMap(o => seedsByOrg[o.id].customers);
 export const tickets:         Ticket[]             = SEED_ORGS.flatMap(o => seedsByOrg[o.id].tickets);
@@ -301,5 +301,5 @@ export const articles:        KbArticle[]          = SEED_ORGS.flatMap(o => seed
 export const slaPolicies:     SlaPolicy[]          = SEED_ORGS.flatMap(o => seedsByOrg[o.id].slaPolicies);
 export const logs:            LogEntry[]           = SEED_ORGS.flatMap(o => seedsByOrg[o.id].logs);
 
-// Demo current user — first agent of first org (used by store mutations as "me")
+// Demo current user - first agent of first org (used by store mutations as "me")
 export const currentUser: Agent = seedsByOrg.org_acme.agents[0];

@@ -104,7 +104,7 @@ export default function Escalations() {
           {pending.length === 0 ? (
             <div className="text-center py-6 text-sm text-muted-foreground flex flex-col items-center gap-2">
               <CheckCircle2 className="h-6 w-6 text-emerald-500" />
-              All clear — no tickets currently require escalation.
+              All clear - no tickets currently require escalation.
             </div>
           ) : (
             <ScrollArea className="max-h-[280px]">
