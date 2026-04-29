@@ -39,7 +39,7 @@ export default function SignUp() {
           </div>
           <div>
             <div className="font-display font-bold text-sidebar-accent-foreground text-lg">Advora</div>
-            <div className="text-[10px] uppercase tracking-[0.2em] text-sidebar-foreground/60">Support OS</div>
+            <div className="text-[10px] uppercase tracking-[0.2em] text-sidebar-foreground/60">Service Desk</div>
           </div>
         </div>
         <div className="relative space-y-6 max-w-md">

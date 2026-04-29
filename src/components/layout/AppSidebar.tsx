@@ -143,7 +143,7 @@ export function AppSidebar() {
             </div>
             <div className="leading-tight min-w-0 flex-1">
               <div className="font-display font-bold text-sidebar-accent-foreground tracking-tight truncate">Advora</div>
-              <div className="text-[10px] uppercase tracking-[0.18em] text-sidebar-foreground/60 truncate">Support OS</div>
+              <div className="text-[10px] uppercase tracking-[0.18em] text-sidebar-foreground/60 truncate">Service Desk</div>
             </div>
           </>
         )}
