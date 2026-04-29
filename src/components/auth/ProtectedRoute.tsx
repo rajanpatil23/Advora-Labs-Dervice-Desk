@@ -3,7 +3,7 @@ import { useAuth, AppRole } from "@/contexts/AuthContext";
 import { Loader2 } from "lucide-react";
 
 export function ProtectedRoute({ roles }: { roles?: AppRole[] }) {
-  const { user, loading, memberships, currentRole } = useAuth();
+  const { user, loading, currentRole } = useAuth();
   const loc = useLocation();
 
   if (loading) {
@@ -15,7 +15,6 @@ export function ProtectedRoute({ roles }: { roles?: AppRole[] }) {
   }
 
   if (!user) return <Navigate to="/login" state={{ from: loc }} replace />;
-  if (memberships.length === 0) return <Navigate to="/onboarding" replace />;
   if (roles && currentRole && !roles.includes(currentRole)) {
     return <Navigate to="/app" replace />;
   }

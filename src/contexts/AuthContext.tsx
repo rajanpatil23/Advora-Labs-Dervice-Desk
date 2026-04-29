@@ -1,30 +1,12 @@
 import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from "react";
-import { Session, User } from "@supabase/supabase-js";
-import { supabase } from "@/integrations/supabase/client";
+import { authApi, type AuthUser, type Membership, type AppRole } from "@/lib/api/auth";
+import { tokenStore } from "@/lib/api/client";
 
-export type AppRole = "admin" | "manager" | "agent" | "resolver" | "requester";
-
-export interface Profile {
-  id: string;
-  email: string;
-  full_name: string | null;
-  avatar_url: string | null;
-  current_org_id: string | null;
-}
-
-export interface Membership {
-  id: string;
-  org_id: string;
-  role: AppRole;
-  team_id: string | null;
-  is_active: boolean;
-  org?: { id: string; name: string; slug: string };
-}
+export type { AppRole };
 
 interface AuthCtx {
-  session: Session | null;
-  user: User | null;
-  profile: Profile | null;
+  user: AuthUser | null;
+  profile: AuthUser | null; // alias for backwards compat with existing components
   memberships: Membership[];
   currentOrgId: string | null;
   currentRole: AppRole | null;
@@ -33,88 +15,82 @@ interface AuthCtx {
   signOut: () => Promise<void>;
   switchOrg: (orgId: string) => Promise<void>;
   hasRole: (...roles: AppRole[]) => boolean;
+  // Called by Login / SignUp pages after a successful auth call
+  setSessionUser: (user: AuthUser) => void;
 }
 
 const Ctx = createContext<AuthCtx | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [session, setSession] = useState<Session | null>(null);
-  const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [memberships, setMemberships] = useState<Membership[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const loadUserData = useCallback(async (uid: string) => {
-    const [{ data: prof }, { data: mems }] = await Promise.all([
-      supabase.from("profiles").select("*").eq("id", uid).maybeSingle(),
-      supabase
-        .from("memberships")
-        .select("id, org_id, role, team_id, is_active, org:organizations(id, name, slug)")
-        .eq("user_id", uid)
-        .eq("is_active", true),
+  const loadAll = useCallback(async () => {
+    try {
+      const [me, mems] = await Promise.all([authApi.me(), authApi.memberships()]);
+      setUser(me);
+      setMemberships(mems);
+    } catch {
+      setUser(null);
+      setMemberships([]);
+      tokenStore.clear();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!tokenStore.get()) {
+      setLoading(false);
+      return;
+    }
+    loadAll().finally(() => setLoading(false));
+  }, [loadAll]);
+
+  const setSessionUser = useCallback((u: AuthUser) => {
+    setUser(u);
+    setMemberships([
+      {
+        id: `mem_${u.id}`,
+        org_id: u.org_id,
+        org_name: u.org_name,
+        role: u.role,
+        team_id: u.team_id,
+        team_name: u.team_name,
+        is_active: true,
+      },
     ]);
-    setProfile(prof as Profile | null);
-    setMemberships((mems || []) as unknown as Membership[]);
   }, []);
 
   const refresh = useCallback(async () => {
-    if (user) await loadUserData(user.id);
-  }, [user, loadUserData]);
-
-  useEffect(() => {
-    // Set up listener FIRST
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, sess) => {
-      setSession(sess);
-      setUser(sess?.user ?? null);
-      if (sess?.user) {
-        // Defer DB calls to avoid deadlocks inside the auth callback
-        setTimeout(() => loadUserData(sess.user.id), 0);
-      } else {
-        setProfile(null);
-        setMemberships([]);
-      }
-    });
-
-    // THEN check existing session
-    supabase.auth.getSession().then(async ({ data: { session: s } }) => {
-      setSession(s);
-      setUser(s?.user ?? null);
-      if (s?.user) await loadUserData(s.user.id);
-      setLoading(false);
-    });
-
-    return () => sub.subscription.unsubscribe();
-  }, [loadUserData]);
+    await loadAll();
+  }, [loadAll]);
 
   const signOut = useCallback(async () => {
-    await supabase.auth.signOut();
-    setProfile(null);
+    try { await authApi.logout(); } catch { /* ignore */ }
+    tokenStore.clear();
+    setUser(null);
     setMemberships([]);
   }, []);
 
-  const switchOrg = useCallback(
-    async (orgId: string) => {
-      const { error } = await supabase.rpc("switch_org", { _org_id: orgId });
-      if (error) throw error;
-      await refresh();
-    },
-    [refresh]
-  );
+  const switchOrg = useCallback(async (_orgId: string) => {
+    // Single-org demo; refresh to keep API parity.
+    await refresh();
+  }, [refresh]);
 
-  const currentOrgId = profile?.current_org_id ?? memberships[0]?.org_id ?? null;
-  const currentRole = memberships.find((m) => m.org_id === currentOrgId)?.role ?? null;
+  const currentOrgId = user?.org_id ?? memberships[0]?.org_id ?? null;
+  const currentRole =
+    memberships.find((m) => m.org_id === currentOrgId)?.role ?? user?.role ?? null;
 
   const hasRole = useCallback(
     (...roles: AppRole[]) => (currentRole ? roles.includes(currentRole) : false),
-    [currentRole]
+    [currentRole],
   );
 
   return (
     <Ctx.Provider
       value={{
-        session,
         user,
-        profile,
+        profile: user,
         memberships,
         currentOrgId,
         currentRole,
@@ -123,6 +99,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signOut,
         switchOrg,
         hasRole,
+        setSessionUser,
       }}
     >
       {children}
