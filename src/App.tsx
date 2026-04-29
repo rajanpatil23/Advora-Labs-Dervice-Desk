@@ -56,6 +56,7 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/invite" element={<AcceptInvite />} />
+            <Route path="/survey/:ticketNumber" element={<PublicSurvey />} />
 
             <Route element={<ProtectedRoute />}>
               <Route path="/onboarding" element={<Onboarding />} />
@@ -80,6 +81,7 @@ const App = () => (
                 <Route path="security" element={<Security />} />
                 <Route path="integrations" element={<Integrations />} />
                 <Route path="automations" element={<Automations />} />
+                <Route path="csat" element={<Csat />} />
               </Route>
             </Route>
 
