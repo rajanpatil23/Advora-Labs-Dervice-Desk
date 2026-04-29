@@ -709,6 +709,32 @@ export default function Tickets() {
 
 /* ----------------- Sub-components ----------------- */
 
+function MessageBody({ text, knownHandles, myHandle }: { text: string; knownHandles: string[]; myHandle?: string }) {
+  const set = new Set(knownHandles);
+  const parts = renderWithMentions(text, (h) => set.has(h));
+  return (
+    <span className="whitespace-pre-wrap">
+      {parts.map((p, i) => {
+        if (p.type === "text") return <span key={i}>{p.value}</span>;
+        const handle = p.value.slice(1).toLowerCase();
+        const isMe = !!myHandle && handle === myHandle;
+        return (
+          <span
+            key={i}
+            className={cn(
+              "inline px-1 -mx-0.5 rounded font-medium",
+              isMe ? "bg-warning/30 text-warning-foreground" : p.known ? "bg-primary/15 text-primary" : "bg-surface-2 text-muted-foreground",
+            )}
+          >
+            {p.value}
+          </span>
+        );
+      })}
+    </span>
+  );
+}
+
+
 function Kbd({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
     <kbd className={cn("inline-flex items-center justify-center min-w-[16px] h-[16px] px-1 rounded bg-surface-2 border border-border text-[9px] font-mono text-muted-foreground", className)}>
