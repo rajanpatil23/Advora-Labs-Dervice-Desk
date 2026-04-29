@@ -1,6 +1,6 @@
 import { useAppStore, useOrgAgents, useOrgCustomers, useOrgSettings } from "@/lib/store";
 import { Building2, Bell, Palette, ShieldCheck, Tag, Users } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -29,10 +29,14 @@ export default function Settings() {
 
   // Reset draft when org changes
   const orgKey = currentMembership?.org_id;
-  if ((companyDraft as any)._org !== orgKey) {
-    (companyDraft as any)._org = orgKey;
-    setCompanyDraft({ companyName: settings.companyName, supportEmail: settings.supportEmail, timezone: settings.timezone });
-  }
+  useEffect(() => {
+    setCompanyDraft({
+      companyName: settings.companyName,
+      supportEmail: settings.supportEmail,
+      timezone: settings.timezone,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [orgKey]);
 
   const addCat = () => {
     const name = window.prompt("New category name");
