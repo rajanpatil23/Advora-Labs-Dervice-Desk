@@ -20,8 +20,8 @@ import { PriorityChip, StatusChip } from "@/components/common/Chips";
 import { timeAgo } from "@/lib/format";
 import type { Priority, TicketStatus } from "@/lib/types";
 
-const STATUSES: TicketStatus[] = ["open", "in_progress", "pending", "resolved", "closed"];
-const PRIORITIES: Priority[] = ["urgent", "high", "medium", "low"];
+const STATUSES: TicketStatus[] = ["new", "open", "in_progress", "on_hold", "resolved", "closed"];
+const PRIORITIES: Priority[] = ["critical", "high", "medium", "low"];
 
 export default function BulkActions() {
   const { tickets, setStatus, setPriority, setAssignee, deleteTicket } = useAppStore();
