@@ -15,7 +15,7 @@ type Item = { to: string; label: string; icon: typeof Ticket; roles?: AppRole[] 
 
 // Up to 5 items in bottom bar
 const BOTTOM_ITEMS: Item[] = [
-  { to: "/app/dashboard", label: "Home",     icon: LayoutDashboard },
+  { to: "/app/mobile",    label: "Agent",    icon: LayoutDashboard },
   { to: "/app/tickets",   label: "Tickets",  icon: Ticket },
   { to: "/app/my-queue",  label: "Queue",    icon: Inbox, roles: ["agent", "resolver"] },
   { to: "/app/incidents", label: "Incidents",icon: AlertOctagon },

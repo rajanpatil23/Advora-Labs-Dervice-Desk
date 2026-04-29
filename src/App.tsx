@@ -56,6 +56,7 @@ import Developer from "./pages/Developer";
 import SsoSetup from "./pages/SsoSetup";
 import Compliance from "./pages/Compliance";
 import StatusPage from "./pages/StatusPage";
+import MobileAgent from "./pages/MobileAgent";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -114,6 +115,7 @@ const App = () => (
                 <Route path="sso" element={<SsoSetup />} />
                 <Route path="compliance" element={<Compliance />} />
                 <Route path="status" element={<StatusPage />} />
+                <Route path="mobile" element={<MobileAgent />} />
               </Route>
             </Route>
 
