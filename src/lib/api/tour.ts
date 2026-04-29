@@ -24,7 +24,7 @@ export const PRODUCT_TOUR: Tour = {
   steps: [
     {
       id: "welcome",
-      title: "Welcome to Connecttly 👋",
+      title: "Welcome to Advora 👋",
       description:
         "Let's take a 60-second tour of the most important parts of your support workspace. You can exit anytime.",
       placement: "center",

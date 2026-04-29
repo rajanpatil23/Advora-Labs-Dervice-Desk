@@ -95,7 +95,7 @@ export default function Onboarding() {
               <Sparkles className="h-4.5 w-4.5 text-primary-foreground" />
             </div>
             <div>
-              <div className="font-display font-bold text-sm leading-none">Connecttly</div>
+              <div className="font-display font-bold text-sm leading-none">Advora</div>
               <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground mt-0.5">Onboarding</div>
             </div>
           </div>

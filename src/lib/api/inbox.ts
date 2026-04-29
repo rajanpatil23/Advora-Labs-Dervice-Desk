@@ -37,7 +37,7 @@ const SAMPLES: Array<Pick<InboxMessage, "channel" | "subject" | "body" | "sentim
   { channel: "email",     subject: "Re: Invoice #4821 — partial credit?", body: "Hi team, following up on the credit memo we discussed. Could you confirm the amount and when it will be applied to our next billing cycle?", sentiment: "neutral" },
   { channel: "chat",      body: "Hey 👋 my dashboard widgets keep disappearing after I refresh. Is this a known issue?", sentiment: "negative" },
   { channel: "sms",       body: "Order #A-7741 says delivered but I haven't received it. Can you check?", sentiment: "negative" },
-  { channel: "twitter",   body: "@Connecttly love the new mobile app! the swipe-to-resolve is genuinely delightful 🔥", sentiment: "positive" },
+  { channel: "twitter",   body: "@Advora love the new mobile app! the swipe-to-resolve is genuinely delightful 🔥", sentiment: "positive" },
   { channel: "facebook",  body: "I tried updating my payment method 3 times and it keeps failing with a generic error. Help?", sentiment: "negative" },
   { channel: "instagram", body: "DM: Quick question — do you ship to the EU? Couldn't find it in the FAQ.", sentiment: "neutral" },
   { channel: "whatsapp",  body: "Hola, necesito mover mi cita de mañana. ¿Es posible?", sentiment: "neutral" },
@@ -45,7 +45,7 @@ const SAMPLES: Array<Pick<InboxMessage, "channel" | "subject" | "body" | "sentim
   { channel: "email",     subject: "API rate limit increase request", body: "We're hitting 429s consistently between 14:00-16:00 UTC. Could we get bumped to the next tier? Happy to share usage logs.", sentiment: "neutral" },
   { channel: "chat",      body: "Just wanted to say the team that handled my migration was incredible. Five stars ⭐⭐⭐⭐⭐", sentiment: "positive" },
   { channel: "sms",       body: "STOP texting me. I unsubscribed twice already.", sentiment: "negative" },
-  { channel: "twitter",   body: "Anyone else seeing 502s on @Connecttly status page? Status dashboard says all green though.", sentiment: "negative" },
+  { channel: "twitter",   body: "Anyone else seeing 502s on @Advora status page? Status dashboard says all green though.", sentiment: "negative" },
   { channel: "email",     subject: "Security disclosure — XSS in comment renderer", body: "Hello security team — I'd like to report a potential issue. Please confirm a secure channel for details.", sentiment: "neutral" },
   { channel: "whatsapp",  body: "Can you confirm whether my account is on the Pro plan? Billing page is unclear.", sentiment: "neutral" },
 ];

@@ -40,9 +40,9 @@ function defaultSession(): ChatSession {
       {
         id: RAND(),
         role: "bot",
-        authorName: "Connecttly Assistant",
+        authorName: "Advora Assistant",
         at: NOW(),
-        body: "Hi there! 👋 I'm the Connecttly assistant. I can usually help instantly, or hand you off to a human agent. What's going on?",
+        body: "Hi there! 👋 I'm the Advora assistant. I can usually help instantly, or hand you off to a human agent. What's going on?",
         suggestions: [
           "I can't sign in",
           "Reset my password",
@@ -164,7 +164,7 @@ export const portalChat = {
         reply: {
           id: RAND(),
           role: "bot",
-          authorName: "Connecttly Assistant",
+          authorName: "Advora Assistant",
           at: NOW(),
           body: "On it — I'm finding an available agent for you. You're in the queue.",
         },
@@ -200,7 +200,7 @@ export const portalChat = {
           reply: {
             id: RAND(),
             role: "bot",
-            authorName: "Connecttly Assistant",
+            authorName: "Advora Assistant",
             at: NOW(),
             body: k.reply,
             articles: k.articles,
@@ -215,7 +215,7 @@ export const portalChat = {
       reply: {
         id: RAND(),
         role: "bot",
-        authorName: "Connecttly Assistant",
+        authorName: "Advora Assistant",
         at: NOW(),
         body: "Hmm, I'm not 100% sure I caught that. Could you give me a bit more detail, or would you like me to connect you with a human agent?",
         suggestions: ["Talk to an agent", "Open a request"],

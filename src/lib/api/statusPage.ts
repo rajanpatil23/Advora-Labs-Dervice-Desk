@@ -136,7 +136,7 @@ let subscribers: Subscriber[] = [
 ];
 
 let settings: StatusPageSettings = {
-  pageTitle: "Connecttly Status",
+  pageTitle: "Advora Status",
   pageUrl: "status.connecttly.com",
   supportEmail: "support@connecttly.com",
   showUptimeHistory: true,

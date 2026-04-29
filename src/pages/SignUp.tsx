@@ -4,6 +4,7 @@ import { Sparkles, ArrowRight, Loader2 } from "lucide-react";
 import { authApi } from "@/lib/api/auth";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import advoraLogo from "@/assets/advora-logo-light.png";
 
 export default function SignUp() {
   const nav = useNavigate();
@@ -34,12 +35,12 @@ export default function SignUp() {
       <div className="relative hidden lg:flex flex-col justify-between p-10 bg-sidebar text-sidebar-foreground overflow-hidden">
         <div className="absolute inset-0 mesh-bg opacity-80 pointer-events-none" />
         <div className="relative flex items-center gap-2.5">
-          <div className="h-10 w-10 rounded-xl bg-gradient-primary flex items-center justify-center shadow-glow">
-            <Sparkles className="h-5 w-5 text-primary-foreground" />
+          <div className="h-10 w-10 rounded-xl bg-sidebar-accent flex items-center justify-center overflow-hidden">
+            <img src={advoraLogo} alt="Advora" className="h-8 w-8 object-contain" />
           </div>
           <div>
-            <div className="font-display font-bold text-sidebar-accent-foreground text-lg">Connecttly</div>
-            <div className="text-[10px] uppercase tracking-[0.2em] text-sidebar-foreground/60">Support OS</div>
+            <div className="font-display font-bold text-sidebar-accent-foreground text-lg">Advora</div>
+            <div className="text-[10px] uppercase tracking-[0.2em] text-sidebar-foreground/60">Service Desk</div>
           </div>
         </div>
         <div className="relative space-y-6 max-w-md">
@@ -48,7 +49,7 @@ export default function SignUp() {
           </h1>
           <p className="text-sidebar-foreground/70 text-lg">Tickets, incidents, SLAs and a knowledge base — all in one focused workspace.</p>
         </div>
-        <div className="relative text-xs text-sidebar-foreground/50">© Connecttly 2026</div>
+        <div className="relative text-xs text-sidebar-foreground/50">© Advora 2026</div>
       </div>
 
       <div className="flex flex-col justify-center p-6 sm:p-12">
