@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useAppStore, findUser, findAgent, agents } from "@/lib/store";
+import { useAppStore, findUser, findAgent, useOrgAgents, useCurrentOrgUser } from "@/lib/store";
+import { useSearchParams } from "react-router-dom";
 import { PriorityChip, StatusChip, SlaChip, Avatar } from "@/components/common/Chips";
 import { timeAgo, timeUntil, formatDateTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
