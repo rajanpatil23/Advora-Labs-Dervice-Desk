@@ -110,7 +110,11 @@ export default function Login() {
                   className="flex items-center justify-between text-xs px-2.5 py-1.5 rounded-md hover:bg-surface-2 transition-colors text-left"
                 >
                   <span className="font-mono">{u.email}</span>
-                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground">{u.memberships.map(m => m.role).join(" / ")}</span>
+                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground">{
+                    SEED_PLATFORM_ADMINS.find(p => p.user_id === u.id)?.role
+                    || u.memberships.map(m => m.role).join(" / ")
+                    || "—"
+                  }</span>
                 </button>
               ))}
             </div>
