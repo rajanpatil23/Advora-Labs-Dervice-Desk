@@ -67,6 +67,7 @@ const SECTIONS: NavSection[] = [
     i18nKey: "nav.manage",
     items: [
       { to: "/app/users",      label: "Users",            i18nKey: "nav.users",         icon: Users,           roles: ["owner", "admin", "manager"] },
+      { to: "/app/customers",  label: "Customer 360",     icon: UsersRound,                                    roles: ["owner", "admin", "manager", "agent", "resolver"] },
       { to: "/app/agents",     label: "Agents",           i18nKey: "nav.agents",        icon: UserCog,         roles: ["owner", "admin", "manager"] },
       { to: "/app/sla",        label: "SLA Policies",     i18nKey: "nav.sla",           icon: Timer,           roles: ["owner", "admin"] },
       { to: "/app/escalations", label: "Escalations",     icon: Siren,                                         roles: ["owner", "admin", "manager"] },
