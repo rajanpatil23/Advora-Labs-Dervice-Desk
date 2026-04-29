@@ -58,6 +58,7 @@ import SsoSetup from "./pages/SsoSetup";
 import Compliance from "./pages/Compliance";
 import StatusPage from "./pages/StatusPage";
 import MobileAgent from "./pages/MobileAgent";
+import Workflows from "./pages/Workflows";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -118,6 +119,7 @@ const App = () => (
                 <Route path="compliance" element={<Compliance />} />
                 <Route path="status" element={<StatusPage />} />
                 <Route path="mobile" element={<MobileAgent />} />
+                <Route path="workflows" element={<Workflows />} />
               </Route>
             </Route>
 
