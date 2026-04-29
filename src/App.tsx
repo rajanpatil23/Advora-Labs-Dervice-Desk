@@ -3,8 +3,13 @@ import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { AppLayout } from "@/components/layout/AppLayout";
 import Login from "./pages/Login";
+import SignUp from "./pages/SignUp";
+import Onboarding from "./pages/Onboarding";
+import AcceptInvite from "./pages/AcceptInvite";
 import Dashboard from "./pages/Dashboard";
 import Tickets from "./pages/Tickets";
 import Incidents from "./pages/Incidents";
@@ -26,25 +31,35 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/app" element={<AppLayout />}>
-            <Route index element={<Tickets />} />
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route path="tickets" element={<Tickets />} />
-            <Route path="incidents" element={<Incidents />} />
-            <Route path="requests" element={<Requests />} />
-            <Route path="users" element={<Users />} />
-            <Route path="agents" element={<Agents />} />
-            <Route path="sla" element={<SLA />} />
-            <Route path="kb" element={<KnowledgeBase />} />
-            <Route path="reports" element={<Reports />} />
-            <Route path="logs" element={<Logs />} />
-            <Route path="settings" element={<Settings />} />
-          </Route>
-          <Route path="/dashboard" element={<Navigate to="/app" replace />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AuthProvider>
+          <Routes>
+            <Route path="/" element={<Navigate to="/app" replace />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/onboarding" element={<Onboarding />} />
+            <Route path="/invite" element={<AcceptInvite />} />
+
+            <Route element={<ProtectedRoute />}>
+              <Route path="/app" element={<AppLayout />}>
+                <Route index element={<Tickets />} />
+                <Route path="dashboard" element={<Dashboard />} />
+                <Route path="tickets" element={<Tickets />} />
+                <Route path="incidents" element={<Incidents />} />
+                <Route path="requests" element={<Requests />} />
+                <Route path="users" element={<Users />} />
+                <Route path="agents" element={<Agents />} />
+                <Route path="sla" element={<SLA />} />
+                <Route path="kb" element={<KnowledgeBase />} />
+                <Route path="reports" element={<Reports />} />
+                <Route path="logs" element={<Logs />} />
+                <Route path="settings" element={<Settings />} />
+              </Route>
+            </Route>
+
+            <Route path="/dashboard" element={<Navigate to="/app" replace />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
