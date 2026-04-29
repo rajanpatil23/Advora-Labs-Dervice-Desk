@@ -3,7 +3,7 @@ import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, Ticket, AlertOctagon, ClipboardList, Users, UserCog,
   Timer, BookOpen, BarChart3, ScrollText, Settings, Sparkles, LogOut,
-  PanelLeftClose, PanelLeft
+  PanelLeftClose, PanelLeft, Inbox, UsersRound, CheckSquare, CreditCard, ShieldCheck
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -15,22 +15,58 @@ interface NavItem {
   label: string;
   icon: typeof LayoutDashboard;
   end?: boolean;
-  roles?: AppRole[]; // if omitted, visible to all roles
+  roles?: AppRole[]; // omitted = visible to all tenant roles
   badgeKey?: "openTickets" | "activeIncidents";
 }
 
-const items: NavItem[] = [
-  { to: "/app/dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["owner", "admin", "manager", "agent", "resolver"] },
-  { to: "/app", label: "Tickets", icon: Ticket, end: true, badgeKey: "openTickets" },
-  { to: "/app/incidents", label: "Incidents", icon: AlertOctagon, badgeKey: "activeIncidents", roles: ["owner", "admin", "manager", "agent", "resolver"] },
-  { to: "/app/requests", label: "Service Requests", icon: ClipboardList },
-  { to: "/app/users", label: "Users", icon: Users, roles: ["owner", "admin", "manager"] },
-  { to: "/app/agents", label: "Agents", icon: UserCog, roles: ["owner", "admin", "manager"] },
-  { to: "/app/sla", label: "SLA", icon: Timer, roles: ["owner", "admin", "manager"] },
-  { to: "/app/kb", label: "Knowledge Base", icon: BookOpen },
-  { to: "/app/reports", label: "Reports", icon: BarChart3, roles: ["owner", "admin", "manager"] },
-  { to: "/app/logs", label: "Activity Logs", icon: ScrollText, roles: ["owner", "admin"] },
-  { to: "/app/settings", label: "Settings", icon: Settings, roles: ["owner", "admin"] },
+interface NavSection {
+  label: string;
+  items: NavItem[];
+}
+
+// Role × feature matrix from ROLES_AND_FEATURES.md
+const SECTIONS: NavSection[] = [
+  {
+    label: "Workspace",
+    items: [
+      { to: "/app/dashboard",  label: "Dashboard",        icon: LayoutDashboard, roles: ["owner", "admin"] },
+      { to: "/app/team",       label: "Team Dashboard",   icon: UsersRound,      roles: ["manager"] },
+      { to: "/app/my-queue",   label: "My Queue",         icon: Inbox,           roles: ["agent", "resolver"] },
+    ],
+  },
+  {
+    label: "Work",
+    items: [
+      { to: "/app/tickets",    label: "Tickets",          icon: Ticket,          badgeKey: "openTickets",     roles: ["owner", "admin", "manager", "agent", "resolver"] },
+      { to: "/app/incidents",  label: "Incidents",        icon: AlertOctagon,    badgeKey: "activeIncidents", roles: ["owner", "admin", "manager", "agent", "resolver"] },
+      { to: "/app/requests",   label: "Service Requests", icon: ClipboardList,   roles: ["owner", "admin", "manager", "agent", "resolver"] },
+      { to: "/app/approvals",  label: "Approvals",        icon: CheckSquare,     roles: ["owner", "admin", "manager"] },
+      { to: "/app/kb",         label: "Knowledge Base",   icon: BookOpen },
+    ],
+  },
+  {
+    label: "Insights",
+    items: [
+      { to: "/app/reports",    label: "Reports",          icon: BarChart3,       roles: ["owner", "admin", "manager"] },
+    ],
+  },
+  {
+    label: "Manage",
+    items: [
+      { to: "/app/users",      label: "Users",            icon: Users,           roles: ["owner", "admin", "manager"] },
+      { to: "/app/agents",     label: "Agents",           icon: UserCog,         roles: ["owner", "admin", "manager"] },
+      { to: "/app/sla",        label: "SLA Policies",     icon: Timer,           roles: ["owner", "admin"] },
+      { to: "/app/logs",       label: "Audit Log",        icon: ScrollText,      roles: ["owner", "admin"] },
+    ],
+  },
+  {
+    label: "Organization",
+    items: [
+      { to: "/app/settings",   label: "Settings",         icon: Settings,        roles: ["owner", "admin"] },
+      { to: "/app/billing",    label: "Billing & Plan",   icon: CreditCard,      roles: ["owner"] },
+      { to: "/app/security",   label: "Security",         icon: ShieldCheck,     roles: ["owner", "admin"] },
+    ],
+  },
 ];
 
 export function AppSidebar() {
@@ -45,7 +81,9 @@ export function AppSidebar() {
     activeIncidents: incidents.filter((i) => i.status !== "resolved").length,
   };
 
-  const visibleItems = items.filter((it) => !it.roles || (currentRole && it.roles.includes(currentRole)));
+  const visibleSections = SECTIONS
+    .map((s) => ({ ...s, items: s.items.filter((it) => !it.roles || (currentRole && it.roles.includes(currentRole))) }))
+    .filter((s) => s.items.length > 0);
 
   const handleSignOut = async () => {
     await signOut();
@@ -85,49 +123,55 @@ export function AppSidebar() {
         </button>
       </div>
 
-      <nav className={cn("flex-1 py-4 space-y-0.5 overflow-y-auto overflow-x-hidden", collapsed ? "px-2" : "px-3")}>
-        {!collapsed && (
-          <div className="px-2 pb-2 text-[10px] uppercase tracking-wider text-sidebar-foreground/50">Workspace</div>
-        )}
-        {visibleItems.map((it) => {
-          const active = it.end ? loc.pathname === it.to : loc.pathname.startsWith(it.to);
-          const Icon = it.icon;
-          const badge = it.badgeKey ? counts[it.badgeKey] : undefined;
-          const showBadge = badge !== undefined && badge > 0;
-          return (
-            <NavLink
-              key={it.to}
-              to={it.to}
-              end={it.end}
-              title={collapsed ? it.label : undefined}
-              className={cn(
-                "group flex items-center rounded-lg text-sm font-medium transition-all relative",
-                collapsed ? "justify-center h-10 w-10 mx-auto" : "gap-3 px-3 py-2",
-                active
-                  ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-sm"
-                  : "text-sidebar-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground"
-              )}
-            >
-              {active && !collapsed && <span className="absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-r-full bg-sidebar-primary" />}
-              <Icon className={cn("h-4 w-4 shrink-0", active ? "text-sidebar-primary" : "")} />
-              {!collapsed && (
-                <>
-                  <span className="flex-1">{it.label}</span>
-                  {showBadge && (
-                    <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-md bg-sidebar-primary/15 text-sidebar-primary tabular-nums">
-                      {badge}
-                    </span>
-                  )}
-                </>
-              )}
-              {collapsed && showBadge && (
-                <span className="absolute -top-0.5 -right-0.5 h-4 min-w-[16px] px-1 rounded-full bg-sidebar-primary text-[9px] font-semibold text-sidebar-primary-foreground flex items-center justify-center tabular-nums">
-                  {badge}
-                </span>
-              )}
-            </NavLink>
-          );
-        })}
+      <nav className={cn("flex-1 py-4 overflow-y-auto overflow-x-hidden", collapsed ? "px-2 space-y-1" : "px-3 space-y-4")}>
+        {visibleSections.map((section, idx) => (
+          <div key={section.label} className={collapsed && idx > 0 ? "pt-1 mt-1 border-t border-sidebar-border/40" : ""}>
+            {!collapsed && (
+              <div className="px-2 pb-1.5 text-[10px] uppercase tracking-wider text-sidebar-foreground/50">{section.label}</div>
+            )}
+            <div className="space-y-0.5">
+              {section.items.map((it) => {
+                const active = it.end ? loc.pathname === it.to : loc.pathname === it.to || loc.pathname.startsWith(it.to + "/");
+                const Icon = it.icon;
+                const badge = it.badgeKey ? counts[it.badgeKey] : undefined;
+                const showBadge = badge !== undefined && badge > 0;
+                return (
+                  <NavLink
+                    key={it.to}
+                    to={it.to}
+                    end={it.end}
+                    title={collapsed ? it.label : undefined}
+                    className={cn(
+                      "group flex items-center rounded-lg text-sm font-medium transition-all relative",
+                      collapsed ? "justify-center h-10 w-10 mx-auto" : "gap-3 px-3 py-2",
+                      active
+                        ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-sm"
+                        : "text-sidebar-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground"
+                    )}
+                  >
+                    {active && !collapsed && <span className="absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-r-full bg-sidebar-primary" />}
+                    <Icon className={cn("h-4 w-4 shrink-0", active ? "text-sidebar-primary" : "")} />
+                    {!collapsed && (
+                      <>
+                        <span className="flex-1">{it.label}</span>
+                        {showBadge && (
+                          <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-md bg-sidebar-primary/15 text-sidebar-primary tabular-nums">
+                            {badge}
+                          </span>
+                        )}
+                      </>
+                    )}
+                    {collapsed && showBadge && (
+                      <span className="absolute -top-0.5 -right-0.5 h-4 min-w-[16px] px-1 rounded-full bg-sidebar-primary text-[9px] font-semibold text-sidebar-primary-foreground flex items-center justify-center tabular-nums">
+                        {badge}
+                      </span>
+                    )}
+                  </NavLink>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </nav>
 
       {!collapsed && (
