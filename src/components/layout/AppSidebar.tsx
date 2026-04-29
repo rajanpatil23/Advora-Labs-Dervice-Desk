@@ -9,72 +9,78 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useAppStore } from "@/lib/store";
 import { useAuth, type AppRole } from "@/contexts/AuthContext";
+import { useT } from "@/lib/i18n-app";
 
 interface NavItem {
   to: string;
   label: string;
+  i18nKey?: string;
   icon: typeof LayoutDashboard;
   end?: boolean;
-  roles?: AppRole[]; // omitted = visible to all tenant roles
+  roles?: AppRole[];
   badgeKey?: "openTickets" | "activeIncidents";
 }
 
 interface NavSection {
   label: string;
+  i18nKey?: string;
   items: NavItem[];
 }
 
-// Role × feature matrix from ROLES_AND_FEATURES.md
 const SECTIONS: NavSection[] = [
   {
     label: "Workspace",
+    i18nKey: "nav.workspace",
     items: [
-      { to: "/app/dashboard",  label: "Dashboard",        icon: LayoutDashboard, roles: ["owner", "admin"] },
-      { to: "/app/team",       label: "Team Dashboard",   icon: UsersRound,      roles: ["manager"] },
-      { to: "/app/my-queue",   label: "My Queue",         icon: Inbox,           roles: ["agent", "resolver"] },
+      { to: "/app/dashboard",  label: "Dashboard",        i18nKey: "nav.dashboard",     icon: LayoutDashboard, roles: ["owner", "admin"] },
+      { to: "/app/team",       label: "Team Dashboard",   i18nKey: "nav.team",          icon: UsersRound,      roles: ["manager"] },
+      { to: "/app/my-queue",   label: "My Queue",         i18nKey: "nav.myQueue",       icon: Inbox,           roles: ["agent", "resolver"] },
     ],
   },
   {
     label: "Work",
     items: [
-      { to: "/app/tickets",    label: "Tickets",          icon: Ticket,          badgeKey: "openTickets",     roles: ["owner", "admin", "manager", "agent", "resolver"] },
-      { to: "/app/incidents",  label: "Incidents",        icon: AlertOctagon,    badgeKey: "activeIncidents", roles: ["owner", "admin", "manager", "agent", "resolver"] },
-      { to: "/app/requests",   label: "Service Requests", icon: ClipboardList,   roles: ["owner", "admin", "manager", "agent", "resolver"] },
-      { to: "/app/approvals",  label: "Approvals",        icon: CheckSquare,     roles: ["owner", "admin", "manager"] },
-      { to: "/app/views",      label: "Saved Views",      icon: Bookmark,        roles: ["owner", "admin", "manager", "agent", "resolver"] },
-      { to: "/app/bulk",       label: "Bulk Actions",     icon: Layers,          roles: ["owner", "admin", "manager"] },
-      { to: "/app/data",       label: "Import / Export",  icon: Database,        roles: ["owner", "admin"] },
-      { to: "/app/kb",         label: "Knowledge Base",   icon: BookOpen },
+      { to: "/app/tickets",    label: "Tickets",          i18nKey: "nav.tickets",       icon: Ticket,          badgeKey: "openTickets",     roles: ["owner", "admin", "manager", "agent", "resolver"] },
+      { to: "/app/incidents",  label: "Incidents",        i18nKey: "nav.incidents",     icon: AlertOctagon,    badgeKey: "activeIncidents", roles: ["owner", "admin", "manager", "agent", "resolver"] },
+      { to: "/app/requests",   label: "Service Requests", i18nKey: "nav.requests",      icon: ClipboardList,   roles: ["owner", "admin", "manager", "agent", "resolver"] },
+      { to: "/app/approvals",  label: "Approvals",        i18nKey: "nav.approvals",     icon: CheckSquare,     roles: ["owner", "admin", "manager"] },
+      { to: "/app/views",      label: "Saved Views",      i18nKey: "nav.savedViews",    icon: Bookmark,        roles: ["owner", "admin", "manager", "agent", "resolver"] },
+      { to: "/app/bulk",       label: "Bulk Actions",     icon: Layers,                                       roles: ["owner", "admin", "manager"] },
+      { to: "/app/data",       label: "Import / Export",  i18nKey: "nav.data",          icon: Database,        roles: ["owner", "admin"] },
+      { to: "/app/kb",         label: "Knowledge Base",   i18nKey: "nav.knowledge",     icon: BookOpen },
     ],
   },
   {
     label: "Insights",
+    i18nKey: "nav.insights",
     items: [
-      { to: "/app/reports",        label: "Reports",          icon: BarChart3,       roles: ["owner", "admin", "manager"] },
-      { to: "/app/report-builder",  label: "Report builder",   icon: BarChart3,       roles: ["owner", "admin", "manager"] },
-      { to: "/app/csat",            label: "CSAT",             icon: Smile,           roles: ["owner", "admin", "manager"] },
+      { to: "/app/reports",        label: "Reports",         i18nKey: "nav.reports",       icon: BarChart3,       roles: ["owner", "admin", "manager"] },
+      { to: "/app/report-builder", label: "Report builder",  i18nKey: "nav.reportBuilder", icon: BarChart3,       roles: ["owner", "admin", "manager"] },
+      { to: "/app/csat",           label: "CSAT",            i18nKey: "nav.csat",          icon: Smile,           roles: ["owner", "admin", "manager"] },
     ],
   },
   {
     label: "Manage",
+    i18nKey: "nav.manage",
     items: [
-      { to: "/app/users",      label: "Users",            icon: Users,           roles: ["owner", "admin", "manager"] },
-      { to: "/app/agents",     label: "Agents",           icon: UserCog,         roles: ["owner", "admin", "manager"] },
-      { to: "/app/sla",        label: "SLA Policies",     icon: Timer,           roles: ["owner", "admin"] },
-      { to: "/app/automations", label: "Automations",     icon: Zap,             roles: ["owner", "admin", "manager"] },
-      { to: "/app/logs",       label: "Audit Log",        icon: ScrollText,      roles: ["owner", "admin"] },
+      { to: "/app/users",      label: "Users",            i18nKey: "nav.users",         icon: Users,           roles: ["owner", "admin", "manager"] },
+      { to: "/app/agents",     label: "Agents",           i18nKey: "nav.agents",        icon: UserCog,         roles: ["owner", "admin", "manager"] },
+      { to: "/app/sla",        label: "SLA Policies",     i18nKey: "nav.sla",           icon: Timer,           roles: ["owner", "admin"] },
+      { to: "/app/automations", label: "Automations",     i18nKey: "nav.automations",   icon: Zap,             roles: ["owner", "admin", "manager"] },
+      { to: "/app/logs",       label: "Audit Log",        i18nKey: "nav.logs",          icon: ScrollText,      roles: ["owner", "admin"] },
     ],
   },
   {
     label: "Organization",
+    i18nKey: "nav.system",
     items: [
-      { to: "/app/settings",   label: "Settings",         icon: Settings,        roles: ["owner", "admin"] },
-      { to: "/app/notifications", label: "Notifications", icon: Bell },
-      { to: "/app/fields",     label: "Custom Fields",    icon: ListChecks,      roles: ["owner", "admin"] },
-      { to: "/app/branding",   label: "Branding",         icon: Palette,         roles: ["owner", "admin"] },
-      { to: "/app/billing",    label: "Billing & Plan",   icon: CreditCard,      roles: ["owner"] },
-      { to: "/app/security",   label: "Security",         icon: ShieldCheck,     roles: ["owner", "admin"] },
-      { to: "/app/integrations", label: "Integrations",   icon: Plug,            roles: ["owner", "admin"] },
+      { to: "/app/settings",   label: "Settings",         i18nKey: "nav.settings",      icon: Settings,        roles: ["owner", "admin"] },
+      { to: "/app/notifications", label: "Notifications", i18nKey: "nav.notifications", icon: Bell },
+      { to: "/app/fields",     label: "Custom Fields",    i18nKey: "nav.fields",        icon: ListChecks,      roles: ["owner", "admin"] },
+      { to: "/app/branding",   label: "Branding",         i18nKey: "nav.branding",      icon: Palette,         roles: ["owner", "admin"] },
+      { to: "/app/billing",    label: "Billing & Plan",   i18nKey: "nav.billing",       icon: CreditCard,      roles: ["owner"] },
+      { to: "/app/security",   label: "Security",         i18nKey: "nav.security",      icon: ShieldCheck,     roles: ["owner", "admin"] },
+      { to: "/app/integrations", label: "Integrations",   i18nKey: "nav.integrations",  icon: Plug,            roles: ["owner", "admin"] },
     ],
   },
 ];
