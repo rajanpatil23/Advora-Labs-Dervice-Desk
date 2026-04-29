@@ -125,6 +125,55 @@ export const SEED_USERS: SeedUser[] = [
       { org_id: "org_acme", role: "requester", team_id: null },
     ],
   },
+  // ---- Platform staff (SaaS operators) — NOT tenant members ----
+  {
+    id: "u_platform",
+    email: "platform@demo.com",
+    password: "demo",
+    full_name: "Sam Superadmin",
+    avatar_color: "#0f172a",
+    initials: "SS",
+    memberships: [],
+  },
+  {
+    id: "u_support",
+    email: "support@demo.com",
+    password: "demo",
+    full_name: "Sky Support",
+    avatar_color: "#64748b",
+    initials: "SK",
+    memberships: [],
+  },
+];
+
+// ---- Platform admins (separate from tenant memberships) ----
+export interface SeedPlatformAdmin {
+  user_id: string;
+  role: PlatformRole;
+  is_active: boolean;
+  created_at: string;
+}
+
+export const SEED_PLATFORM_ADMINS: SeedPlatformAdmin[] = [
+  { user_id: "u_platform", role: "super_admin", is_active: true, created_at: "2024-08-01" },
+  { user_id: "u_support",  role: "support",     is_active: true, created_at: "2024-11-15" },
+];
+
+// ---- Platform audit log ----
+export interface SeedAuditEntry {
+  id: string;
+  actor_id: string;
+  action: string;
+  target_org_id?: string | null;
+  target_user_id?: string | null;
+  metadata?: Record<string, unknown>;
+  created_at: string;
+}
+
+export const SEED_AUDIT_LOG: SeedAuditEntry[] = [
+  { id: "aud_1", actor_id: "u_platform", action: "platform.grant_role", target_user_id: "u_support", metadata: { role: "support" }, created_at: "2024-11-15T09:12:00Z" },
+  { id: "aud_2", actor_id: "u_platform", action: "org.view",            target_org_id: "org_acme",                                  created_at: "2025-02-03T14:30:00Z" },
+  { id: "aud_3", actor_id: "u_support",  action: "org.view",            target_org_id: "org_initech",                               created_at: "2025-03-18T10:05:00Z" },
 ];
 
 export function getOrg(id: string) {
@@ -132,4 +181,10 @@ export function getOrg(id: string) {
 }
 export function getTeam(id: string) {
   return SEED_TEAMS.find((t) => t.id === id);
+}
+export function getPlatformAdmin(user_id: string) {
+  return SEED_PLATFORM_ADMINS.find((p) => p.user_id === user_id && p.is_active);
+}
+export function getUser(user_id: string) {
+  return SEED_USERS.find((u) => u.id === user_id);
 }
