@@ -15,6 +15,7 @@ import { NewTicketDialog } from "@/components/dialogs/NewTicketDialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { PresenceBubbles } from "@/components/common/Presence";
+import { presenceApi } from "@/lib/api/presence";
 
 const queues = [
   { key: "all", label: "All tickets", icon: Inbox },
@@ -506,7 +507,12 @@ export default function Tickets() {
                 <div className={cn("rounded-xl border bg-surface p-2.5 transition-all focus-within:ring-2 focus-within:ring-ring/30", internal && "border-warning/40 bg-warning/5")}>
                   <textarea
                     ref={composerRef}
-                    value={reply} onChange={e => setReply(e.target.value)}
+                    value={reply} onChange={e => {
+                      setReply(e.target.value);
+                      if (selected && me) {
+                        presenceApi.setTyping({ id: me.id }, selected.id, e.target.value.length > 0);
+                      }
+                    }}
                     placeholder={internal ? "Write an internal note for the team…" : `Reply to ${requester?.name.split(" ")[0] ?? "customer"}…`}
                     rows={3}
                     className="w-full resize-none bg-transparent text-[13px] outline-none placeholder:text-muted-foreground leading-relaxed"
