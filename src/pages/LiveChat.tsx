@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useAppStore } from "@/lib/store";
 import {
   subscribe, listSessions, getSession, appendMessage, markRead,
   assignAgent, endSession, setTags, seedIfEmpty, chatStats, startSession,
   type ChatSession, type ChatMessage,
 } from "@/lib/api/liveChat";
+import { chatbotAutoReply, chatbotGreet, type BotReply } from "@/lib/api/aiChatbot";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
   MessageCircle, Send, UserPlus, X, Globe, Monitor, Smartphone, Tablet,
-  Plus, CheckCheck, Tag as TagIcon, Star,
+  Plus, CheckCheck, Tag as TagIcon, Star, Bot, Sparkles, Loader2, Wand2,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -159,8 +161,13 @@ function ChatThread({
   session: ChatSession;
   currentUser: { id: string; name: string };
 }) {
+  const articles = useAppStore(s => s.articles);
   const [input, setInput] = useState("");
   const [tagInput, setTagInput] = useState("");
+  const [autopilot, setAutopilot] = useState(false);
+  const [botSuggestion, setBotSuggestion] = useState<BotReply | null>(null);
+  const [botBusy, setBotBusy] = useState(false);
+  const lastVisitorMsgIdRef = useRef<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -170,6 +177,60 @@ function ChatThread({
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [session.messages.length]);
+
+  // reset suggestion when switching sessions
+  useEffect(() => {
+    setBotSuggestion(null);
+    lastVisitorMsgIdRef.current = null;
+  }, [session.id]);
+
+  const lastVisitorMsg = useMemo(() => {
+    for (let i = session.messages.length - 1; i >= 0; i--) {
+      if (session.messages[i].sender === "visitor") return session.messages[i];
+    }
+    return null;
+  }, [session.messages]);
+
+  // Autopilot: when a new visitor message arrives and autopilot is on, ask bot to reply
+  useEffect(() => {
+    if (!autopilot || !lastVisitorMsg) return;
+    if (session.status === "ended") return;
+    if (lastVisitorMsgIdRef.current === lastVisitorMsg.id) return;
+    lastVisitorMsgIdRef.current = lastVisitorMsg.id;
+    runBot(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autopilot, lastVisitorMsg?.id, session.status]);
+
+  async function runBot(autoSend: boolean) {
+    setBotBusy(true);
+    try {
+      const reply = await chatbotAutoReply({ session, kbArticles: articles });
+      setBotSuggestion(reply);
+      if (autoSend && !reply.shouldHandoff) {
+        appendMessage(session.id, { sender: "bot", authorName: "AI assistant", body: reply.reply });
+        setBotSuggestion(null);
+      }
+      if (reply.shouldHandoff && session.status !== "active") {
+        toast.warning("Bot recommends human handoff", { description: reply.handoffReason });
+      }
+    } catch (e: any) {
+      toast.error(e.message ?? "Bot failed");
+    } finally {
+      setBotBusy(false);
+    }
+  }
+
+  async function greet() {
+    setBotBusy(true);
+    try {
+      const reply = await chatbotGreet({ visitor: session.visitor });
+      appendMessage(session.id, { sender: "bot", authorName: "AI assistant", body: reply });
+    } catch (e: any) {
+      toast.error(e.message ?? "Greeting failed");
+    } finally {
+      setBotBusy(false);
+    }
+  }
 
   // Visitor auto-reply demo: 30% chance after agent sends
   function maybeAutoReply() {
@@ -188,11 +249,13 @@ function ChatThread({
     if (!input.trim()) return;
     appendMessage(session.id, { sender: "agent", authorName: currentUser.name, body: input.trim() });
     setInput("");
+    setBotSuggestion(null);
     maybeAutoReply();
   }
 
   function take() {
     assignAgent(session.id, currentUser.id, currentUser.name);
+    setAutopilot(false);
     toast.success("You took this chat");
   }
 
@@ -206,6 +269,12 @@ function ChatThread({
     if (!t || session.tags.includes(t)) return;
     setTags(session.id, [...session.tags, t]);
     setTagInput("");
+  }
+
+  function useSuggestion() {
+    if (!botSuggestion) return;
+    setInput(botSuggestion.reply);
+    setBotSuggestion(null);
   }
 
   const Device = deviceIcon(session.visitor.device);
@@ -227,6 +296,23 @@ function ChatThread({
           </div>
           <div className="flex items-center gap-2">
             <Badge variant="outline" className="capitalize">{session.status}</Badge>
+            <Button
+              size="sm"
+              variant={autopilot ? "default" : "outline"}
+              onClick={() => {
+                setAutopilot(a => !a);
+                toast.success(`Bot autopilot ${!autopilot ? "ON" : "OFF"}`);
+              }}
+              disabled={session.status === "ended"}
+              title="Bot replies automatically when visitor messages"
+            >
+              <Bot className="mr-2 h-4 w-4" /> Autopilot {autopilot ? "on" : "off"}
+            </Button>
+            {session.messages.filter(m => m.sender !== "system").length === 0 && session.status !== "ended" && (
+              <Button size="sm" variant="outline" onClick={greet} disabled={botBusy}>
+                <Wand2 className="mr-2 h-4 w-4" /> AI greet
+              </Button>
+            )}
             {session.status === "queued" && (
               <Button size="sm" onClick={take}><UserPlus className="mr-2 h-4 w-4" /> Take chat</Button>
             )}
@@ -266,7 +352,48 @@ function ChatThread({
         {session.messages.map(m => <Bubble key={m.id} msg={m} />)}
       </CardContent>
 
-      <div className="border-t p-3">
+      <div className="border-t p-3 space-y-2">
+        {botSuggestion && (
+          <div className="rounded-md border border-primary/30 bg-primary/5 p-3 space-y-2">
+            <div className="flex items-center justify-between text-xs">
+              <span className="flex items-center gap-1.5 font-medium">
+                <Sparkles className="h-3 w-3" /> Bot suggestion
+                <Badge variant="outline" className="text-[10px]">
+                  conf {Math.round(botSuggestion.confidence * 100)}%
+                </Badge>
+                {botSuggestion.shouldHandoff && (
+                  <Badge variant="destructive" className="text-[10px]">Recommends handoff</Badge>
+                )}
+              </span>
+              <button onClick={() => setBotSuggestion(null)}>
+                <X className="h-3 w-3" />
+              </button>
+            </div>
+            <p className="text-sm">{botSuggestion.reply}</p>
+            {botSuggestion.handoffReason && (
+              <p className="text-xs text-muted-foreground italic">{botSuggestion.handoffReason}</p>
+            )}
+            {botSuggestion.suggestedQuickReplies.length > 0 && (
+              <div className="flex flex-wrap gap-1">
+                {botSuggestion.suggestedQuickReplies.map(q => (
+                  <span key={q} className="text-[10px] px-2 py-0.5 rounded-full bg-background border">{q}</span>
+                ))}
+              </div>
+            )}
+            <div className="flex gap-2">
+              <Button size="sm" variant="outline" onClick={useSuggestion}>Use as draft</Button>
+              <Button
+                size="sm"
+                onClick={() => {
+                  appendMessage(session.id, { sender: "bot", authorName: "AI assistant", body: botSuggestion.reply });
+                  setBotSuggestion(null);
+                }}
+              >
+                Send as bot
+              </Button>
+            </div>
+          </div>
+        )}
         <div className="flex gap-2">
           <Textarea
             value={input}
@@ -279,9 +406,20 @@ function ChatThread({
             rows={2}
             className="resize-none"
           />
-          <Button onClick={send} disabled={!input.trim() || session.status === "ended"}>
-            <Send className="h-4 w-4" />
-          </Button>
+          <div className="flex flex-col gap-1">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => runBot(false)}
+              disabled={botBusy || session.status === "ended" || session.messages.length === 0}
+              title="Ask AI for a reply suggestion"
+            >
+              {botBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+            </Button>
+            <Button onClick={send} disabled={!input.trim() || session.status === "ended"} size="icon">
+              <Send className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </div>
     </Card>
@@ -297,19 +435,27 @@ function Bubble({ msg }: { msg: ChatMessage }) {
       </div>
     );
   }
-  const isAgent = msg.sender === "agent" || msg.sender === "bot";
+  const isOutbound = msg.sender === "agent" || msg.sender === "bot";
+  const isBot = msg.sender === "bot";
   return (
-    <div className={`flex ${isAgent ? "justify-end" : "justify-start"}`}>
+    <div className={`flex ${isOutbound ? "justify-end" : "justify-start"}`}>
       <div className={`max-w-[75%] rounded-lg px-3 py-2 ${
-        isAgent ? "bg-primary text-primary-foreground" : "bg-muted"
+        isBot ? "bg-accent border border-primary/30 text-foreground"
+        : isOutbound ? "bg-primary text-primary-foreground"
+        : "bg-muted"
       }`}>
         {msg.authorName && (
-          <div className={`text-[10px] font-medium mb-0.5 ${isAgent ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
+          <div className={`text-[10px] font-medium mb-0.5 flex items-center gap-1 ${
+            isBot ? "text-primary" : isOutbound ? "text-primary-foreground/70" : "text-muted-foreground"
+          }`}>
+            {isBot && <Bot className="h-3 w-3" />}
             {msg.authorName}
           </div>
         )}
         <div className="text-sm whitespace-pre-wrap">{msg.body}</div>
-        <div className={`text-[10px] mt-1 ${isAgent ? "text-primary-foreground/60" : "text-muted-foreground"}`}>
+        <div className={`text-[10px] mt-1 ${
+          isBot ? "text-muted-foreground" : isOutbound ? "text-primary-foreground/60" : "text-muted-foreground"
+        }`}>
           {new Date(msg.sentAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
         </div>
       </div>
