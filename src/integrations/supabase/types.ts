@@ -133,6 +133,9 @@ export type Database = {
           logo_url: string | null
           name: string
           slug: string
+          status: Database["public"]["Enums"]["org_status"]
+          suspended_at: string | null
+          suspended_reason: string | null
           updated_at: string
         }
         Insert: {
@@ -142,6 +145,9 @@ export type Database = {
           logo_url?: string | null
           name: string
           slug: string
+          status?: Database["public"]["Enums"]["org_status"]
+          suspended_at?: string | null
+          suspended_reason?: string | null
           updated_at?: string
         }
         Update: {
@@ -151,7 +157,70 @@ export type Database = {
           logo_url?: string | null
           name?: string
           slug?: string
+          status?: Database["public"]["Enums"]["org_status"]
+          suspended_at?: string | null
+          suspended_reason?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      platform_admins: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          is_active: boolean
+          role: Database["public"]["Enums"]["platform_role"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          role: Database["public"]["Enums"]["platform_role"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          role?: Database["public"]["Enums"]["platform_role"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      platform_audit_log: {
+        Row: {
+          action: string
+          actor_id: string
+          created_at: string
+          id: string
+          metadata: Json | null
+          target_org_id: string | null
+          target_user_id: string | null
+        }
+        Insert: {
+          action: string
+          actor_id: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          target_org_id?: string | null
+          target_user_id?: string | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          target_org_id?: string | null
+          target_user_id?: string | null
         }
         Relationships: []
       }
@@ -244,10 +313,24 @@ export type Database = {
           team_name: string
         }[]
       }
+      has_any_platform_role: {
+        Args: {
+          _roles: Database["public"]["Enums"]["platform_role"][]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       has_any_role: {
         Args: {
           _org_id: string
           _roles: Database["public"]["Enums"]["app_role"][]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      has_platform_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["platform_role"]
           _user_id: string
         }
         Returns: boolean
@@ -264,6 +347,21 @@ export type Database = {
         Args: { _org_id: string; _user_id: string }
         Returns: boolean
       }
+      is_org_active: { Args: { _org_id: string }; Returns: boolean }
+      is_platform_admin: { Args: { _user_id: string }; Returns: boolean }
+      platform_grant_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["platform_role"]
+          _user_id: string
+        }
+        Returns: undefined
+      }
+      platform_resume_org: { Args: { _org_id: string }; Returns: undefined }
+      platform_revoke_role: { Args: { _user_id: string }; Returns: undefined }
+      platform_suspend_org: {
+        Args: { _org_id: string; _reason?: string }
+        Returns: undefined
+      }
       role_in_org: {
         Args: { _org_id: string; _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]
@@ -273,6 +371,8 @@ export type Database = {
     Enums: {
       app_role: "admin" | "manager" | "agent" | "resolver" | "requester"
       invite_status: "pending" | "accepted" | "revoked" | "expired"
+      org_status: "active" | "suspended"
+      platform_role: "super_admin" | "support" | "billing_admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -402,6 +502,8 @@ export const Constants = {
     Enums: {
       app_role: ["admin", "manager", "agent", "resolver", "requester"],
       invite_status: ["pending", "accepted", "revoked", "expired"],
+      org_status: ["active", "suspended"],
+      platform_role: ["super_admin", "support", "billing_admin"],
     },
   },
 } as const
