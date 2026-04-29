@@ -67,6 +67,8 @@ export default function Tickets() {
   const [loading, setLoading] = useState(true);
   const [tick, setTick] = useState(0);
   const composerRef = useRef<HTMLTextAreaElement>(null);
+  const mentionRef = useRef<MentionAutocompleteHandle>(null);
+  const mentionables = useMemo(() => orgAgents.map(toMentionable), [orgAgents]);
   const threadRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { setSearch(params.get("q") ?? ""); }, [params]);
@@ -143,8 +145,28 @@ export default function Tickets() {
 
   const send = () => {
     if (!selected || !reply.trim()) return;
-    addMessage(selected.id, reply.trim(), internal);
-    toast.success(internal ? "Internal note added" : "Reply sent");
+    const text = reply.trim();
+    addMessage(selected.id, text, internal);
+
+    // Notify mentioned agents
+    const handles = extractMentionHandles(text);
+    if (handles.length > 0) {
+      const mentioned = mentionables.filter((m) => handles.includes(m.handle));
+      mentioned.forEach((m) => {
+        emitNotification({
+          userId: m.id,
+          event: "ticket_mentioned",
+          title: `You were mentioned · ${selected.number}`,
+          body: `${me?.name ?? "Someone"}: ${text.slice(0, 120)}`,
+          tag: `mention:${selected.id}:${m.id}`,
+        });
+      });
+      if (mentioned.length > 0) {
+        toast.success(`Notified ${mentioned.map((m) => m.name.split(" ")[0]).join(", ")}`);
+      }
+    } else {
+      toast.success(internal ? "Internal note added" : "Reply sent");
+    }
     setReply("");
   };
 
