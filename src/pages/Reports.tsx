@@ -19,14 +19,14 @@ export default function Reports() {
 
   const exportCsv = () => {
     const rows = [["Number","Title","Status","Priority","Category","SLA","Updated"],
-      ...tickets.map(t => [t.number, t.title.replace(/,/g, ";"), t.status, t.priority, t.category, t.slaState, t.updatedAt])];
+      ...scoped.map(t => [t.number, t.title.replace(/,/g, ";"), t.status, t.priority, t.category, t.slaState, t.updatedAt])];
     const csv = rows.map(r => r.join(",")).join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url; a.download = `connecttly-tickets-${Date.now()}.csv`; a.click();
     URL.revokeObjectURL(url);
-    toast.success("Report exported", { description: `${tickets.length} tickets exported as CSV` });
+    toast.success("Report exported", { description: `${scoped.length} tickets exported as CSV` });
   };
 
   return (
