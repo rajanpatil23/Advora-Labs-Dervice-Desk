@@ -1,9 +1,10 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth, AppRole } from "@/contexts/AuthContext";
 import { Loader2 } from "lucide-react";
+import { orgConfigApi } from "@/lib/api/orgConfig";
 
 export function ProtectedRoute({ roles }: { roles?: AppRole[] }) {
-  const { user, loading, currentRole, isPlatformAdmin, memberships } = useAuth();
+  const { user, loading, currentRole, currentOrgId, isPlatformAdmin, memberships } = useAuth();
   const loc = useLocation();
 
   if (loading) {
@@ -24,6 +25,16 @@ export function ProtectedRoute({ roles }: { roles?: AppRole[] }) {
   // Requesters live in /portal — never the agent app
   if (currentRole === "requester" && loc.pathname.startsWith("/app")) {
     return <Navigate to="/portal" replace />;
+  }
+
+  // Owners/admins of an un-onboarded org get sent through the wizard
+  if (
+    currentOrgId &&
+    (currentRole === "owner" || currentRole === "admin") &&
+    !orgConfigApi.isOnboarded(currentOrgId) &&
+    !loc.pathname.startsWith("/onboarding")
+  ) {
+    return <Navigate to="/onboarding" replace />;
   }
 
   if (roles && currentRole && !roles.includes(currentRole)) {
