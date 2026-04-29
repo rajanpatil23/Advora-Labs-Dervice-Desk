@@ -74,7 +74,19 @@ const App = () => (
               </Route>
             </Route>
 
-            <Route path="/portal/*" element={<ComingSoon phase="Phase 3" title="Requester Portal" description="Self-service portal for end users: submit a request, browse the catalog, track your requests, search the knowledge base." backTo="/login" />} />
+
+            <Route element={<ProtectedRoute />}>
+              <Route path="/portal" element={<PortalLayout />}>
+                <Route index element={<PortalHome />} />
+                <Route path="new" element={<PortalNewRequest />} />
+                <Route path="requests" element={<PortalRequests />} />
+                <Route path="requests/:id" element={<PortalRequestDetail />} />
+                <Route path="catalog" element={<PortalCatalog />} />
+                <Route path="kb" element={<PortalKnowledge />} />
+                <Route path="kb/:id" element={<PortalKnowledgeArticle />} />
+              </Route>
+            </Route>
+
             <Route path="/dashboard" element={<Navigate to="/app" replace />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
