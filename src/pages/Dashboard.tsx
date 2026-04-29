@@ -1,42 +1,81 @@
-import { useAppStore, useOrgAgents, useCurrentOrgUser } from "@/lib/store";
-import { Avatar, PriorityChip, SlaChip, StatusChip } from "@/components/common/Chips";
-import { timeAgo } from "@/lib/format";
-import { findUser } from "@/lib/store";
-import { ArrowUpRight, Ticket as TicketIcon, AlertOctagon, CheckCircle2, Timer, TrendingUp, Activity } from "lucide-react";
-import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, Tooltip, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, RadialBarChart, RadialBar } from "recharts";
+import { useEffect, useMemo, useState } from "react";
+import { useCurrentOrgUser, useAppStore } from "@/lib/store";
+import { ArrowUpRight, TrendingUp, Pencil, Plus, RotateCcw, Check, X, GripVertical, Maximize2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import {
+  dashboardApi,
+  DEFAULT_LAYOUT,
+  getMeta,
+  SIZE_CLASS,
+  type DashboardLayout,
+  type WidgetId,
+  type WidgetInstance,
+  type WidgetSize,
+} from "@/lib/api/dashboard";
+import { WidgetBody } from "@/components/dashboard/Widgets";
+import { WidgetLibrary } from "@/components/dashboard/WidgetLibrary";
 
 export default function Dashboard() {
-  const { tickets, setSelectedTicket } = useAppStore();
-  const agents = useOrgAgents();
   const me = useCurrentOrgUser();
+  const tickets = useAppStore((s) => s.tickets);
   const nav = useNavigate();
-  const open = tickets.filter(t => t.status !== "resolved" && t.status !== "closed").length;
-  const overdue = tickets.filter(t => t.slaState === "breached").length;
-  const atRisk = tickets.filter(t => t.slaState === "at_risk").length;
-  const resolvedToday = tickets.filter(t => t.resolvedAt && (Date.now() - new Date(t.resolvedAt).getTime() < 86400000)).length;
-  const highPriority = tickets.filter(t => t.priority === "critical" || t.priority === "high").slice(0, 5);
 
-  const trend = Array.from({ length: 14 }, (_, i) => ({
-    day: `D${i+1}`,
-    created: 8 + Math.round(Math.sin(i/2)*5 + Math.random()*6),
-    resolved: 7 + Math.round(Math.cos(i/2)*4 + Math.random()*6),
-  }));
-  const byPriority = (["critical","high","medium","low"] as const).map(p => ({ name: p, value: tickets.filter(t => t.priority === p).length }));
-  const byCategory = ["Network","Hardware","Access","Software","Email","Security","Cloud"].map(c => ({ name: c, count: tickets.filter(t => t.category === c).length }));
-  const slaCompliance = [
-    { name: "Met", value: tickets.filter(t => t.slaState === "met" || t.slaState === "on_track").length, fill: "hsl(var(--success))" },
-    { name: "At risk", value: atRisk, fill: "hsl(var(--warning))" },
-    { name: "Breached", value: overdue, fill: "hsl(var(--destructive))" },
-  ];
-  const workload = agents.slice(0, 6).map(a => ({ name: a.name.split(" ")[0], load: a.workload }));
+  const [layout, setLayout] = useState<DashboardLayout>(() => dashboardApi.load());
+  const [editing, setEditing] = useState(false);
+  const [libOpen, setLibOpen] = useState(false);
+  const [dragUid, setDragUid] = useState<string | null>(null);
+  const [overUid, setOverUid] = useState<string | null>(null);
 
-  const priorityColors: Record<string, string> = {
-    critical: "hsl(var(--destructive))",
-    high: "hsl(var(--accent))",
-    medium: "hsl(var(--warning))",
-    low: "hsl(var(--info))",
-  };
+  useEffect(() => {
+    if (!editing) dashboardApi.save(layout);
+  }, [layout, editing]);
+
+  const open = tickets.filter((t) => t.status !== "resolved" && t.status !== "closed").length;
+  const overdue = tickets.filter((t) => t.slaState === "breached").length;
+  const atRisk = tickets.filter((t) => t.slaState === "at_risk").length;
+
+  const existingIds = useMemo(() => layout.widgets.map((w) => w.id), [layout]);
+
+  function handleDrop(targetUid: string) {
+    if (!dragUid || dragUid === targetUid) return;
+    const widgets = [...layout.widgets];
+    const from = widgets.findIndex((w) => w.uid === dragUid);
+    const to = widgets.findIndex((w) => w.uid === targetUid);
+    if (from < 0 || to < 0) return;
+    const [moved] = widgets.splice(from, 1);
+    widgets.splice(to, 0, moved);
+    setLayout({ ...layout, widgets });
+    setDragUid(null);
+    setOverUid(null);
+  }
+
+  function addWidget(id: WidgetId) {
+    const meta = getMeta(id);
+    if (!meta) return;
+    const inst: WidgetInstance = { uid: `w-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, id, size: meta.defaultSize };
+    setLayout({ ...layout, widgets: [...layout.widgets, inst] });
+  }
+  function removeWidget(uid: string) {
+    setLayout({ ...layout, widgets: layout.widgets.filter((w) => w.uid !== uid) });
+  }
+  function cycleSize(uid: string) {
+    const order: WidgetSize[] = ["sm", "md", "lg", "xl"];
+    setLayout({
+      ...layout,
+      widgets: layout.widgets.map((w) => {
+        if (w.uid !== uid) return w;
+        const meta = getMeta(w.id);
+        const allowed = meta?.allowedSizes ?? order;
+        const idx = allowed.indexOf(w.size);
+        const next = allowed[(idx + 1) % allowed.length];
+        return { ...w, size: next };
+      }),
+    });
+  }
+  function resetLayout() {
+    dashboardApi.reset();
+    setLayout({ ...DEFAULT_LAYOUT, widgets: DEFAULT_LAYOUT.widgets.map((w) => ({ ...w })) });
+  }
 
   return (
     <div className="h-full overflow-y-auto">
@@ -50,205 +89,202 @@ export default function Dashboard() {
               <h1 className="mt-1 text-3xl lg:text-4xl font-display font-bold tracking-tight">
                 Good morning, <span className="gradient-text">{(me?.name ?? "there").split(" ")[0]}</span>
               </h1>
-              <p className="mt-2 text-sm text-muted-foreground max-w-lg">Your team has {open} open tickets and {atRisk + overdue} need attention. Let's clear the queue.</p>
+              <p className="mt-2 text-sm text-muted-foreground max-w-lg">
+                Your team has {open} open tickets and {atRisk + overdue} need attention. Let's clear the queue.
+              </p>
             </div>
-            <div className="flex gap-2">
-              <button className="px-4 py-2 rounded-xl bg-surface border border-border text-sm font-medium hover:bg-surface-2 transition-colors flex items-center gap-2">
-                Last 30 days <TrendingUp className="h-4 w-4" />
-              </button>
-              <button onClick={() => nav("/app/tickets")} className="px-4 py-2 rounded-xl bg-gradient-primary text-primary-foreground text-sm font-semibold hover:shadow-glow transition-shadow flex items-center gap-2">
-                Open agent workspace <ArrowUpRight className="h-4 w-4" />
-              </button>
+            <div className="flex gap-2 flex-wrap">
+              {editing ? (
+                <>
+                  <button
+                    onClick={() => setLibOpen(true)}
+                    className="px-3 py-2 rounded-xl bg-surface border border-border text-sm font-medium hover:bg-surface-2 transition-colors flex items-center gap-2"
+                  >
+                    <Plus className="h-4 w-4" /> Add widget
+                  </button>
+                  <button
+                    onClick={resetLayout}
+                    className="px-3 py-2 rounded-xl bg-surface border border-border text-sm font-medium hover:bg-surface-2 transition-colors flex items-center gap-2"
+                  >
+                    <RotateCcw className="h-4 w-4" /> Reset
+                  </button>
+                  <button
+                    onClick={() => setEditing(false)}
+                    className="px-3 py-2 rounded-xl bg-gradient-primary text-primary-foreground text-sm font-semibold hover:shadow-glow transition-shadow flex items-center gap-2"
+                  >
+                    <Check className="h-4 w-4" /> Done
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button className="px-3 py-2 rounded-xl bg-surface border border-border text-sm font-medium hover:bg-surface-2 transition-colors flex items-center gap-2">
+                    Last 30 days <TrendingUp className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => setEditing(true)}
+                    className="px-3 py-2 rounded-xl bg-surface border border-border text-sm font-medium hover:bg-surface-2 transition-colors flex items-center gap-2"
+                  >
+                    <Pencil className="h-4 w-4" /> Customize
+                  </button>
+                  <button
+                    onClick={() => nav("/app/tickets")}
+                    className="px-3 py-2 rounded-xl bg-gradient-primary text-primary-foreground text-sm font-semibold hover:shadow-glow transition-shadow flex items-center gap-2"
+                  >
+                    Open agent workspace <ArrowUpRight className="h-4 w-4" />
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>
 
-        {/* Metrics */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <Metric icon={TicketIcon} label="Total tickets" value={tickets.length} delta="+12%" tone="primary" />
-          <Metric icon={Activity} label="Open" value={open} delta="+3" tone="info" />
-          <Metric icon={AlertOctagon} label="Overdue" value={overdue} delta="-2" tone="destructive" />
-          <Metric icon={CheckCircle2} label="Resolved today" value={resolvedToday} delta="+8" tone="success" />
-        </div>
+        {editing && (
+          <div className="rounded-xl border border-dashed border-primary/40 bg-primary/5 px-4 py-2.5 text-xs text-muted-foreground flex items-center gap-2">
+            <GripVertical className="h-3.5 w-3.5 text-primary" />
+            Drag widgets to reorder · click <Maximize2 className="h-3 w-3 inline" /> to resize · click <X className="h-3 w-3 inline" /> to remove.
+          </div>
+        )}
 
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
-          {/* Trend */}
-          <Card className="xl:col-span-2" title="Ticket trend" subtitle="Created vs resolved · last 14 days" right={<Legend items={[["Created","hsl(var(--primary))"],["Resolved","hsl(var(--success))"]]} />}>
-            <div className="h-64">
-              <ResponsiveContainer>
-                <AreaChart data={trend} margin={{ left: -20, right: 0, top: 10, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.4} />
-                      <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0} />
-                    </linearGradient>
-                    <linearGradient id="g2" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="hsl(var(--success))" stopOpacity={0.35} />
-                      <stop offset="100%" stopColor="hsl(var(--success))" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <XAxis dataKey="day" stroke="hsl(var(--muted-foreground))" fontSize={11} tickLine={false} axisLine={false} />
-                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={11} tickLine={false} axisLine={false} />
-                  <Tooltip contentStyle={{ background: "hsl(var(--popover))", border: "1px solid hsl(var(--border))", borderRadius: 12, fontSize: 12 }} />
-                  <Area type="monotone" dataKey="created" stroke="hsl(var(--primary))" fill="url(#g1)" strokeWidth={2} />
-                  <Area type="monotone" dataKey="resolved" stroke="hsl(var(--success))" fill="url(#g2)" strokeWidth={2} />
-                </AreaChart>
-              </ResponsiveContainer>
+        {/* Widget grid */}
+        <div className="grid grid-cols-12 gap-4">
+          {layout.widgets.map((w) => (
+            <WidgetCell
+              key={w.uid}
+              instance={w}
+              editing={editing}
+              isDragging={dragUid === w.uid}
+              isOver={overUid === w.uid && dragUid !== w.uid}
+              onDragStart={() => setDragUid(w.uid)}
+              onDragEnd={() => {
+                setDragUid(null);
+                setOverUid(null);
+              }}
+              onDragOver={() => setOverUid(w.uid)}
+              onDrop={() => handleDrop(w.uid)}
+              onRemove={() => removeWidget(w.uid)}
+              onResize={() => cycleSize(w.uid)}
+            />
+          ))}
+          {!layout.widgets.length && (
+            <div className="col-span-12 panel p-12 text-center">
+              <div className="text-sm font-medium">No widgets yet</div>
+              <div className="text-xs text-muted-foreground mt-1">Add widgets from the library to build your dashboard.</div>
+              <button
+                onClick={() => {
+                  setEditing(true);
+                  setLibOpen(true);
+                }}
+                className="mt-4 px-3 py-2 rounded-xl bg-gradient-primary text-primary-foreground text-sm font-semibold inline-flex items-center gap-2"
+              >
+                <Plus className="h-4 w-4" /> Browse widgets
+              </button>
             </div>
-          </Card>
-
-          {/* SLA radial */}
-          <Card title="SLA compliance" subtitle="Last 30 days">
-            <div className="h-64 flex items-center">
-              <ResponsiveContainer>
-                <RadialBarChart innerRadius="40%" outerRadius="100%" data={slaCompliance} startAngle={90} endAngle={-270}>
-                  <RadialBar dataKey="value" cornerRadius={8} background={{ fill: "hsl(var(--surface-2))" }} />
-                  <Tooltip contentStyle={{ background: "hsl(var(--popover))", border: "1px solid hsl(var(--border))", borderRadius: 12, fontSize: 12 }} />
-                </RadialBarChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="grid grid-cols-3 gap-2 text-xs mt-2">
-              {slaCompliance.map(s => (
-                <div key={s.name} className="flex items-center gap-1.5">
-                  <span className="h-2 w-2 rounded-full" style={{ background: s.fill }} /> {s.name} <span className="ml-auto font-mono">{s.value}</span>
-                </div>
-              ))}
-            </div>
-          </Card>
-        </div>
-
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
-          <Card title="Tickets by category">
-            <div className="h-56">
-              <ResponsiveContainer>
-                <BarChart data={byCategory} margin={{ left: -20, right: 0, top: 10 }}>
-                  <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={11} tickLine={false} axisLine={false} />
-                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={11} tickLine={false} axisLine={false} />
-                  <Tooltip contentStyle={{ background: "hsl(var(--popover))", border: "1px solid hsl(var(--border))", borderRadius: 12, fontSize: 12 }} cursor={{ fill: "hsl(var(--surface-2))" }} />
-                  <Bar dataKey="count" radius={[8,8,0,0]} fill="hsl(var(--primary))" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </Card>
-
-          <Card title="By priority">
-            <div className="h-56">
-              <ResponsiveContainer>
-                <PieChart>
-                  <Pie data={byPriority} dataKey="value" innerRadius={50} outerRadius={80} paddingAngle={4}>
-                    {byPriority.map((d) => <Cell key={d.name} fill={priorityColors[d.name]} />)}
-                  </Pie>
-                  <Tooltip contentStyle={{ background: "hsl(var(--popover))", border: "1px solid hsl(var(--border))", borderRadius: 12, fontSize: 12 }} />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="grid grid-cols-2 gap-2 text-xs mt-2">
-              {byPriority.map(p => (
-                <div key={p.name} className="flex items-center gap-1.5 capitalize">
-                  <span className="h-2 w-2 rounded-full" style={{ background: priorityColors[p.name] }} /> {p.name} <span className="ml-auto font-mono">{p.value}</span>
-                </div>
-              ))}
-            </div>
-          </Card>
-
-          <Card title="Agent workload">
-            <div className="h-56">
-              <ResponsiveContainer>
-                <BarChart data={workload} layout="vertical" margin={{ left: 0, right: 10 }}>
-                  <XAxis type="number" stroke="hsl(var(--muted-foreground))" fontSize={11} tickLine={false} axisLine={false} />
-                  <YAxis dataKey="name" type="category" stroke="hsl(var(--muted-foreground))" fontSize={11} tickLine={false} axisLine={false} width={70} />
-                  <Tooltip contentStyle={{ background: "hsl(var(--popover))", border: "1px solid hsl(var(--border))", borderRadius: 12, fontSize: 12 }} cursor={{ fill: "hsl(var(--surface-2))" }} />
-                  <Bar dataKey="load" radius={[0,8,8,0]} fill="hsl(var(--accent))" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </Card>
-        </div>
-
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
-          <Card className="xl:col-span-2" title="High priority tickets" subtitle="Needs your attention">
-            <div className="space-y-1">
-              {highPriority.map(t => {
-                const r = findUser(t.requesterId);
-                return (
-                  <button key={t.id} onClick={() => { setSelectedTicket(t.id); nav("/app/tickets"); }}
-                    className="w-full text-left flex items-center gap-3 py-2.5 px-2 rounded-lg hover:bg-surface-2 transition-colors">
-                    <PriorityChip priority={t.priority} />
-                    <div className="min-w-0 flex-1">
-                      <div className="text-sm font-medium truncate">{t.title}</div>
-                      <div className="text-xs text-muted-foreground flex items-center gap-2">
-                        <span className="font-mono">{t.number}</span> · <span>{r?.name}</span> · <span>{timeAgo(t.updatedAt)}</span>
-                      </div>
-                    </div>
-                    <StatusChip status={t.status} />
-                    <SlaChip state={t.slaState} />
-                  </button>
-                );
-              })}
-            </div>
-          </Card>
-
-          <Card title="Recent activity">
-            <div className="space-y-3 relative pl-4">
-              <div className="absolute left-1 top-2 bottom-2 w-px bg-border" />
-              {tickets.slice(0,6).flatMap(t => t.activity.slice(0,1)).slice(0,6).map((e, i) => (
-                <div key={i} className="relative">
-                  <span className="absolute -left-3 top-1.5 h-2 w-2 rounded-full bg-primary ring-2 ring-surface" />
-                  <div className="text-xs">{e.text}</div>
-                  <div className="text-[10px] text-muted-foreground">{e.by} · {timeAgo(e.at)}</div>
-                </div>
-              ))}
-            </div>
-          </Card>
+          )}
         </div>
       </div>
+
+      <WidgetLibrary
+        open={libOpen}
+        onClose={() => setLibOpen(false)}
+        onAdd={addWidget}
+        existing={existingIds}
+      />
     </div>
   );
 }
 
-function Metric({ icon: Icon, label, value, delta, tone }: any) {
-  const tones: Record<string, string> = {
-    primary: "from-primary/15 to-primary/0 text-primary",
-    info: "from-info/15 to-info/0 text-info",
-    destructive: "from-destructive/15 to-destructive/0 text-destructive",
-    success: "from-success/15 to-success/0 text-success",
-  };
-  return (
-    <div className="relative overflow-hidden rounded-2xl border border-border bg-surface p-5 hover:shadow-md transition-shadow">
-      <div className={`absolute -top-12 -right-12 h-32 w-32 rounded-full bg-gradient-to-br ${tones[tone]} opacity-60 blur-2xl pointer-events-none`} />
-      <div className="flex items-center justify-between">
-        <div className={`h-9 w-9 rounded-xl flex items-center justify-center bg-${tone}/10 text-${tone}`}>
-          <Icon className={`h-4.5 w-4.5 text-${tone}`} />
-        </div>
-        <span className="text-[11px] font-semibold text-muted-foreground">{delta}</span>
-      </div>
-      <div className="mt-3 text-3xl font-display font-bold tabular-nums">{value}</div>
-      <div className="text-xs text-muted-foreground">{label}</div>
-    </div>
-  );
-}
+function WidgetCell({
+  instance,
+  editing,
+  isDragging,
+  isOver,
+  onDragStart,
+  onDragEnd,
+  onDragOver,
+  onDrop,
+  onRemove,
+  onResize,
+}: {
+  instance: WidgetInstance;
+  editing: boolean;
+  isDragging: boolean;
+  isOver: boolean;
+  onDragStart: () => void;
+  onDragEnd: () => void;
+  onDragOver: () => void;
+  onDrop: () => void;
+  onRemove: () => void;
+  onResize: () => void;
+}) {
+  const meta = getMeta(instance.id);
+  if (!meta) return null;
 
-function Card({ title, subtitle, right, children, className = "" }: any) {
   return (
-    <div className={`panel p-5 ${className}`}>
-      <div className="flex items-start justify-between gap-4 mb-4">
-        <div>
-          <div className="font-display font-semibold">{title}</div>
-          {subtitle && <div className="text-xs text-muted-foreground mt-0.5">{subtitle}</div>}
-        </div>
-        {right}
-      </div>
-      {children}
-    </div>
-  );
-}
+    <div
+      className={`${SIZE_CLASS[instance.size]} transition-all ${isDragging ? "opacity-40" : ""} ${
+        isOver ? "ring-2 ring-primary/60 rounded-2xl" : ""
+      }`}
+      draggable={editing}
+      onDragStart={(e) => {
+        e.dataTransfer.effectAllowed = "move";
+        onDragStart();
+      }}
+      onDragEnd={onDragEnd}
+      onDragOver={(e) => {
+        if (!editing) return;
+        e.preventDefault();
+        onDragOver();
+      }}
+      onDrop={(e) => {
+        if (!editing) return;
+        e.preventDefault();
+        onDrop();
+      }}
+    >
+      <div
+        className={`panel p-5 h-full relative group ${editing ? "cursor-grab active:cursor-grabbing border-dashed" : ""}`}
+      >
+        {editing && (
+          <div className="absolute top-2 right-2 z-10 flex items-center gap-1">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onResize();
+              }}
+              className="h-7 w-7 rounded-lg bg-surface border border-border hover:bg-surface-2 grid place-items-center"
+              title={`Resize (${instance.size})`}
+            >
+              <Maximize2 className="h-3.5 w-3.5" />
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onRemove();
+              }}
+              className="h-7 w-7 rounded-lg bg-surface border border-border hover:bg-destructive hover:text-destructive-foreground grid place-items-center"
+              title="Remove"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        )}
 
-function Legend({ items }: { items: [string, string][] }) {
-  return (
-    <div className="flex items-center gap-3 text-xs">
-      {items.map(([l, c]) => (
-        <span key={l} className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full" style={{ background: c }} /> {l}</span>
-      ))}
+        {meta.category !== "Metric" && (
+          <div className="flex items-start justify-between gap-4 mb-3">
+            <div className="min-w-0">
+              <div className="font-display font-semibold truncate">{meta.title}</div>
+              <div className="text-xs text-muted-foreground mt-0.5 truncate">{meta.description}</div>
+            </div>
+            {editing && (
+              <span className="text-[10px] uppercase tracking-wide text-muted-foreground font-mono px-1.5 py-0.5 rounded bg-surface-2">
+                {instance.size}
+              </span>
+            )}
+          </div>
+        )}
+
+        <WidgetBody id={instance.id} />
+      </div>
     </div>
   );
 }
