@@ -10,7 +10,7 @@ export default function Login() {
   const nav = useNavigate();
   const loc = useLocation() as { state?: { from?: { pathname?: string } } };
   const redirect = loc.state?.from?.pathname || "/app";
-  const { setSessionUser } = useAuth();
+  const { setSession } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
@@ -20,7 +20,7 @@ export default function Login() {
     setBusy(true);
     try {
       const session = await authApi.login(email, password);
-      setSessionUser(session.user);
+      setSession(session);
       toast.success(`Welcome back, ${session.user.full_name}`);
       nav(redirect, { replace: true });
     } catch (err) {
@@ -107,7 +107,7 @@ export default function Login() {
                   className="flex items-center justify-between text-xs px-2.5 py-1.5 rounded-md hover:bg-surface-2 transition-colors text-left"
                 >
                   <span className="font-mono">{u.email}</span>
-                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground">{u.role}</span>
+                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground">{u.memberships.map(m => m.role).join(" / ")}</span>
                 </button>
               ))}
             </div>
