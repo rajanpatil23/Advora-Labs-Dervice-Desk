@@ -12,11 +12,18 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import {
   Bell, BellOff, Mail, MessageSquare, Inbox, Moon, Clock, AtSign, Slack as SlackIcon,
+  Volume2, VolumeX, Monitor, Play,
 } from "lucide-react";
 import {
   EVENT_DEFINITIONS, MUTE_PRESETS, isMuted, readPrefs, writePrefs, defaultPrefs,
   type Channel, type DigestFrequency, type NotificationPrefs, type NotificationEventKey,
 } from "@/lib/api/notifications";
+import {
+  SOUND_PACKS, readFeedback, writeFeedback, defaultFeedback, previewSound, previewDesktop,
+  requestDesktopPermission, desktopPermission,
+  type FeedbackPrefs, type SoundPack,
+} from "@/lib/api/notificationEngine";
+import { Slider } from "@/components/ui/slider";
 
 const CHANNEL_META: { key: Channel; label: string; icon: typeof Inbox }[] = [
   { key: "inApp", label: "In-app", icon: Inbox },
