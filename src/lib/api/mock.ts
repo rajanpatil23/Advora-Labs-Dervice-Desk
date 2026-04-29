@@ -43,12 +43,14 @@ function writeSession(s: MockSession | null) {
 }
 
 function toAuthUser(u: SeedUser): AuthUser {
+  const pa = getPlatformAdmin(u.id);
   return {
     id: u.id,
     email: u.email,
     full_name: u.full_name,
     avatar_color: u.avatar_color,
     initials: u.initials,
+    platform_role: pa?.role ?? null,
   };
 }
 
