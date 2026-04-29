@@ -35,7 +35,7 @@ export default function SignUp() {
   return (
     <div className="min-h-screen w-full grid lg:grid-cols-2 bg-background">
       {/* Left brand panel */}
-      <div className="relative hidden lg:flex flex-col justify-between p-10 overflow-hidden text-white" style={{ background: "linear-gradient(135deg, hsl(217 91% 55%) 0%, hsl(221 83% 45%) 100%)" }}>
+      <div className="brand-canvas relative hidden lg:flex flex-col justify-between p-10 overflow-hidden text-white">
         <div className="relative flex items-center gap-3">
           <div className="h-11 w-11 rounded-xl bg-white flex items-center justify-center overflow-hidden ring-1 ring-white/30 shadow-sm">
             <img src={advoraLogo} alt="Advora" className="h-9 w-9 object-contain" />
@@ -110,8 +110,7 @@ export default function SignUp() {
             </div>
             <button
               disabled={busy}
-              className="w-full h-11 rounded-xl text-white font-semibold text-sm transition-all flex items-center justify-center gap-2 disabled:opacity-60 hover:opacity-95"
-              style={{ background: "linear-gradient(135deg, hsl(217 91% 55%) 0%, hsl(221 83% 45%) 100%)" }}
+              className="brand-button w-full h-11 rounded-xl text-primary-foreground font-semibold text-sm transition-all flex items-center justify-center gap-2 disabled:opacity-60"
             >
               {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Create workspace <ArrowRight className="h-4 w-4" /></>}
             </button>
