@@ -131,7 +131,7 @@ export default function ImportExport() {
     let added = 0;
     parsed.forEach((row) => {
       try {
-        store.createTicket({
+        store.addTicket({
           title: row.title || "Untitled",
           description: row.description || "",
           requesterId: row.requesterId || me,
