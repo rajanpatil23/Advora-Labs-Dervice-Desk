@@ -55,6 +55,7 @@ import Webhooks from "./pages/Webhooks";
 import Developer from "./pages/Developer";
 import SsoSetup from "./pages/SsoSetup";
 import Compliance from "./pages/Compliance";
+import StatusPage from "./pages/StatusPage";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -112,6 +113,7 @@ const App = () => (
                 <Route path="developer" element={<Developer />} />
                 <Route path="sso" element={<SsoSetup />} />
                 <Route path="compliance" element={<Compliance />} />
+                <Route path="status" element={<StatusPage />} />
               </Route>
             </Route>
 
