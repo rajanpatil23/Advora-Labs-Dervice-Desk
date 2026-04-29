@@ -3,7 +3,7 @@ import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, Ticket, AlertOctagon, ClipboardList, Users, UserCog,
   Timer, BookOpen, BarChart3, ScrollText, Settings, Sparkles, LogOut,
-  PanelLeftClose, PanelLeft, Inbox, UsersRound, CheckSquare, CreditCard, ShieldCheck, Plug, Zap
+  PanelLeftClose, PanelLeft, Inbox, UsersRound, CheckSquare, CreditCard, ShieldCheck, Plug, Zap, Smile
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -48,6 +48,7 @@ const SECTIONS: NavSection[] = [
     label: "Insights",
     items: [
       { to: "/app/reports",    label: "Reports",          icon: BarChart3,       roles: ["owner", "admin", "manager"] },
+      { to: "/app/csat",       label: "CSAT",             icon: Smile,           roles: ["owner", "admin", "manager"] },
     ],
   },
   {

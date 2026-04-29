@@ -38,6 +38,8 @@ import Billing from "./pages/Billing";
 import Security from "./pages/Security";
 import Integrations from "./pages/Integrations";
 import Automations from "./pages/Automations";
+import Csat from "./pages/Csat";
+import PublicSurvey from "./pages/PublicSurvey";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
