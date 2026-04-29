@@ -1,4 +1,5 @@
-import { Bell, Search, Sun, Moon, Plus, HelpCircle, LogOut, User as UserIcon, Settings as SettingsIcon, Building2, Check, ChevronsUpDown } from "lucide-react";
+import { Bell, Search, Sun, Moon, Plus, HelpCircle, LogOut, User as UserIcon, Settings as SettingsIcon, Building2, Check, ChevronsUpDown, Sparkles } from "lucide-react";
+import { startProductTour } from "@/components/common/ProductTour";
 import { useAppStore } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { NewTicketDialog } from "@/components/dialogs/NewTicketDialog";
@@ -152,6 +153,9 @@ export function Topbar() {
                 description: `${currentRole?.toUpperCase()} · ${currentOrg?.org_name ?? ""}`,
               });
             }}><UserIcon className="h-4 w-4 mr-2" /> Profile</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => startProductTour()}>
+              <Sparkles className="h-4 w-4 mr-2" /> Take product tour
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={() => nav("/app/settings")}><SettingsIcon className="h-4 w-4 mr-2" /> Settings</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleSignOut}>
