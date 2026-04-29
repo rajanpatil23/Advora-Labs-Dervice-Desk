@@ -1,15 +1,15 @@
 /**
- * Mock backend that resolves API requests against in-memory + localStorage data.
- * Mirrors the contract documented in API_CONTRACT.md exactly.
+ * Mock backend that resolves API requests in-browser.
+ * Mirrors the contract documented in API_CONTRACT.md.
  */
 
 import type { ApiRequest } from "./client";
-import { SEED_USERS, DEMO_ORG, type AuthUser, type AppRole } from "./seedUsers";
+import { SEED_USERS, SEED_ORGS, getOrg, getTeam, type SeedUser } from "./seedUsers";
+import type { AuthUser, Membership, Session } from "./auth";
 
-// --- helpers -------------------------------------------------------------
 const delay = (ms = 200) => new Promise((r) => setTimeout(r, ms));
 const json = async <T>(data: T): Promise<T> => {
-  await delay(150 + Math.random() * 150);
+  await delay(120 + Math.random() * 120);
   return data;
 };
 
@@ -24,7 +24,8 @@ const SESSION_KEY = "connecttly.auth.session";
 
 interface MockSession {
   token: string;
-  user: AuthUser;
+  user_id: string;
+  current_org_id: string;
 }
 
 function readSession(): MockSession | null {
@@ -37,6 +38,47 @@ function writeSession(s: MockSession | null) {
   else localStorage.removeItem(SESSION_KEY);
 }
 
+function toAuthUser(u: SeedUser): AuthUser {
+  return {
+    id: u.id,
+    email: u.email,
+    full_name: u.full_name,
+    avatar_color: u.avatar_color,
+    initials: u.initials,
+  };
+}
+
+function membershipsFor(u: SeedUser): Membership[] {
+  return u.memberships.map((m) => {
+    const org = getOrg(m.org_id)!;
+    const team = m.team_id ? getTeam(m.team_id) : null;
+    return {
+      id: `mem_${u.id}_${m.org_id}`,
+      org_id: m.org_id,
+      org_name: org.name,
+      org_slug: org.slug,
+      org_industry: org.industry,
+      role: m.role,
+      team_id: m.team_id,
+      team_name: team?.name ?? null,
+      is_active: true,
+    };
+  });
+}
+
+function buildSession(u: SeedUser, current_org_id?: string): Session {
+  const mems = membershipsFor(u);
+  const orgId = current_org_id && mems.some((m) => m.org_id === current_org_id)
+    ? current_org_id
+    : mems[0].org_id;
+  return {
+    token: `mock.${u.id}.${Date.now()}`,
+    user: toAuthUser(u),
+    memberships: mems,
+    current_org_id: orgId,
+  };
+}
+
 // --- handlers ------------------------------------------------------------
 export async function mockHandlers<T>(req: ApiRequest): Promise<T> {
   const { method, path, body } = req;
@@ -47,33 +89,35 @@ export async function mockHandlers<T>(req: ApiRequest): Promise<T> {
     const { email, password } = (body as { email: string; password: string }) ?? {};
     const user = SEED_USERS.find((u) => u.email === email && u.password === password);
     if (!user) err(401, "Invalid email or password");
-    const { password: _pw, ...safeUser } = user!;
-    const session: MockSession = {
-      token: `mock.${user!.id}.${Date.now()}`,
-      user: safeUser,
-    };
-    writeSession(session);
+    const session = buildSession(user!);
+    writeSession({ token: session.token, user_id: user!.id, current_org_id: session.current_org_id });
     return json(session) as Promise<T>;
   }
 
   if (route === "POST /auth/signup") {
-    const { email, password, full_name } = (body as { email: string; password: string; full_name: string }) ?? {};
+    const { email, password, full_name, org_name } = (body as { email: string; password: string; full_name: string; org_name?: string }) ?? {};
     if (SEED_USERS.some((u) => u.email === email)) err(409, "Email already registered");
-    const newUser: AuthUser = {
+    const newOrgId = `org_${Date.now()}`;
+    const newOrgName = org_name?.trim() || `${(full_name || email.split("@")[0])}'s workspace`;
+    SEED_ORGS.push({
+      id: newOrgId,
+      name: newOrgName,
+      slug: newOrgName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""),
+      industry: "Custom",
+      domain: email.split("@")[1] ?? "example.com",
+    });
+    const newUser: SeedUser = {
       id: `u_${Date.now()}`,
       email,
+      password: password ?? "demo",
       full_name: full_name || email.split("@")[0],
       avatar_color: "#6366f1",
       initials: (full_name || email).slice(0, 2).toUpperCase(),
-      role: "admin", // first signup becomes admin of a new org
-      org_id: `org_${Date.now()}`,
-      org_name: `${full_name || email.split("@")[0]}'s workspace`,
-      team_id: null,
-      team_name: null,
+      memberships: [{ org_id: newOrgId, role: "owner", team_id: null }],
     };
-    void password; // not validated in mock
-    const session: MockSession = { token: `mock.${newUser.id}.${Date.now()}`, user: newUser };
-    writeSession(session);
+    SEED_USERS.push(newUser);
+    const session = buildSession(newUser);
+    writeSession({ token: session.token, user_id: newUser.id, current_org_id: session.current_org_id });
     return json(session) as Promise<T>;
   }
 
@@ -85,39 +129,36 @@ export async function mockHandlers<T>(req: ApiRequest): Promise<T> {
   if (route === "GET /auth/me") {
     const s = readSession();
     if (!s) err(401, "Not authenticated");
-    return json(s!.user) as Promise<T>;
+    const u = SEED_USERS.find((x) => x.id === s!.user_id);
+    if (!u) err(401, "User not found");
+    return json(toAuthUser(u!)) as Promise<T>;
   }
 
   if (route === "GET /auth/memberships") {
     const s = readSession();
     if (!s) err(401, "Not authenticated");
-    return json([
-      {
-        id: `mem_${s!.user.id}`,
-        org_id: s!.user.org_id,
-        org_name: s!.user.org_name,
-        role: s!.user.role as AppRole,
-        team_id: s!.user.team_id,
-        team_name: s!.user.team_name,
-        is_active: true,
-      },
-    ]) as Promise<T>;
+    const u = SEED_USERS.find((x) => x.id === s!.user_id);
+    if (!u) err(401, "User not found");
+    return json(membershipsFor(u!)) as Promise<T>;
   }
 
-  // ---------- Echo / health ----------
+  if (route === "POST /auth/switch-org") {
+    const s = readSession();
+    if (!s) err(401, "Not authenticated");
+    const { org_id } = (body as { org_id: string }) ?? {};
+    const u = SEED_USERS.find((x) => x.id === s!.user_id);
+    if (!u || !u.memberships.some((m) => m.org_id === org_id)) err(403, "Not a member of that org");
+    writeSession({ ...s!, current_org_id: org_id });
+    return json({ current_org_id: org_id }) as Promise<T>;
+  }
+
   if (route === "GET /health") {
     return json({ status: "ok", mode: "mock" }) as Promise<T>;
   }
 
-  // ---------- Catch-all ----------
-  // Tickets, incidents, requests, KB, SLA, agents, users, logs are still served
-  // directly via Zustand store (src/lib/store.ts) for now. When the local AI agent
-  // implements the backend, those pages can swap to apiCall() one by one.
-  console.warn(`[mock] no handler for ${route} — returning empty result`);
-  await delay(100);
+  console.warn(`[mock] no handler for ${route}`);
+  await delay(80);
   return (Array.isArray(body) ? [] : {}) as T;
 }
 
-// Expose for AuthContext bootstrapping
 export const mockSession = { read: readSession, write: writeSession };
-export { DEMO_ORG };

@@ -7,8 +7,9 @@ import { toast } from "sonner";
 
 export default function SignUp() {
   const nav = useNavigate();
-  const { setSessionUser } = useAuth();
+  const { setSession } = useAuth();
   const [fullName, setFullName] = useState("");
+  const [orgName, setOrgName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
@@ -17,8 +18,8 @@ export default function SignUp() {
     e.preventDefault();
     setBusy(true);
     try {
-      const session = await authApi.signup(email, password, fullName);
-      setSessionUser(session.user);
+      const session = await authApi.signup(email, password, fullName, orgName);
+      setSession(session);
       toast.success("Workspace created");
       nav("/app", { replace: true });
     } catch (err) {
@@ -54,43 +55,26 @@ export default function SignUp() {
         <div className="max-w-md w-full mx-auto">
           <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Get started</div>
           <h2 className="mt-1 font-display font-bold text-3xl">Create your workspace</h2>
-          <p className="text-sm text-muted-foreground mt-1">You'll be the admin of a new organization.</p>
+          <p className="text-sm text-muted-foreground mt-1">You'll be the owner of a brand-new organization.</p>
 
           <form onSubmit={submit} className="mt-8 space-y-4">
             <div>
               <label className="text-xs font-medium text-muted-foreground">Full name</label>
-              <input
-                required
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                className="mt-1 w-full h-11 px-3.5 rounded-xl bg-surface border border-border focus:border-ring outline-none focus:ring-4 focus:ring-ring/15 text-sm"
-              />
+              <input required value={fullName} onChange={(e) => setFullName(e.target.value)} className="mt-1 w-full h-11 px-3.5 rounded-xl bg-surface border border-border focus:border-ring outline-none focus:ring-4 focus:ring-ring/15 text-sm" />
+            </div>
+            <div>
+              <label className="text-xs font-medium text-muted-foreground">Organization name</label>
+              <input required value={orgName} onChange={(e) => setOrgName(e.target.value)} placeholder="Acme Inc." className="mt-1 w-full h-11 px-3.5 rounded-xl bg-surface border border-border focus:border-ring outline-none focus:ring-4 focus:ring-ring/15 text-sm" />
             </div>
             <div>
               <label className="text-xs font-medium text-muted-foreground">Work email</label>
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 w-full h-11 px-3.5 rounded-xl bg-surface border border-border focus:border-ring outline-none focus:ring-4 focus:ring-ring/15 text-sm"
-              />
+              <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="mt-1 w-full h-11 px-3.5 rounded-xl bg-surface border border-border focus:border-ring outline-none focus:ring-4 focus:ring-ring/15 text-sm" />
             </div>
             <div>
               <label className="text-xs font-medium text-muted-foreground">Password</label>
-              <input
-                type="password"
-                required
-                minLength={4}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 w-full h-11 px-3.5 rounded-xl bg-surface border border-border focus:border-ring outline-none focus:ring-4 focus:ring-ring/15 text-sm"
-              />
+              <input type="password" required minLength={4} value={password} onChange={(e) => setPassword(e.target.value)} className="mt-1 w-full h-11 px-3.5 rounded-xl bg-surface border border-border focus:border-ring outline-none focus:ring-4 focus:ring-ring/15 text-sm" />
             </div>
-            <button
-              disabled={busy}
-              className="w-full h-11 rounded-xl bg-gradient-primary text-primary-foreground font-semibold text-sm hover:shadow-glow transition-shadow flex items-center justify-center gap-2 disabled:opacity-60"
-            >
+            <button disabled={busy} className="w-full h-11 rounded-xl bg-gradient-primary text-primary-foreground font-semibold text-sm hover:shadow-glow transition-shadow flex items-center justify-center gap-2 disabled:opacity-60">
               {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Create workspace <ArrowRight className="h-4 w-4" /></>}
             </button>
             <p className="text-center text-xs text-muted-foreground">
