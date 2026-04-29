@@ -48,10 +48,10 @@ const App = () => (
             <Route path="/" element={<Navigate to="/app" replace />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />
-            <Route path="/onboarding" element={<Onboarding />} />
             <Route path="/invite" element={<AcceptInvite />} />
 
             <Route element={<ProtectedRoute />}>
+              <Route path="/onboarding" element={<Onboarding />} />
               <Route path="/platform" element={<Platform />} />
               <Route path="/app" element={<AppLayout />}>
                 <Route index element={<AppHome />} />
