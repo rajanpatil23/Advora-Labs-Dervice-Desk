@@ -497,7 +497,7 @@ export default function Tickets() {
                             ? "bg-primary text-primary-foreground border-transparent shadow-sm rounded-tr-md"
                             : "bg-surface border-border rounded-tl-md"
                         )}>
-                          {m.body}
+                          <MessageBody text={m.body} knownHandles={mentionables.map(p => p.handle)} myHandle={me ? toMentionable({ id: me.id, name: me.name, initials: me.initials, avatarColor: me.avatarColor } as any).handle : undefined} />
                         </div>
                         {m.attachments && m.attachments.length > 0 && (
                           <div className="mt-1.5 flex flex-wrap gap-1.5">
