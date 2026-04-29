@@ -76,7 +76,7 @@ Deno.serve(async (req) => {
     if (!apiKey) throw new Error("LOVABLE_API_KEY not configured");
 
     const body = (await req.json()) as Body;
-    const { mode, ticket, messages, tone = "friendly", categories } = body;
+    const { mode, ticket, messages, tone = "friendly", categories, kbArticles, variantCount, agentName, customInstructions } = body;
     const thread = buildThread(messages);
     const ticketMeta = `Title: ${ticket.title}\nRequester: ${ticket.requesterName ?? "—"}\nChannel: ${ticket.channel ?? "—"}\nPriority: ${ticket.priority ?? "—"}\nStatus: ${ticket.status ?? "—"}\nCurrent category: ${ticket.category ?? "—"} / ${ticket.subcategory ?? "—"}`;
 
