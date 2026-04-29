@@ -14,6 +14,7 @@ import type { Priority, TicketStatus } from "@/lib/types";
 import { NewTicketDialog } from "@/components/dialogs/NewTicketDialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
+import { PresenceBubbles } from "@/components/common/Presence";
 
 const queues = [
   { key: "all", label: "All tickets", icon: Inbox },
@@ -362,7 +363,8 @@ export default function Tickets() {
                 </div>
                 <h1 className="mt-0.5 font-display font-bold text-[18px] leading-tight truncate">{selected.title}</h1>
               </div>
-              <div className="flex items-center gap-1 shrink-0">
+              <div className="flex items-center gap-2 shrink-0">
+                <PresenceBubbles ticketId={selected.id} />
                 {canWork && (
                   <button
                     onClick={() => me && toggleWatcher(selected.id, me.id)}
