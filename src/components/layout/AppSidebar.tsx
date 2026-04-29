@@ -3,7 +3,7 @@ import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, Ticket, AlertOctagon, ClipboardList, Users, UserCog,
   Timer, BookOpen, BarChart3, ScrollText, Settings, Sparkles, LogOut,
-  PanelLeftClose, PanelLeft, Inbox, UsersRound, CheckSquare, CreditCard, ShieldCheck, Plug, Zap, Smile, ListChecks, Palette, Bell, Bookmark, Layers, Database
+  PanelLeftClose, PanelLeft, Inbox, UsersRound, CheckSquare, CreditCard, ShieldCheck, Plug, Zap, Smile, ListChecks, Palette, Bell, Bookmark, Layers, Database, Activity
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -45,6 +45,7 @@ const SECTIONS: NavSection[] = [
       { to: "/app/requests",   label: "Service Requests", i18nKey: "nav.requests",      icon: ClipboardList,   roles: ["owner", "admin", "manager", "agent", "resolver"] },
       { to: "/app/approvals",  label: "Approvals",        i18nKey: "nav.approvals",     icon: CheckSquare,     roles: ["owner", "admin", "manager"] },
       { to: "/app/views",      label: "Saved Views",      i18nKey: "nav.savedViews",    icon: Bookmark,        roles: ["owner", "admin", "manager", "agent", "resolver"] },
+      { to: "/app/activity",   label: "Activity Feed",    i18nKey: "nav.activity",      icon: Activity,        roles: ["owner", "admin", "manager", "agent", "resolver"] },
       { to: "/app/bulk",       label: "Bulk Actions",     icon: Layers,                                       roles: ["owner", "admin", "manager"] },
       { to: "/app/data",       label: "Import / Export",  i18nKey: "nav.data",          icon: Database,        roles: ["owner", "admin"] },
       { to: "/app/kb",         label: "Knowledge Base",   i18nKey: "nav.knowledge",     icon: BookOpen },

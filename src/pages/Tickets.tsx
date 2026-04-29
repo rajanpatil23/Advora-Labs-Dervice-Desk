@@ -13,6 +13,9 @@ import {
 import type { Priority, TicketStatus } from "@/lib/types";
 import { NewTicketDialog } from "@/components/dialogs/NewTicketDialog";
 import { AssistSuggestButton, AssistInsightsPanel } from "@/components/tickets/AiAssist";
+import { MentionAutocomplete, type MentionAutocompleteHandle } from "@/components/common/MentionAutocomplete";
+import { extractMentionHandles, toMentionable, toHandle, renderWithMentions } from "@/lib/mentions";
+import { emitNotification } from "@/lib/api/notificationEngine";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { PresenceBubbles } from "@/components/common/Presence";
@@ -64,6 +67,8 @@ export default function Tickets() {
   const [loading, setLoading] = useState(true);
   const [tick, setTick] = useState(0);
   const composerRef = useRef<HTMLTextAreaElement>(null);
+  const mentionRef = useRef<MentionAutocompleteHandle>(null);
+  const mentionables = useMemo(() => orgAgents.map(toMentionable), [orgAgents]);
   const threadRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { setSearch(params.get("q") ?? ""); }, [params]);
@@ -140,8 +145,28 @@ export default function Tickets() {
 
   const send = () => {
     if (!selected || !reply.trim()) return;
-    addMessage(selected.id, reply.trim(), internal);
-    toast.success(internal ? "Internal note added" : "Reply sent");
+    const text = reply.trim();
+    addMessage(selected.id, text, internal);
+
+    // Notify mentioned agents
+    const handles = extractMentionHandles(text);
+    if (handles.length > 0) {
+      const mentioned = mentionables.filter((m) => handles.includes(m.handle));
+      mentioned.forEach((m) => {
+        emitNotification({
+          userId: m.id,
+          event: "ticket_mentioned",
+          title: `You were mentioned · ${selected.number}`,
+          body: `${me?.name ?? "Someone"}: ${text.slice(0, 120)}`,
+          tag: `mention:${selected.id}:${m.id}`,
+        });
+      });
+      if (mentioned.length > 0) {
+        toast.success(`Notified ${mentioned.map((m) => m.name.split(" ")[0]).join(", ")}`);
+      }
+    } else {
+      toast.success(internal ? "Internal note added" : "Reply sent");
+    }
     setReply("");
   };
 
@@ -472,7 +497,7 @@ export default function Tickets() {
                             ? "bg-primary text-primary-foreground border-transparent shadow-sm rounded-tr-md"
                             : "bg-surface border-border rounded-tl-md"
                         )}>
-                          {m.body}
+                          <MessageBody text={m.body} knownHandles={mentionables.map(p => p.handle)} myHandle={me ? toHandle(me.name) : undefined} />
                         </div>
                         {m.attachments && m.attachments.length > 0 && (
                           <div className="mt-1.5 flex flex-wrap gap-1.5">
@@ -509,7 +534,14 @@ export default function Tickets() {
                     />
                   </div>
                 </div>
-                <div className={cn("rounded-xl border bg-surface p-2.5 transition-all focus-within:ring-2 focus-within:ring-ring/30", internal && "border-warning/40 bg-warning/5")}>
+                <div className={cn("relative rounded-xl border bg-surface p-2.5 transition-all focus-within:ring-2 focus-within:ring-ring/30", internal && "border-warning/40 bg-warning/5")}>
+                  <MentionAutocomplete
+                    ref={mentionRef}
+                    value={reply}
+                    textareaRef={composerRef}
+                    people={mentionables}
+                    onInsert={(next) => setReply(next)}
+                  />
                   <textarea
                     ref={composerRef}
                     value={reply} onChange={e => {
@@ -518,7 +550,10 @@ export default function Tickets() {
                         presenceApi.setTyping({ id: me.id }, selected.id, e.target.value.length > 0);
                       }
                     }}
-                    placeholder={internal ? "Write an internal note for the team…" : `Reply to ${requester?.name.split(" ")[0] ?? "customer"}…`}
+                    onKeyDown={(e) => {
+                      if (mentionRef.current?.handleKeyDown(e)) return;
+                    }}
+                    placeholder={internal ? "Write an internal note for the team… (use @ to mention)" : `Reply to ${requester?.name.split(" ")[0] ?? "customer"}… (use @ to mention)`}
                     rows={3}
                     className="w-full resize-none bg-transparent text-[13px] outline-none placeholder:text-muted-foreground leading-relaxed"
                   />
@@ -673,6 +708,32 @@ export default function Tickets() {
 }
 
 /* ----------------- Sub-components ----------------- */
+
+function MessageBody({ text, knownHandles, myHandle }: { text: string; knownHandles: string[]; myHandle?: string }) {
+  const set = new Set(knownHandles);
+  const parts = renderWithMentions(text, (h) => set.has(h));
+  return (
+    <span className="whitespace-pre-wrap">
+      {parts.map((p, i) => {
+        if (p.type === "text") return <span key={i}>{p.value}</span>;
+        const handle = p.value.slice(1).toLowerCase();
+        const isMe = !!myHandle && handle === myHandle;
+        return (
+          <span
+            key={i}
+            className={cn(
+              "inline px-1 -mx-0.5 rounded font-medium",
+              isMe ? "bg-warning/30 text-warning-foreground" : p.known ? "bg-primary/15 text-primary" : "bg-surface-2 text-muted-foreground",
+            )}
+          >
+            {p.value}
+          </span>
+        );
+      })}
+    </span>
+  );
+}
+
 
 function Kbd({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
