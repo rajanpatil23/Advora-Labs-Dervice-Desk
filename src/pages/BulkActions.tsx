@@ -39,7 +39,7 @@ export default function BulkActions() {
     return tickets.filter((t) => {
       if (filterStatus !== "all" && t.status !== filterStatus) return false;
       if (filterPriority !== "all" && t.priority !== filterPriority) return false;
-      if (search && !`${t.subject} ${t.number ?? ""}`.toLowerCase().includes(search.toLowerCase())) return false;
+      if (search && !`${t.title} ${t.number ?? ""}`.toLowerCase().includes(search.toLowerCase())) return false;
       return true;
     });
   }, [tickets, filterStatus, filterPriority, search]);
@@ -227,7 +227,7 @@ export default function BulkActions() {
                     <Checkbox checked={checked} onCheckedChange={() => toggleOne(t.id)} />
                   </div>
                   <div className="font-mono text-xs text-muted-foreground">{t.number ?? t.id.slice(0, 6)}</div>
-                  <div className="truncate font-medium">{t.subject}</div>
+                  <div className="truncate font-medium">{t.title}</div>
                   <div><StatusChip status={t.status} /></div>
                   <div><PriorityChip priority={t.priority} /></div>
                   <div className="truncate text-xs">{(assignee as any)?.name ?? (assignee as any)?.email ?? <span className="text-muted-foreground">Unassigned</span>}</div>
