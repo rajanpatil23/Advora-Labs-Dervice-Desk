@@ -36,9 +36,17 @@ const replyTemplates = [
 ];
 
 export default function Tickets() {
-  const { tickets, selectedTicketId, setSelectedTicket, addMessage, setStatus, setPriority, setAssignee } = useAppStore();
+  const { tickets: allTickets, selectedTicketId, setSelectedTicket, addMessage, setStatus, setPriority, setAssignee } = useAppStore();
+  const orgAgents = useOrgAgents();
+  const me = useCurrentOrgUser();
+  const isRequester = me?.role === "requester";
+  const tickets = useMemo(
+    () => (isRequester && me ? allTickets.filter(t => t.requesterId === me.id) : allTickets),
+    [allTickets, isRequester, me?.id]
+  );
+  const [params, setParams] = useSearchParams();
   const [queue, setQueue] = useState("all");
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(params.get("q") ?? "");
   const [reply, setReply] = useState("");
   const [internal, setInternal] = useState(false);
   const [activeQuick, setActiveQuick] = useState<string | null>(null);
@@ -49,27 +57,27 @@ export default function Tickets() {
   const [filterCategory, setFilterCategory] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [tick, setTick] = useState(0);
-  // `me` already declared above
   const composerRef = useRef<HTMLTextAreaElement>(null);
   const threadRef = useRef<HTMLDivElement>(null);
 
-  // Initial loading skeleton
+  useEffect(() => { setSearch(params.get("q") ?? ""); }, [params]);
   useEffect(() => {
-    const t = setTimeout(() => setLoading(false), 400);
-    return () => clearTimeout(t);
-  }, []);
+    const cur = params.get("q") ?? "";
+    if (cur !== search) {
+      const next = new URLSearchParams(params);
+      if (search) next.set("q", search); else next.delete("q");
+      setParams(next, { replace: true });
+    }
+  }, [search]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Live SLA tick (every 30s)
-  useEffect(() => {
-    const i = setInterval(() => setTick((t) => t + 1), 30000);
-    return () => clearInterval(i);
-  }, []);
+  useEffect(() => { const t = setTimeout(() => setLoading(false), 400); return () => clearTimeout(t); }, []);
+  useEffect(() => { const i = setInterval(() => setTick((t) => t + 1), 30000); return () => clearInterval(i); }, []);
 
   const categories = useMemo(() => Array.from(new Set(tickets.map(t => t.category))), [tickets]);
 
   const filtered = useMemo(() => {
     let list = tickets;
-    if (queue === "mine") list = list.filter(t => t.assigneeId === me.id);
+    if (queue === "mine" && me) list = list.filter(t => t.assigneeId === me.id);
     if (queue === "unassigned") list = list.filter(t => !t.assigneeId);
     if (queue === "at_risk") list = list.filter(t => t.slaState === "at_risk" || t.slaState === "breached");
 
@@ -86,14 +94,13 @@ export default function Tickets() {
     if (search) list = list.filter(t =>
       (t.title + " " + t.number + " " + (findUser(t.requesterId)?.name ?? "")).toLowerCase().includes(search.toLowerCase())
     );
-    // Sort: at-risk first, then by updatedAt
     return [...list].sort((a, b) => {
       const sa = a.slaState === "breached" ? 0 : a.slaState === "at_risk" ? 1 : 2;
       const sb = b.slaState === "breached" ? 0 : b.slaState === "at_risk" ? 1 : 2;
       if (sa !== sb) return sa - sb;
       return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
     });
-  }, [tickets, queue, search, me.id, activeQuick, filterStatus, filterPriority, filterAssignee, filterCategory]);
+  }, [tickets, queue, search, me?.id, activeQuick, filterStatus, filterPriority, filterAssignee, filterCategory]);
 
   const selected = tickets.find(t => t.id === selectedTicketId) ?? filtered[0];
   const requester = selected ? findUser(selected.requesterId) : null;
