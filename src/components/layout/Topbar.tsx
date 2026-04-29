@@ -54,7 +54,7 @@ export function Topbar() {
             <ChevronsUpDown className="h-3.5 w-3.5 text-muted-foreground" />
           </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="w-64">
+        <DropdownMenuContent align="start" className="w-72">
           <DropdownMenuLabel>Workspaces</DropdownMenuLabel>
           <DropdownMenuSeparator />
           {memberships.map(m => (
@@ -62,18 +62,20 @@ export function Topbar() {
               try { await switchOrg(m.org_id); toast.success(`Switched to ${m.org_name}`); }
               catch (e) { toast.error((e as Error).message); }
             }}>
-              <div className="flex items-center justify-between w-full">
-                <div>
-                  <div className="text-sm font-medium">{m.org_name}</div>
-                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{m.role}</div>
+              <div className="flex items-center justify-between w-full gap-2">
+                <div className="min-w-0">
+                  <div className="text-sm font-medium truncate">{m.org_name}</div>
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground truncate">
+                    {m.role} · {m.org_industry}
+                  </div>
                 </div>
-                {m.org_id === currentOrgId && <Check className="h-4 w-4 text-primary" />}
+                {m.org_id === currentOrgId && <Check className="h-4 w-4 text-primary shrink-0" />}
               </div>
             </DropdownMenuItem>
           ))}
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => nav("/onboarding")}>
-            <Plus className="h-4 w-4 mr-2" /> Create workspace
+          <DropdownMenuItem onClick={() => nav("/signup")}>
+            <Plus className="h-4 w-4 mr-2" /> Create new workspace
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
