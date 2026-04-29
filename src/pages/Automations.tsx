@@ -262,6 +262,12 @@ function RuleEditor({ rule, onClose, onSaved }: { rule: Rule | null; onClose: ()
             <Input value={draft.description ?? ""} onChange={(e) => update({ description: e.target.value })} placeholder="What this rule does" />
           </div>
 
+          {/* Live flow preview */}
+          <div className="space-y-2">
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground">Flow preview</Label>
+            <FlowPreview rule={draft} />
+          </div>
+
           {/* Trigger */}
           <Section step="1" title="When">
             <Select value={draft.trigger} onValueChange={(v) => update({ trigger: v as any })}>
