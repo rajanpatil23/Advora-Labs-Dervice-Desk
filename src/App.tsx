@@ -51,6 +51,7 @@ import BulkActions from "./pages/BulkActions";
 import ImportExport from "./pages/ImportExport";
 import ActivityFeed from "./pages/ActivityFeed";
 import Macros from "./pages/Macros";
+import Webhooks from "./pages/Webhooks";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -104,6 +105,7 @@ const App = () => (
                 <Route path="data" element={<ImportExport />} />
                 <Route path="activity" element={<ActivityFeed />} />
                 <Route path="macros" element={<Macros />} />
+                <Route path="webhooks" element={<Webhooks />} />
               </Route>
             </Route>
 
