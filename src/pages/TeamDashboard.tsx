@@ -10,13 +10,14 @@ import { cn } from "@/lib/utils";
  * Phase 7 will expand this with workload balancing, drag-drop reassign, team reports.
  */
 export default function TeamDashboard() {
-  const { tickets, users } = useAppStore();
+  const { tickets, orgAgents } = useAppStore();
   const { user, currentMembership } = useAuth();
 
   const teamMembers = useMemo(() => {
-    if (!currentMembership?.team_id) return users.filter((u) => u.role === "agent" || u.role === "resolver");
-    return users.filter((u) => u.team === currentMembership.team_name);
-  }, [users, currentMembership]);
+    if (!currentMembership?.team_name) return orgAgents;
+    const filtered = orgAgents.filter((u) => u.team === currentMembership.team_name);
+    return filtered.length > 0 ? filtered : orgAgents;
+  }, [orgAgents, currentMembership]);
 
   const teamTickets = useMemo(() => {
     const ids = new Set(teamMembers.map((m) => m.id));
