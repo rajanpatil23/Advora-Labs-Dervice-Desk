@@ -31,6 +31,7 @@ import Agents from "./pages/Agents";
 import SLA from "./pages/SLA";
 import KnowledgeBase from "./pages/KnowledgeBase";
 import Reports from "./pages/Reports";
+import ReportBuilder from "./pages/ReportBuilder";
 import Logs from "./pages/Logs";
 import Settings from "./pages/Settings";
 import Platform from "./pages/Platform";
@@ -83,6 +84,7 @@ const App = () => (
                 <Route path="sla" element={<SLA />} />
                 <Route path="kb" element={<KnowledgeBase />} />
                 <Route path="reports" element={<Reports />} />
+                <Route path="report-builder" element={<ReportBuilder />} />
                 <Route path="logs" element={<Logs />} />
                 <Route path="settings" element={<Settings />} />
                 <Route path="billing" element={<Billing />} />
