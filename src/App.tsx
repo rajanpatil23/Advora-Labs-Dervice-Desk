@@ -42,6 +42,7 @@ import Security from "./pages/Security";
 import Integrations from "./pages/Integrations";
 import Automations from "./pages/Automations";
 import Csat from "./pages/Csat";
+import CsatTrends from "./pages/CsatTrends";
 import PublicSurvey from "./pages/PublicSurvey";
 import CustomFields from "./pages/CustomFields";
 import Branding from "./pages/Branding";
@@ -102,6 +103,7 @@ const App = () => (
                 <Route path="integrations" element={<Integrations />} />
                 <Route path="automations" element={<Automations />} />
                 <Route path="csat" element={<Csat />} />
+                <Route path="csat/trends" element={<CsatTrends />} />
                 <Route path="fields" element={<CustomFields />} />
                 <Route path="branding" element={<Branding />} />
                 <Route path="notifications" element={<Notifications />} />
