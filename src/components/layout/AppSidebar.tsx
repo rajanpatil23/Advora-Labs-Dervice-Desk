@@ -50,8 +50,9 @@ const SECTIONS: NavSection[] = [
   {
     label: "Insights",
     items: [
-      { to: "/app/reports",    label: "Reports",          icon: BarChart3,       roles: ["owner", "admin", "manager"] },
-      { to: "/app/csat",       label: "CSAT",             icon: Smile,           roles: ["owner", "admin", "manager"] },
+      { to: "/app/reports",        label: "Reports",          icon: BarChart3,       roles: ["owner", "admin", "manager"] },
+      { to: "/app/report-builder",  label: "Report builder",   icon: BarChart3,       roles: ["owner", "admin", "manager"] },
+      { to: "/app/csat",            label: "CSAT",             icon: Smile,           roles: ["owner", "admin", "manager"] },
     ],
   },
   {
