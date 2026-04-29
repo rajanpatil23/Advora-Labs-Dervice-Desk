@@ -1,8 +1,6 @@
 import { useState } from "react";
-import { logs } from "@/lib/mockData";
+import { useOrgLogs } from "@/lib/store";
 import { timeAgo } from "@/lib/format";
-import { Filter } from "lucide-react";
-import { toast } from "sonner";
 
 const typeColor: Record<string, string> = {
   ticket: "bg-primary/10 text-primary",
@@ -13,8 +11,11 @@ const typeColor: Record<string, string> = {
 };
 
 export default function Logs() {
+  const logs = useOrgLogs();
   const [filter, setFilter] = useState("all");
-  const list = filter === "all" ? logs : logs.filter(l => l.type === filter);
+  const [actorFilter, setActorFilter] = useState("");
+  let list = filter === "all" ? logs : logs.filter(l => l.type === filter);
+  if (actorFilter.trim()) list = list.filter(l => l.actor.toLowerCase().includes(actorFilter.toLowerCase()));
   return (
     <div className="h-full overflow-y-auto">
       <div className="px-6 lg:px-8 py-6 max-w-[1400px] mx-auto space-y-6">
