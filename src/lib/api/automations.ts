@@ -203,4 +203,46 @@ export const automationsApi = {
     runCount: 0,
     createdAt: new Date().toISOString(),
   }),
+  duplicateRule: (id: string): Rule | null => {
+    const s = read();
+    const src = s.rules.find(r => r.id === id);
+    if (!src) return null;
+    const copy: Rule = {
+      ...src,
+      id: crypto.randomUUID(),
+      name: `${src.name} (copy)`,
+      runCount: 0,
+      lastRunAt: undefined,
+      createdAt: new Date().toISOString(),
+      conditions: src.conditions.map(c => ({ ...c, id: crypto.randomUUID() })),
+      actions: src.actions.map(a => ({ ...a, id: crypto.randomUUID() })),
+    };
+    const idx = s.rules.findIndex(r => r.id === id);
+    s.rules = [...s.rules.slice(0, idx + 1), copy, ...s.rules.slice(idx + 1)];
+    write(s);
+    return copy;
+  },
+  moveRule: (id: string, dir: "up" | "down") => {
+    const s = read();
+    const idx = s.rules.findIndex(r => r.id === id);
+    if (idx < 0) return;
+    const target = dir === "up" ? idx - 1 : idx + 1;
+    if (target < 0 || target >= s.rules.length) return;
+    const arr = [...s.rules];
+    [arr[idx], arr[target]] = [arr[target], arr[idx]];
+    s.rules = arr;
+    write(s);
+  },
+  createFromTemplate: (rule: Omit<Rule, "id" | "createdAt" | "runCount" | "lastRunAt">): Rule => {
+    const full: Rule = {
+      ...rule,
+      id: crypto.randomUUID(),
+      runCount: 0,
+      createdAt: new Date().toISOString(),
+    };
+    const s = read();
+    s.rules = [full, ...s.rules];
+    write(s);
+    return full;
+  },
 };
