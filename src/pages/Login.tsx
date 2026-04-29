@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { ArrowRight, Loader2, Mail, Lock, Eye, EyeOff, ChevronDown } from "lucide-react";
+import { ArrowRight, Loader2, Mail, Lock, Eye, EyeOff, ChevronDown, Sparkles, X } from "lucide-react";
 import { authApi } from "@/lib/api/auth";
 import { useAuth } from "@/contexts/AuthContext";
 import { SEED_USERS, SEED_PLATFORM_ADMINS } from "@/lib/api/seedUsers";
@@ -18,6 +18,27 @@ export default function Login() {
   const [busy, setBusy] = useState(false);
   const [showPwd, setShowPwd] = useState(false);
   const [showDemos, setShowDemos] = useState(false);
+  const [showDemoHint, setShowDemoHint] = useState(false);
+  const demoBtnRef = useRef<HTMLButtonElement>(null);
+
+  // First-time visitor nudge: surface the demo accounts toggle
+  useEffect(() => {
+    const seen = localStorage.getItem("advora_demo_hint_dismissed");
+    if (seen === "1") return;
+    const t = setTimeout(() => setShowDemoHint(true), 700);
+    return () => clearTimeout(t);
+  }, []);
+
+  const dismissHint = () => {
+    setShowDemoHint(false);
+    localStorage.setItem("advora_demo_hint_dismissed", "1");
+  };
+
+  const openDemosFromHint = () => {
+    setShowDemos(true);
+    dismissHint();
+    setTimeout(() => demoBtnRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }), 50);
+  };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -141,12 +162,47 @@ export default function Login() {
             </button>
           </form>
 
-          {/* Demo accounts (collapsible) */}
-          <div className="mt-6">
+          {/* Demo accounts (collapsible) - with first-time nudge */}
+          <div className="mt-6 relative">
+            {showDemoHint && (
+              <div className="absolute -top-24 left-1/2 -translate-x-1/2 z-10 w-[300px] animate-in fade-in slide-in-from-bottom-2 duration-500">
+                <div className="relative rounded-xl bg-foreground text-background shadow-2xl px-4 py-3 ring-1 ring-foreground/20">
+                  <button
+                    onClick={dismissHint}
+                    className="absolute top-2 right-2 text-background/60 hover:text-background"
+                    aria-label="Dismiss hint"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                  <div className="flex items-start gap-2 pr-4">
+                    <Sparkles className="h-4 w-4 mt-0.5 text-background flex-shrink-0" />
+                    <div>
+                      <div className="text-sm font-semibold leading-tight">Here to explore?</div>
+                      <p className="text-xs text-background/75 mt-1 leading-snug">
+                        Tap below to load a demo account - no signup needed.
+                      </p>
+                      <button
+                        onClick={openDemosFromHint}
+                        className="mt-2 text-xs font-medium text-background underline underline-offset-2 hover:opacity-80"
+                      >
+                        Show demo accounts →
+                      </button>
+                    </div>
+                  </div>
+                  <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 h-3 w-3 rotate-45 bg-foreground" />
+                </div>
+              </div>
+            )}
+
             <button
+              ref={demoBtnRef}
               type="button"
-              onClick={() => setShowDemos((s) => !s)}
-              className="w-full flex items-center justify-center gap-2 text-xs text-muted-foreground hover:text-foreground py-2"
+              onClick={() => { setShowDemos((s) => !s); dismissHint(); }}
+              className={`w-full flex items-center justify-center gap-2 text-xs py-2 rounded-lg transition-all ${
+                showDemoHint
+                  ? "text-foreground bg-primary/10 ring-2 ring-primary/40 animate-pulse"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
             >
               <span className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[10px]">?</span>
               Evaluating Advora? Try a demo account
