@@ -56,7 +56,16 @@ export default function Incidents() {
                     </td>
                     <td className="py-3 text-xs flex items-center gap-1.5"><Server className="h-3 w-3 text-muted-foreground" /> {i.service}</td>
                     <td className="py-3"><span className={`text-[10px] font-bold px-2 py-0.5 rounded ${sevColors[i.severity]}`}>SEV {i.severity}</span></td>
-                    <td className="py-3"><span className={`text-[10px] capitalize font-medium px-2 py-0.5 rounded ${statusColor[i.status]}`}>{i.status}</span></td>
+                    <td className="py-3">
+                      <select
+                        value={i.status}
+                        onClick={(e) => e.stopPropagation()}
+                        onChange={(e) => { setIncidentStatus(i.id, e.target.value as Incident["status"]); toast.success(`Incident ${i.number} → ${e.target.value}`); }}
+                        className={`text-[10px] capitalize font-medium px-2 py-1 rounded outline-none border-0 ${statusColor[i.status]}`}
+                      >
+                        {statusOrder.map(s => <option key={s} value={s}>{s}</option>)}
+                      </select>
+                    </td>
                     <td className="py-3">{owner && <div className="flex items-center gap-2"><Avatar initials={owner.initials} color={owner.avatarColor} size={22} /><span className="text-xs">{owner.name}</span></div>}</td>
                     <td className="py-3 text-xs tabular-nums">{i.affected.toLocaleString()}</td>
                     <td className="py-3 pr-5 text-xs text-muted-foreground">{timeAgo(i.updatedAt)}</td>
