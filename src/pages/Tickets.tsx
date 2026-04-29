@@ -14,6 +14,7 @@ import type { Priority, TicketStatus } from "@/lib/types";
 import { NewTicketDialog } from "@/components/dialogs/NewTicketDialog";
 import { AssistSuggestButton, AssistInsightsPanel } from "@/components/tickets/AiAssist";
 import { MacroPicker } from "@/components/tickets/MacroPicker";
+import { ReplyDraftsDialog } from "@/components/tickets/ReplyDraftsDialog";
 import { MentionAutocomplete, type MentionAutocompleteHandle } from "@/components/common/MentionAutocomplete";
 import { extractMentionHandles, toMentionable, toHandle, renderWithMentions } from "@/lib/mentions";
 import { emitNotification } from "@/lib/api/notificationEngine";
@@ -533,6 +534,12 @@ export default function Tickets() {
                       ticket={selected}
                       requesterName={requester?.name}
                       onSuggestion={(text) => setReply(text)}
+                    />
+                    <ReplyDraftsDialog
+                      ticket={selected}
+                      requesterName={requester?.name}
+                      agentName={me?.name}
+                      onUse={(text) => setReply(text)}
                     />
                   </div>
                 </div>
