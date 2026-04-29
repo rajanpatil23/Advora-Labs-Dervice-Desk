@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Sparkles, ArrowRight, Loader2 } from "lucide-react";
 import { authApi } from "@/lib/api/auth";
 import { useAuth } from "@/contexts/AuthContext";
-import { SEED_USERS } from "@/lib/api/seedUsers";
+import { SEED_USERS, SEED_PLATFORM_ADMINS } from "@/lib/api/seedUsers";
 import { toast } from "sonner";
 
 export default function Login() {
