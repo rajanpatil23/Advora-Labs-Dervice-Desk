@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { BrandingProvider } from "@/contexts/BrandingContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PortalLayout } from "@/components/layout/PortalLayout";
@@ -41,6 +42,7 @@ import Automations from "./pages/Automations";
 import Csat from "./pages/Csat";
 import PublicSurvey from "./pages/PublicSurvey";
 import CustomFields from "./pages/CustomFields";
+import Branding from "./pages/Branding";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
