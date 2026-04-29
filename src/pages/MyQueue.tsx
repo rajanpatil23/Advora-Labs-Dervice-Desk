@@ -85,12 +85,35 @@ export default function MyQueue() {
 
         <div className="rounded-xl border border-border bg-surface divide-y divide-border overflow-hidden">
           {myTickets.length === 0 ? (
-            <div className="p-12 text-center">
+            <div className="p-10 text-center">
               <div className="mx-auto h-12 w-12 rounded-full bg-surface-2 flex items-center justify-center mb-3">
                 <Inbox className="h-5 w-5 text-muted-foreground" />
               </div>
-              <p className="font-medium">All clear</p>
-              <p className="text-sm text-muted-foreground mt-1">No tickets match this filter.</p>
+              <p className="font-medium">Your queue is empty</p>
+              <p className="text-sm text-muted-foreground mt-1 max-w-sm mx-auto">
+                No tickets are assigned to you yet. Browse all open tickets, or claim a few demo tickets so you can try out the workspace.
+              </p>
+              <div className="mt-5 flex items-center justify-center gap-2 flex-wrap">
+                <Link
+                  to="/app/tickets"
+                  className="inline-flex items-center gap-1.5 h-9 px-4 rounded-lg bg-foreground text-background text-xs font-medium hover:opacity-90"
+                >
+                  Browse all tickets <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!user) return;
+                    const pool = tickets
+                      .filter((t) => t.status !== "closed" && t.status !== "resolved")
+                      .slice(0, 6);
+                    pool.forEach((t) => useAppStore.getState().updateTicket(t.id, { assigneeId: user.id }));
+                  }}
+                  className="inline-flex items-center gap-1.5 h-9 px-4 rounded-lg border border-border text-xs font-medium hover:bg-surface-2"
+                >
+                  Assign 6 demo tickets to me
+                </button>
+              </div>
             </div>
           ) : (
             myTickets.map((t) => (
