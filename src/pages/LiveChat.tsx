@@ -435,19 +435,27 @@ function Bubble({ msg }: { msg: ChatMessage }) {
       </div>
     );
   }
-  const isAgent = msg.sender === "agent" || msg.sender === "bot";
+  const isOutbound = msg.sender === "agent" || msg.sender === "bot";
+  const isBot = msg.sender === "bot";
   return (
-    <div className={`flex ${isAgent ? "justify-end" : "justify-start"}`}>
+    <div className={`flex ${isOutbound ? "justify-end" : "justify-start"}`}>
       <div className={`max-w-[75%] rounded-lg px-3 py-2 ${
-        isAgent ? "bg-primary text-primary-foreground" : "bg-muted"
+        isBot ? "bg-accent border border-primary/30 text-foreground"
+        : isOutbound ? "bg-primary text-primary-foreground"
+        : "bg-muted"
       }`}>
         {msg.authorName && (
-          <div className={`text-[10px] font-medium mb-0.5 ${isAgent ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
+          <div className={`text-[10px] font-medium mb-0.5 flex items-center gap-1 ${
+            isBot ? "text-primary" : isOutbound ? "text-primary-foreground/70" : "text-muted-foreground"
+          }`}>
+            {isBot && <Bot className="h-3 w-3" />}
             {msg.authorName}
           </div>
         )}
         <div className="text-sm whitespace-pre-wrap">{msg.body}</div>
-        <div className={`text-[10px] mt-1 ${isAgent ? "text-primary-foreground/60" : "text-muted-foreground"}`}>
+        <div className={`text-[10px] mt-1 ${
+          isBot ? "text-muted-foreground" : isOutbound ? "text-primary-foreground/60" : "text-muted-foreground"
+        }`}>
           {new Date(msg.sentAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
         </div>
       </div>
