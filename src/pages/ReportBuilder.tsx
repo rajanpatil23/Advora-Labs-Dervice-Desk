@@ -1,6 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { useAppStore, useOrgAgents, useOrgCustomers } from "@/lib/store";
-import { downloadFile } from "@/lib/csv";
+function downloadBlob(filename: string, blob: Blob) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
 import {
   reportsApi,
   applyFilters,
@@ -137,7 +146,7 @@ export default function ReportBuilder() {
   function runNow(tpl: ReportTemplate, scheduleId?: string) {
     const rows = applyFilters(getRows(tpl.resource), tpl.filters);
     const { blob, ext } = serializeReport(rows, tpl.columns, tpl.format);
-    downloadFile(`${tpl.name.replace(/\s+/g, "_")}.${ext}`, blob);
+    downloadBlob(`${tpl.name.replace(/\s+/g, "_")}.${ext}`, blob);
     const run: ReportRun = {
       id: `run-${Date.now()}`,
       templateId: tpl.id,
