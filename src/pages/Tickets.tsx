@@ -719,6 +719,7 @@ function SelectMenu<T extends string>({ label, value, options, onChange }: { lab
 
 function AssigneeMenu({ value, onChange }: { value?: string; onChange: (id: string | undefined) => void }) {
   const [open, setOpen] = useState(false);
+  const orgAgents = useOrgAgents();
   const a = value ? findAgent(value) : null;
   return (
     <div className="relative">
