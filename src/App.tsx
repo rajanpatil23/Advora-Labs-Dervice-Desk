@@ -63,6 +63,7 @@ import Escalations from "./pages/Escalations";
 import UnifiedInbox from "./pages/UnifiedInbox";
 import Customer360 from "./pages/Customer360";
 import Scheduling from "./pages/Scheduling";
+import CannedResponses from "./pages/CannedResponses";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -128,6 +129,7 @@ const App = () => (
                 <Route path="inbox" element={<UnifiedInbox />} />
                 <Route path="customers" element={<Customer360 />} />
                 <Route path="scheduling" element={<Scheduling />} />
+                <Route path="canned" element={<CannedResponses />} />
               </Route>
             </Route>
 
