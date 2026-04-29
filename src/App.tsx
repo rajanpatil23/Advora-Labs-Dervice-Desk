@@ -44,6 +44,7 @@ import PublicSurvey from "./pages/PublicSurvey";
 import CustomFields from "./pages/CustomFields";
 import Branding from "./pages/Branding";
 import Notifications from "./pages/Notifications";
+import SavedViews from "./pages/SavedViews";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -90,6 +91,7 @@ const App = () => (
                 <Route path="fields" element={<CustomFields />} />
                 <Route path="branding" element={<Branding />} />
                 <Route path="notifications" element={<Notifications />} />
+                <Route path="views" element={<SavedViews />} />
               </Route>
             </Route>
 
