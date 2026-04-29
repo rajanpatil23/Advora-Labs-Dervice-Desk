@@ -21,6 +21,7 @@ import KnowledgeBase from "./pages/KnowledgeBase";
 import Reports from "./pages/Reports";
 import Logs from "./pages/Logs";
 import Settings from "./pages/Settings";
+import Platform from "./pages/Platform";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -40,6 +41,7 @@ const App = () => (
             <Route path="/invite" element={<AcceptInvite />} />
 
             <Route element={<ProtectedRoute />}>
+              <Route path="/platform" element={<Platform />} />
               <Route path="/app" element={<AppLayout />}>
                 <Route index element={<Tickets />} />
                 <Route path="dashboard" element={<Dashboard />} />

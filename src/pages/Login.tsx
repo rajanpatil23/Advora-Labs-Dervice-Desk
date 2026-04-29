@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Sparkles, ArrowRight, Loader2 } from "lucide-react";
 import { authApi } from "@/lib/api/auth";
 import { useAuth } from "@/contexts/AuthContext";
-import { SEED_USERS } from "@/lib/api/seedUsers";
+import { SEED_USERS, SEED_PLATFORM_ADMINS } from "@/lib/api/seedUsers";
 import { toast } from "sonner";
 
 export default function Login() {
@@ -22,7 +22,10 @@ export default function Login() {
       const session = await authApi.login(email, password);
       setSession(session);
       toast.success(`Welcome back, ${session.user.full_name}`);
-      nav(redirect, { replace: true });
+      const dest = session.user.platform_role && session.memberships.length === 0
+        ? "/platform"
+        : redirect;
+      nav(dest, { replace: true });
     } catch (err) {
       toast.error((err as Error).message || "Sign in failed");
     } finally {
@@ -107,7 +110,11 @@ export default function Login() {
                   className="flex items-center justify-between text-xs px-2.5 py-1.5 rounded-md hover:bg-surface-2 transition-colors text-left"
                 >
                   <span className="font-mono">{u.email}</span>
-                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground">{u.memberships.map(m => m.role).join(" / ")}</span>
+                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground">{
+                    SEED_PLATFORM_ADMINS.find(p => p.user_id === u.id)?.role
+                    || u.memberships.map(m => m.role).join(" / ")
+                    || "—"
+                  }</span>
                 </button>
               ))}
             </div>

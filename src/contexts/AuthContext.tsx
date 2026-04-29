@@ -1,8 +1,8 @@
 import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from "react";
-import { authApi, type AuthUser, type Membership, type AppRole, type Session } from "@/lib/api/auth";
+import { authApi, type AuthUser, type Membership, type AppRole, type PlatformRole, type Session } from "@/lib/api/auth";
 import { tokenStore } from "@/lib/api/client";
 
-export type { AppRole, AuthUser, Membership };
+export type { AppRole, PlatformRole, AuthUser, Membership };
 
 interface AuthCtx {
   user: AuthUser | null;
@@ -11,6 +11,8 @@ interface AuthCtx {
   currentOrgId: string | null;
   currentMembership: Membership | null;
   currentRole: AppRole | null;
+  platformRole: PlatformRole | null;
+  isPlatformAdmin: boolean;
   loading: boolean;
   refresh: () => Promise<void>;
   signOut: () => Promise<void>;
@@ -81,6 +83,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const currentMembership = memberships.find((m) => m.org_id === currentOrgId) ?? null;
   const currentRole = currentMembership?.role ?? null;
+  const platformRole = user?.platform_role ?? null;
+  const isPlatformAdmin = !!platformRole;
 
   const hasRole = useCallback(
     (...roles: AppRole[]) => (currentRole ? roles.includes(currentRole) : false),
@@ -96,6 +100,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         currentOrgId,
         currentMembership,
         currentRole,
+        platformRole,
+        isPlatformAdmin,
         loading,
         refresh,
         signOut,

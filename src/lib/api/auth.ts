@@ -1,7 +1,7 @@
 import { apiCall, tokenStore } from "./client";
-import type { AppRole } from "./seedUsers";
+import type { AppRole, PlatformRole } from "./seedUsers";
 
-export type { AppRole };
+export type { AppRole, PlatformRole };
 
 export interface AuthUser {
   id: string;
@@ -9,6 +9,7 @@ export interface AuthUser {
   full_name: string;
   avatar_color: string;
   initials: string;
+  platform_role: PlatformRole | null;
 }
 
 export interface Membership {
