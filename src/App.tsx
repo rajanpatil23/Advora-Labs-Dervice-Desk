@@ -46,6 +46,7 @@ import Branding from "./pages/Branding";
 import Notifications from "./pages/Notifications";
 import SavedViews from "./pages/SavedViews";
 import BulkActions from "./pages/BulkActions";
+import ImportExport from "./pages/ImportExport";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -94,6 +95,7 @@ const App = () => (
                 <Route path="notifications" element={<Notifications />} />
                 <Route path="views" element={<SavedViews />} />
                 <Route path="bulk" element={<BulkActions />} />
+                <Route path="data" element={<ImportExport />} />
               </Route>
             </Route>
 
