@@ -186,6 +186,70 @@ export async function mockHandlers<T>(req: ApiRequest): Promise<T> {
     return json({ current_org_id: org_id }) as Promise<T>;
   }
 
+  // ---------- Platform (SaaS operator) endpoints ----------
+  if (route === "GET /platform/orgs") {
+    requirePlatform();
+    const result = SEED_ORGS.map((o) => {
+      const memberCount = SEED_USERS.filter((u) => u.memberships.some((m) => m.org_id === o.id)).length;
+      return { ...o, member_count: memberCount };
+    });
+    return json(result) as Promise<T>;
+  }
+
+  if (route === "POST /platform/orgs/suspend") {
+    const actor = requirePlatform("super_admin");
+    const { org_id, reason } = (body as { org_id: string; reason?: string }) ?? {};
+    const org = SEED_ORGS.find((o) => o.id === org_id);
+    if (!org) err(404, "Org not found");
+    org!.status = "suspended";
+    org!.suspended_at = new Date().toISOString();
+    org!.suspended_reason = reason ?? null;
+    logAudit(actor.id, "org.suspend", { target_org_id: org_id, metadata: { reason } });
+    return json(org!) as Promise<T>;
+  }
+
+  if (route === "POST /platform/orgs/resume") {
+    const actor = requirePlatform("super_admin");
+    const { org_id } = (body as { org_id: string }) ?? {};
+    const org = SEED_ORGS.find((o) => o.id === org_id);
+    if (!org) err(404, "Org not found");
+    org!.status = "active";
+    org!.suspended_at = null;
+    org!.suspended_reason = null;
+    logAudit(actor.id, "org.resume", { target_org_id: org_id });
+    return json(org!) as Promise<T>;
+  }
+
+  if (route === "GET /platform/admins") {
+    requirePlatform();
+    const result = SEED_PLATFORM_ADMINS.filter((p) => p.is_active).map((p) => {
+      const u = getUser(p.user_id);
+      return { ...p, email: u?.email ?? "", full_name: u?.full_name ?? "", initials: u?.initials ?? "", avatar_color: u?.avatar_color ?? "#888" };
+    });
+    return json(result) as Promise<T>;
+  }
+
+  if (route === "GET /platform/audit") {
+    requirePlatform();
+    const result = SEED_AUDIT_LOG.slice(0, 100).map((e) => {
+      const actor = getUser(e.actor_id);
+      const org = e.target_org_id ? getOrg(e.target_org_id) : null;
+      return { ...e, actor_name: actor?.full_name ?? e.actor_id, actor_email: actor?.email ?? "", target_org_name: org?.name ?? null };
+    });
+    return json(result) as Promise<T>;
+  }
+
+  if (route === "GET /platform/stats") {
+    requirePlatform();
+    const total_orgs = SEED_ORGS.length;
+    const active_orgs = SEED_ORGS.filter((o) => o.status === "active").length;
+    const suspended_orgs = total_orgs - active_orgs;
+    const total_users = SEED_USERS.filter((u) => u.memberships.length > 0).length;
+    const total_memberships = SEED_USERS.reduce((acc, u) => acc + u.memberships.length, 0);
+    const by_plan = SEED_ORGS.reduce<Record<string, number>>((acc, o) => { acc[o.plan] = (acc[o.plan] || 0) + 1; return acc; }, {});
+    return json({ total_orgs, active_orgs, suspended_orgs, total_users, total_memberships, by_plan }) as Promise<T>;
+  }
+
   if (route === "GET /health") {
     return json({ status: "ok", mode: "mock" }) as Promise<T>;
   }
