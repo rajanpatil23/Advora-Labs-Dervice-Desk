@@ -575,6 +575,46 @@ export default function Tickets() {
                 </div>
               </Section>
 
+              <Section title={`Watchers · ${selected.watcherIds?.length ?? 0}`}>
+                <div className="space-y-1.5">
+                  {(selected.watcherIds ?? []).length === 0 && (
+                    <div className="text-[11px] text-muted-foreground">No watchers yet. Watchers get notified on every reply or status change.</div>
+                  )}
+                  {(selected.watcherIds ?? []).map((wid) => {
+                    const w = findUser(wid) ?? findAgent(wid);
+                    if (!w) return null;
+                    return (
+                      <div key={wid} className="flex items-center gap-2 text-[11px]">
+                        <Avatar initials={w.initials} color={w.avatarColor} size={20} />
+                        <span className="flex-1 truncate">{w.name}</span>
+                        {canManage && (
+                          <button onClick={() => toggleWatcher(selected.id, wid)} className="text-muted-foreground hover:text-destructive p-0.5"><X className="h-3 w-3" /></button>
+                        )}
+                      </div>
+                    );
+                  })}
+                  {canManage && (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button className="mt-1 text-[11px] px-2 py-1 rounded-md border border-dashed border-border text-muted-foreground hover:text-foreground hover:border-foreground/40 flex items-center gap-1">
+                          <Plus className="h-3 w-3" /> Add watcher
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="start" className="w-56 max-h-72 overflow-y-auto">
+                        {orgAgents
+                          .filter((a) => !(selected.watcherIds ?? []).includes(a.id))
+                          .map((a) => (
+                            <DropdownMenuItem key={a.id} onClick={() => toggleWatcher(selected.id, a.id)}>
+                              <Avatar initials={a.initials} color={a.avatarColor} size={18} />
+                              <span className="ml-2 truncate">{a.name}</span>
+                            </DropdownMenuItem>
+                          ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
+                </div>
+              </Section>
+
               {selected.attachments && selected.attachments.length > 0 && (
                 <Section title="Attachments">
                   {selected.attachments.map(a => (
