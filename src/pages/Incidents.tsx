@@ -4,12 +4,14 @@ import { timeAgo } from "@/lib/format";
 import { AlertOctagon, Activity, ShieldAlert, Layers, Server } from "lucide-react";
 import { NewIncidentDialog } from "@/components/dialogs/NewIncidentDialog";
 import { toast } from "sonner";
+import type { Incident } from "@/lib/types";
 
 const sevColors: Record<number, string> = { 1: "bg-destructive text-destructive-foreground", 2: "bg-accent text-accent-foreground", 3: "bg-warning text-warning-foreground", 4: "bg-info text-info-foreground" };
 const statusColor: Record<string,string> = { investigating: "bg-destructive/10 text-destructive", identified: "bg-warning/10 text-warning", monitoring: "bg-info/10 text-info", resolved: "bg-success/10 text-success" };
+const statusOrder: Incident["status"][] = ["investigating", "identified", "monitoring", "resolved"];
 
 export default function Incidents() {
-  const { incidents } = useAppStore();
+  const { incidents, setIncidentStatus } = useAppStore();
   return (
     <div className="h-full overflow-y-auto">
       <div className="px-6 lg:px-8 py-6 max-w-[1600px] mx-auto space-y-6">
