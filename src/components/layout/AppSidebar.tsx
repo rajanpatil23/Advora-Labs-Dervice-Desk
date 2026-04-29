@@ -91,6 +91,7 @@ export function AppSidebar() {
   const [collapsed, setCollapsed] = useState(true);
   const { tickets, incidents } = useAppStore();
   const { currentRole, signOut } = useAuth();
+  const t = useT();
 
   const counts = {
     openTickets: tickets.filter((t) => t.status !== "resolved" && t.status !== "closed").length,
@@ -143,7 +144,7 @@ export function AppSidebar() {
         {visibleSections.map((section, idx) => (
           <div key={section.label} className={collapsed && idx > 0 ? "pt-1 mt-1 border-t border-sidebar-border/40" : ""}>
             {!collapsed && (
-              <div className="px-2 pb-1.5 text-[10px] uppercase tracking-wider text-sidebar-foreground/50">{section.label}</div>
+              <div className="px-2 pb-1.5 text-[10px] uppercase tracking-wider text-sidebar-foreground/50">{section.i18nKey ? t(section.i18nKey) : section.label}</div>
             )}
             <div className="space-y-0.5">
               {section.items.map((it) => {
@@ -156,7 +157,7 @@ export function AppSidebar() {
                     key={it.to}
                     to={it.to}
                     end={it.end}
-                    title={collapsed ? it.label : undefined}
+                    title={collapsed ? (it.i18nKey ? t(it.i18nKey) : it.label) : undefined}
                     className={cn(
                       "group flex items-center rounded-lg text-sm font-medium transition-all relative",
                       collapsed ? "justify-center h-10 w-10 mx-auto" : "gap-3 px-3 py-2",
@@ -169,7 +170,7 @@ export function AppSidebar() {
                     <Icon className={cn("h-4 w-4 shrink-0", active ? "text-sidebar-primary" : "")} />
                     {!collapsed && (
                       <>
-                        <span className="flex-1">{it.label}</span>
+                        <span className="flex-1">{it.i18nKey ? t(it.i18nKey) : it.label}</span>
                         {showBadge && (
                           <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-md bg-sidebar-primary/15 text-sidebar-primary tabular-nums">
                             {badge}
@@ -202,14 +203,14 @@ export function AppSidebar() {
       <div className={cn("pb-3", collapsed ? "px-2" : "px-3")}>
         <button
           onClick={handleSignOut}
-          title={collapsed ? "Sign out" : undefined}
+          title={collapsed ? t("common.signOut") : undefined}
           className={cn(
             "w-full flex items-center rounded-lg text-xs text-sidebar-foreground/70 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground transition-colors",
             collapsed ? "justify-center h-10 w-10 mx-auto" : "gap-2 px-3 py-2"
           )}
         >
           <LogOut className="h-3.5 w-3.5" />
-          {!collapsed && <span>Sign out</span>}
+          {!collapsed && <span>{t("common.signOut")}</span>}
         </button>
       </div>
     </aside>
