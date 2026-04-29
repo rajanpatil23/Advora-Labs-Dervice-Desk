@@ -33,6 +33,7 @@ import Reports from "./pages/Reports";
 import Logs from "./pages/Logs";
 import Settings from "./pages/Settings";
 import Platform from "./pages/Platform";
+import Approvals from "./pages/Approvals";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
