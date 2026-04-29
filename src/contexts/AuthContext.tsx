@@ -1,29 +1,32 @@
 import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from "react";
-import { authApi, type AuthUser, type Membership, type AppRole } from "@/lib/api/auth";
+import { authApi, type AuthUser, type Membership, type AppRole, type Session } from "@/lib/api/auth";
 import { tokenStore } from "@/lib/api/client";
 
-export type { AppRole };
+export type { AppRole, AuthUser, Membership };
 
 interface AuthCtx {
   user: AuthUser | null;
-  profile: AuthUser | null; // alias for backwards compat with existing components
+  profile: AuthUser | null; // alias
   memberships: Membership[];
   currentOrgId: string | null;
+  currentMembership: Membership | null;
   currentRole: AppRole | null;
   loading: boolean;
   refresh: () => Promise<void>;
   signOut: () => Promise<void>;
   switchOrg: (orgId: string) => Promise<void>;
   hasRole: (...roles: AppRole[]) => boolean;
-  // Called by Login / SignUp pages after a successful auth call
-  setSessionUser: (user: AuthUser) => void;
+  setSession: (s: Session) => void;
 }
 
 const Ctx = createContext<AuthCtx | undefined>(undefined);
 
+const CURRENT_ORG_KEY = "connecttly.auth.current_org";
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [memberships, setMemberships] = useState<Membership[]>([]);
+  const [currentOrgId, setCurrentOrgId] = useState<string | null>(localStorage.getItem(CURRENT_ORG_KEY));
   const [loading, setLoading] = useState(true);
 
   const loadAll = useCallback(async () => {
@@ -31,10 +34,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const [me, mems] = await Promise.all([authApi.me(), authApi.memberships()]);
       setUser(me);
       setMemberships(mems);
+      const stored = localStorage.getItem(CURRENT_ORG_KEY);
+      const next = stored && mems.some((m) => m.org_id === stored) ? stored : mems[0]?.org_id ?? null;
+      setCurrentOrgId(next);
+      if (next) localStorage.setItem(CURRENT_ORG_KEY, next);
     } catch {
       setUser(null);
       setMemberships([]);
+      setCurrentOrgId(null);
       tokenStore.clear();
+      localStorage.removeItem(CURRENT_ORG_KEY);
     }
   }, []);
 
@@ -46,40 +55,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     loadAll().finally(() => setLoading(false));
   }, [loadAll]);
 
-  const setSessionUser = useCallback((u: AuthUser) => {
-    setUser(u);
-    setMemberships([
-      {
-        id: `mem_${u.id}`,
-        org_id: u.org_id,
-        org_name: u.org_name,
-        role: u.role,
-        team_id: u.team_id,
-        team_name: u.team_name,
-        is_active: true,
-      },
-    ]);
+  const setSession = useCallback((s: Session) => {
+    setUser(s.user);
+    setMemberships(s.memberships);
+    setCurrentOrgId(s.current_org_id);
+    localStorage.setItem(CURRENT_ORG_KEY, s.current_org_id);
   }, []);
 
-  const refresh = useCallback(async () => {
-    await loadAll();
-  }, [loadAll]);
+  const refresh = useCallback(async () => { await loadAll(); }, [loadAll]);
 
   const signOut = useCallback(async () => {
-    try { await authApi.logout(); } catch { /* ignore */ }
-    tokenStore.clear();
+    await authApi.logout();
     setUser(null);
     setMemberships([]);
+    setCurrentOrgId(null);
+    localStorage.removeItem(CURRENT_ORG_KEY);
   }, []);
 
-  const switchOrg = useCallback(async (_orgId: string) => {
-    // Single-org demo; refresh to keep API parity.
-    await refresh();
-  }, [refresh]);
+  const switchOrg = useCallback(async (orgId: string) => {
+    if (!memberships.some((m) => m.org_id === orgId)) throw new Error("Not a member of that workspace");
+    await authApi.switchOrg(orgId);
+    setCurrentOrgId(orgId);
+    localStorage.setItem(CURRENT_ORG_KEY, orgId);
+  }, [memberships]);
 
-  const currentOrgId = user?.org_id ?? memberships[0]?.org_id ?? null;
-  const currentRole =
-    memberships.find((m) => m.org_id === currentOrgId)?.role ?? user?.role ?? null;
+  const currentMembership = memberships.find((m) => m.org_id === currentOrgId) ?? null;
+  const currentRole = currentMembership?.role ?? null;
 
   const hasRole = useCallback(
     (...roles: AppRole[]) => (currentRole ? roles.includes(currentRole) : false),
@@ -93,13 +94,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         profile: user,
         memberships,
         currentOrgId,
+        currentMembership,
         currentRole,
         loading,
         refresh,
         signOut,
         switchOrg,
         hasRole,
-        setSessionUser,
+        setSession,
       }}
     >
       {children}
