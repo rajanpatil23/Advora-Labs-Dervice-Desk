@@ -65,6 +65,7 @@ const SECTIONS: NavSection[] = [
     label: "Organization",
     items: [
       { to: "/app/settings",   label: "Settings",         icon: Settings,        roles: ["owner", "admin"] },
+      { to: "/app/fields",     label: "Custom Fields",    icon: ListChecks,      roles: ["owner", "admin"] },
       { to: "/app/billing",    label: "Billing & Plan",   icon: CreditCard,      roles: ["owner"] },
       { to: "/app/security",   label: "Security",         icon: ShieldCheck,     roles: ["owner", "admin"] },
       { to: "/app/integrations", label: "Integrations",   icon: Plug,            roles: ["owner", "admin"] },
