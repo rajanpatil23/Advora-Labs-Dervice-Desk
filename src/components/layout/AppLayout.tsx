@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom";
 import { AppSidebar } from "./AppSidebar";
 import { Topbar } from "./Topbar";
+import { ShortcutsDialog } from "@/components/common/ShortcutsDialog";
 import { useOrgSync } from "@/lib/store";
 
 export function AppLayout() {
@@ -14,6 +15,7 @@ export function AppLayout() {
           <Outlet />
         </main>
       </div>
+      <ShortcutsDialog />
     </div>
   );
 }
