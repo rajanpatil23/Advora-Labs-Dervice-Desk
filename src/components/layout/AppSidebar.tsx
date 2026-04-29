@@ -55,6 +55,7 @@ const SECTIONS: NavSection[] = [
       { to: "/app/canned",     label: "Canned responses", icon: MessageSquareQuote,                            roles: ["owner", "admin", "manager", "agent", "resolver"] },
       { to: "/app/links",      label: "Links & merges",   icon: GitMerge,                                      roles: ["owner", "admin", "manager", "agent", "resolver"] },
       { to: "/app/kb",         label: "Knowledge Base",   i18nKey: "nav.knowledge",     icon: BookOpen },
+      { to: "/app/kb-search",  label: "AI KB search",     icon: BookOpenCheck,                                 roles: ["owner", "admin", "manager", "agent", "resolver"] },
     ],
   },
   {
