@@ -162,7 +162,7 @@ export default function Macros() {
                 {m.assignee?.kind === "current_user" && <Chip>Assign: me</Chip>}
                 {m.assignee?.kind === "unassign" && <Chip>Unassign</Chip>}
                 {m.assignee?.kind === "specific" && (
-                  <Chip>Assign: {orgAgents.find((a) => a.id === m.assignee?.kind === "specific" && (m.assignee as any).agentId)?.name ?? "agent"}</Chip>
+                  <Chip>Assign: {m.assignee.kind === "specific" ? (orgAgents.find((a) => a.id === (m.assignee as any).agentId)?.name ?? "agent") : "agent"}</Chip>
                 )}
                 {(m.addTags ?? []).map((t) => <Chip key={"+" + t}><Tag className="h-2.5 w-2.5 mr-0.5" />+{t}</Chip>)}
                 {(m.removeTags ?? []).map((t) => <Chip key={"-" + t}><Tag className="h-2.5 w-2.5 mr-0.5" />-{t}</Chip>)}
