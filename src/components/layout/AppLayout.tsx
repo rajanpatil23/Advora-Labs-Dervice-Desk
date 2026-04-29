@@ -5,6 +5,7 @@ import { MobileNav } from "./MobileNav";
 import { ShortcutsDialog } from "@/components/common/ShortcutsDialog";
 import { CommandPalette } from "@/components/common/CommandPalette";
 import { ProductTour } from "@/components/common/ProductTour";
+import { NotificationBridge } from "@/components/common/NotificationBridge";
 import { useOrgSync } from "@/lib/store";
 
 export function AppLayout() {
@@ -22,6 +23,7 @@ export function AppLayout() {
       <ShortcutsDialog />
       <CommandPalette />
       <ProductTour />
+      <NotificationBridge />
     </div>
   );
 }

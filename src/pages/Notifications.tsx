@@ -12,11 +12,18 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import {
   Bell, BellOff, Mail, MessageSquare, Inbox, Moon, Clock, AtSign, Slack as SlackIcon,
+  Volume2, VolumeX, Monitor, Play,
 } from "lucide-react";
 import {
   EVENT_DEFINITIONS, MUTE_PRESETS, isMuted, readPrefs, writePrefs, defaultPrefs,
   type Channel, type DigestFrequency, type NotificationPrefs, type NotificationEventKey,
 } from "@/lib/api/notifications";
+import {
+  SOUND_PACKS, readFeedback, writeFeedback, defaultFeedback, previewSound, previewDesktop,
+  requestDesktopPermission, desktopPermission,
+  type FeedbackPrefs, type SoundPack,
+} from "@/lib/api/notificationEngine";
+import { Slider } from "@/components/ui/slider";
 
 const CHANNEL_META: { key: Channel; label: string; icon: typeof Inbox }[] = [
   { key: "inApp", label: "In-app", icon: Inbox },
@@ -38,11 +45,33 @@ export default function Notifications() {
   const userId = (user as any).id ?? "anon";
 
   const [prefs, setPrefsState] = useState<NotificationPrefs>(() => readPrefs(userId));
+  const [feedback, setFeedbackState] = useState<FeedbackPrefs>(() => readFeedback(userId));
+  const [perm, setPerm] = useState<NotificationPermission | "unsupported">(() => desktopPermission());
 
   const update = (patch: Partial<NotificationPrefs>) => {
     const next = { ...prefs, ...patch };
     setPrefsState(next);
     writePrefs(userId, next);
+  };
+
+  const updateFeedback = (patch: Partial<FeedbackPrefs>) => {
+    const next = { ...feedback, ...patch };
+    setFeedbackState(next);
+    writeFeedback(userId, next);
+  };
+
+  const enableDesktop = async () => {
+    const result = await requestDesktopPermission();
+    setPerm(result);
+    if (result === "granted") {
+      updateFeedback({ desktopEnabled: true });
+      previewDesktop("Desktop notifications enabled", "You'll see alerts here when the app is in the background.");
+      toast.success("Desktop notifications enabled");
+    } else if (result === "denied") {
+      toast.error("Permission denied", { description: "Enable notifications in your browser settings." });
+    } else if (result === "unsupported") {
+      toast.error("Not supported in this browser");
+    }
   };
 
   const toggleMatrix = (key: NotificationEventKey, channel: Channel, value: boolean) => {
@@ -148,6 +177,132 @@ export default function Notifications() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Sound & Desktop */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Volume2 className="h-4 w-4 text-primary" /> Sound & desktop alerts
+          </CardTitle>
+          <CardDescription>How notifications get your attention in the browser.</CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-6 md:grid-cols-2">
+          {/* Sound */}
+          <div className="space-y-3 rounded-lg border bg-card p-4">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="snd" className="flex items-center gap-2">
+                {feedback.soundEnabled ? <Volume2 className="h-4 w-4 text-primary" /> : <VolumeX className="h-4 w-4 text-muted-foreground" />}
+                Play sound on new notification
+              </Label>
+              <Switch
+                id="snd"
+                checked={feedback.soundEnabled}
+                onCheckedChange={(v) => updateFeedback({ soundEnabled: v })}
+              />
+            </div>
+
+            <div>
+              <Label className="text-xs text-muted-foreground">Sound pack</Label>
+              <Select
+                value={feedback.soundPack}
+                onValueChange={(v) => updateFeedback({ soundPack: v as SoundPack })}
+                disabled={!feedback.soundEnabled}
+              >
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {SOUND_PACKS.map((p) => (
+                    <SelectItem key={p.value} value={p.value}>
+                      <span className="font-medium">{p.label}</span>
+                      <span className="text-muted-foreground ml-2 text-xs">— {p.description}</span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label className="text-xs text-muted-foreground">
+                Volume · {Math.round(feedback.soundVolume * 100)}%
+              </Label>
+              <Slider
+                value={[feedback.soundVolume * 100]}
+                onValueChange={([v]) => updateFeedback({ soundVolume: v / 100 })}
+                min={0} max={100} step={5}
+                disabled={!feedback.soundEnabled}
+                className="mt-2"
+              />
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              {(["low", "med", "high"] as const).map((sev) => (
+                <Button
+                  key={sev}
+                  size="sm"
+                  variant="outline"
+                  disabled={!feedback.soundEnabled || feedback.soundPack === "off"}
+                  onClick={() => previewSound(feedback.soundPack, sev, feedback.soundVolume)}
+                >
+                  <Play className="h-3 w-3 mr-1.5" /> Preview {sev}
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          {/* Desktop */}
+          <div className="space-y-3 rounded-lg border bg-card p-4">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="desk" className="flex items-center gap-2">
+                <Monitor className="h-4 w-4 text-primary" /> Desktop notifications
+              </Label>
+              <Switch
+                id="desk"
+                checked={feedback.desktopEnabled && perm === "granted"}
+                onCheckedChange={(v) => {
+                  if (v && perm !== "granted") {
+                    void enableDesktop();
+                  } else {
+                    updateFeedback({ desktopEnabled: v });
+                  }
+                }}
+                disabled={perm === "unsupported" || perm === "denied"}
+              />
+            </div>
+
+            <p className="text-xs text-muted-foreground">
+              Pop-ups appear when this tab is in the background. Sound is controlled separately.
+            </p>
+
+            <div className="flex items-center gap-2">
+              <Badge
+                variant="secondary"
+                className={
+                  perm === "granted" ? "bg-emerald-500/15 text-emerald-600 border-emerald-500/30"
+                  : perm === "denied" ? "bg-destructive/15 text-destructive border-destructive/30"
+                  : perm === "unsupported" ? "" : "bg-amber-500/15 text-amber-600 border-amber-500/30"
+                }
+              >
+                Permission: {perm}
+              </Badge>
+              {perm !== "granted" && perm !== "unsupported" && (
+                <Button size="sm" variant="outline" onClick={enableDesktop}>
+                  Enable in browser
+                </Button>
+              )}
+              {perm === "granted" && (
+                <Button size="sm" variant="outline" onClick={() => previewDesktop()}>
+                  <Play className="h-3 w-3 mr-1.5" /> Preview
+                </Button>
+              )}
+            </div>
+
+            {perm === "denied" && (
+              <p className="text-[11px] text-muted-foreground">
+                Permission was blocked. Re-enable it from your browser's site settings, then return here.
+              </p>
+            )}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Channels */}
       <Card>
