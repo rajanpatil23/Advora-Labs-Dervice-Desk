@@ -1,10 +1,10 @@
-import { useAppStore, findUser, agents } from "@/lib/store";
-import { catalog } from "@/lib/mockData";
+import { useAppStore, findUser, useOrgCatalog } from "@/lib/store";
 import { Avatar } from "@/components/common/Chips";
 import { timeAgo } from "@/lib/format";
 import * as Icons from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 
 const statusChip: Record<string,string> = {
   submitted: "bg-info/10 text-info",
@@ -15,18 +15,14 @@ const statusChip: Record<string,string> = {
 };
 
 export default function Requests() {
-  const { requests, addTicket } = useAppStore();
+  const { requests, addServiceRequest, advanceServiceRequest } = useAppStore();
+  const catalog = useOrgCatalog();
+  const { hasRole } = useAuth();
+  const canAdvance = hasRole("owner", "admin", "manager", "agent");
+
   const requestItem = (item: typeof catalog[number]) => {
-    const t = addTicket({
-      title: `Service request: ${item.title}`,
-      description: item.description,
-      requesterId: "c1",
-      assigneeId: agents[0].id,
-      priority: "medium",
-      category: item.catalog,
-      channel: "portal",
-    });
-    toast.success(`Request submitted as ${t.number}`, { description: `Est. delivery: ${item.estimate}` });
+    const sr = addServiceRequest(item.id);
+    toast.success(`Request submitted as ${sr.number}`, { description: `Est. delivery: ${item.estimate}` });
   };
   return (
     <div className="h-full overflow-y-auto">
@@ -57,42 +53,52 @@ export default function Requests() {
         </div>
 
         <div className="panel overflow-hidden">
-          <div className="px-5 py-4 border-b border-border font-display font-semibold">Active requests</div>
-          <div className="divide-y divide-border">
-            {requests.map(r => {
-              const u = findUser(r.requesterId);
-              return (
-                <div key={r.id} className="px-5 py-4 hover:bg-surface-2/40 transition-colors">
-                  <div className="flex items-center gap-4">
-                    <div className="text-xs font-mono text-muted-foreground w-20 shrink-0">{r.number}</div>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium text-sm">{r.itemTitle}</div>
-                      <div className="text-xs text-muted-foreground flex items-center gap-2 mt-0.5">
-                        {u && <Avatar initials={u.initials} color={u.avatarColor} size={16} />}
-                        <span>{u?.name}</span>
-                        <span>·</span>
-                        <span>Approver: {r.approver}</span>
+          <div className="px-5 py-4 border-b border-border font-display font-semibold">Active requests ({requests.length})</div>
+          {requests.length === 0 ? (
+            <div className="px-5 py-10 text-center text-sm text-muted-foreground">No active requests.</div>
+          ) : (
+            <div className="divide-y divide-border">
+              {requests.map(r => {
+                const u = findUser(r.requesterId);
+                return (
+                  <div key={r.id} className="px-5 py-4 hover:bg-surface-2/40 transition-colors">
+                    <div className="flex items-center gap-4">
+                      <div className="text-xs font-mono text-muted-foreground w-20 shrink-0">{r.number}</div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-sm">{r.itemTitle}</div>
+                        <div className="text-xs text-muted-foreground flex items-center gap-2 mt-0.5">
+                          {u && <Avatar initials={u.initials} color={u.avatarColor} size={16} />}
+                          <span>{u?.name ?? "Unknown"}</span>
+                          <span>·</span>
+                          <span>Approver: {r.approver}</span>
+                        </div>
                       </div>
+                      <span className={cn("text-[11px] font-medium capitalize px-2 py-0.5 rounded", statusChip[r.status])}>{r.status}</span>
+                      <div className="text-xs text-muted-foreground w-20 text-right shrink-0">{timeAgo(r.updatedAt)}</div>
+                      {canAdvance && r.status !== "completed" && r.status !== "rejected" && (
+                        <button
+                          onClick={() => { advanceServiceRequest(r.id); toast.success("Request advanced"); }}
+                          className="text-[10px] px-2 py-1 rounded bg-primary/10 text-primary font-semibold"
+                        >Advance →</button>
+                      )}
                     </div>
-                    <span className={cn("text-[11px] font-medium capitalize px-2 py-0.5 rounded", statusChip[r.status])}>{r.status}</span>
-                    <div className="text-xs text-muted-foreground w-20 text-right shrink-0">{timeAgo(r.updatedAt)}</div>
+                    <div className="mt-3 flex items-center gap-2">
+                      {r.steps.map((s, i) => (
+                        <div key={i} className="flex-1">
+                          <div className={cn("h-1 rounded-full",
+                            s.status === "done" ? "bg-gradient-primary" :
+                            s.status === "current" ? "bg-warning" : "bg-surface-2")} />
+                          <div className={cn("text-[10px] mt-1 uppercase tracking-wider",
+                            s.status === "done" ? "text-primary" :
+                            s.status === "current" ? "text-warning" : "text-muted-foreground")}>{s.name}</div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <div className="mt-3 flex items-center gap-2">
-                    {r.steps.map((s, i) => (
-                      <div key={i} className="flex-1">
-                        <div className={cn("h-1 rounded-full",
-                          s.status === "done" ? "bg-gradient-primary" :
-                          s.status === "current" ? "bg-warning" : "bg-surface-2")} />
-                        <div className={cn("text-[10px] mt-1 uppercase tracking-wider",
-                          s.status === "done" ? "text-primary" :
-                          s.status === "current" ? "text-warning" : "text-muted-foreground")}>{s.name}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
     </div>
